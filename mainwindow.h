@@ -7,6 +7,9 @@
 #include <QColorDialog>
 #include <QListView>
 #include <QTextEdit>
+#include <QVBoxLayout>
+
+#include "dragwidget.h"
 
 
 QT_BEGIN_NAMESPACE

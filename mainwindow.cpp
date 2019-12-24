@@ -14,7 +14,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     //Creates a new textEdit and adds it to the vertical layout.
     QTextEdit* textEdit = new QTextEdit(this);
-    ui->verticalLayout->addWidget(textEdit);
+    DragWidget* dragWidget = new DragWidget(nullptr, textEdit);
+
+    ui->verticalLayout->addWidget(dragWidget);
 }
 
 MainWindow::~MainWindow()
