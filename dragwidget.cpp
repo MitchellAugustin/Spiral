@@ -69,7 +69,7 @@ DragWidget::DragWidget(QWidget *parent, QWidget *child)
     int x = 5;
     int y = 5;
 
-    child = createDragLabel("Label", this);
+//    child = createDragLabel("Label", this);
     child->setParent(this);
     child->move(x, y);
     child->show();
@@ -88,6 +88,7 @@ DragWidget::DragWidget(QWidget *parent, QWidget *child)
 
 void DragWidget::dragEnterEvent(QDragEnterEvent *event)
 {
+    qDebug() << "Drag entered" << endl;
     if (event->mimeData()->hasText()) {
         if (event->source() == this) {
             event->setDropAction(Qt::MoveAction);
@@ -116,12 +117,21 @@ void DragWidget::dropEvent(QDropEvent *event)
         }
 
         for (const QString &piece : pieces) {
-            QLabel *newLabel = createDragLabel(piece, this);
-            newLabel->move(position - hotSpot);
-            newLabel->show();
-            newLabel->setAttribute(Qt::WA_DeleteOnClose);
+            qDebug() << "Piece moved: " << piece << endl;
+            if(piece == "CustomElement") {
+                textbox *newBox = new textbox(this);
+                newBox->move(position - hotSpot);
+                newBox->show();
+                newBox->setAttribute(Qt::WA_DeleteOnClose);
+                position += QPoint(newBox->width(), 0);
+            } else {
+                QLabel *newLabel = createDragLabel(piece, this);
+                newLabel->move(position - hotSpot);
+                newLabel->show();
+                newLabel->setAttribute(Qt::WA_DeleteOnClose);
+                position += QPoint(newLabel->width(), 0);
+            }
 
-            position += QPoint(newLabel->width(), 0);
         }
 
         if (event->source() == this) {
@@ -141,14 +151,15 @@ void DragWidget::dropEvent(QDropEvent *event)
 
 void DragWidget::mousePressEvent(QMouseEvent *event)
 {
-    QLabel *child = qobject_cast<QLabel*>(childAt(event->pos()));
+    QWidget *child = qobject_cast<QWidget*>(childAt(event->pos()));
     if (!child)
         return;
 
     QPoint hotSpot = event->pos() - child->pos();
 
     QMimeData *mimeData = new QMimeData;
-    mimeData->setText(child->text());
+
+    mimeData->setText("CustomElement");
     mimeData->setData(hotSpotMimeDataKey(),
                       QByteArray::number(hotSpot.x()) + ' ' + QByteArray::number(hotSpot.y()));
 

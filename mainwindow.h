@@ -10,6 +10,7 @@
 #include <QVBoxLayout>
 
 #include "dragwidget.h"
+#include "textbox.h"
 
 
 QT_BEGIN_NAMESPACE

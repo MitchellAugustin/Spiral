@@ -53,6 +53,8 @@
 
 #include <QWidget>
 
+#include "textbox.h"
+
 QT_BEGIN_NAMESPACE
 class QDragEnterEvent;
 class QDropEvent;

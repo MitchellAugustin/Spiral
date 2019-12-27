@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui quickwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,11 +18,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     dragwidget.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    textbox.cpp
 
 HEADERS += \
     dragwidget.h \
-    mainwindow.h
+    mainwindow.h \
+    textbox.h
 
 FORMS += \
     mainwindow.ui

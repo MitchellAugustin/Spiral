@@ -13,10 +13,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->browserToolBar->addWidget(ui->sectionsListView);
 
     //Creates a new textEdit and adds it to the vertical layout.
-    QTextEdit* textEdit = new QTextEdit(this);
-    DragWidget* dragWidget = new DragWidget(nullptr, textEdit);
-
-    ui->verticalLayout->addWidget(dragWidget);
+    textbox* tBox = new textbox(this);
+    DragWidget* customDragWidget = new DragWidget(nullptr, tBox);
+    ui->verticalLayout->addWidget(customDragWidget);
 }
 
 MainWindow::~MainWindow()
