@@ -19,61 +19,29 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QFontComboBox" name="fontComboBox">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>214</width>
-      <height>25</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="fontSizeSpinner">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>0</y>
-      <width>62</width>
-      <height>24</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QListView" name="notebooksListView">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>30</y>
-      <width>71</width>
-      <height>192</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QListView" name="sectionsListView">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>230</y>
-      <width>71</width>
-      <height>192</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>80</y>
-      <width>791</width>
-      <height>501</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="sizeConstraint">
-      <enum>QLayout::SetDefaultConstraint</enum>
-     </property>
-    </layout>
-   </widget>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0">
+     <widget class="QListView" name="sectionsListView">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" rowspan="2" colspan="2">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMaximumSize</enum>
+      </property>
+     </layout>
+    </item>
+    <item row="0" column="0">
+     <widget class="QListView" name="notebooksListView">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

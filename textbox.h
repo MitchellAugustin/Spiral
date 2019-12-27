@@ -7,12 +7,15 @@
 #include <QLabel>
 #include <QTextEdit>
 
+#include "mrichtextedit.h"
+
 class textbox : public QWidget
 {
     Q_OBJECT
 public:
     textbox(QWidget *parent = nullptr);
     ~textbox() {}
+    MRichTextEdit* richTextEdit = new MRichTextEdit(this);
 signals:
     void updateFile();
 };

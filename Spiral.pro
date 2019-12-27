@@ -19,15 +19,20 @@ SOURCES += \
     dragwidget.cpp \
     main.cpp \
     mainwindow.cpp \
-    textbox.cpp
+    textbox.cpp \
+    mrichtextedit.cpp \
+    mtextedit.cpp
 
 HEADERS += \
     dragwidget.h \
     mainwindow.h \
-    textbox.h
+    textbox.h \
+    mrichtextedit.h \
+    mtextedit.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    mrichtextedit.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
