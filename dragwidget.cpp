@@ -52,34 +52,30 @@
 
 #include "dragwidget.h"
 
-static QLabel *createDragLabel(const QString &text, QWidget *parent)
-{
-    QLabel *label = new QLabel(text, parent);
-    label->setAutoFillBackground(true);
-    label->setFrameShape(QFrame::Panel);
-    label->setFrameShadow(QFrame::Raised);
-    return label;
+static textbox *createNewTextbox(const QString &htmlText, QWidget *parent) {
+    textbox *tBox = new textbox(parent);
+    tBox->richTextEdit->setHtml(htmlText);
+    return tBox;
 }
 
 static QString hotSpotMimeDataKey() { return QStringLiteral("application/x-hotspot"); }
 
-DragWidget::DragWidget(QWidget *parent, QWidget *child)
+DragWidget::DragWidget(QWidget *parent)
     : QWidget(parent)
 {
+
     int x = 5;
     int y = 5;
 
-//    child = createDragLabel("Label", this);
-    child->setParent(this);
-    child->move(x, y);
-    child->show();
-    child->setAttribute(Qt::WA_DeleteOnClose);
-    x += child->width() + 2;
+    textbox *tBox = createNewTextbox("TextBox", this);
+    tBox->move(x, y);
+    tBox->show();
+    tBox->setAttribute(Qt::WA_DeleteOnClose);
+    x += tBox->width() + 2;
     if (x >= 245) {
         x = 5;
-        y += child->height() + 2;
+        y += tBox->height() + 2;
     }
-
 
     setAcceptDrops(true);
     setMinimumSize(400, qMax(200, y));
@@ -88,7 +84,6 @@ DragWidget::DragWidget(QWidget *parent, QWidget *child)
 
 void DragWidget::dragEnterEvent(QDragEnterEvent *event)
 {
-    qDebug() << "Drag entered" << endl;
     if (event->mimeData()->hasText()) {
         if (event->source() == this) {
             event->setDropAction(Qt::MoveAction);
@@ -115,39 +110,12 @@ void DragWidget::dropEvent(QDropEvent *event)
             hotSpot.setY(hotSpotPos.last().toInt());
         }
 
-        textbox *newBox = new textbox(this);
-        newBox->richTextEdit->setHtml(textString);
-        newBox->move(position - hotSpot);
-        newBox->show();
-        newBox->setAttribute(Qt::WA_DeleteOnClose);
-        position += QPoint(newBox->width(), 0);
+        textbox *tBox = createNewTextbox(textString, this);
+        tBox->move(position - hotSpot);
+        tBox->show();
+        tBox->setAttribute(Qt::WA_DeleteOnClose);
 
-//        for (const QString &piece : pieces) {
-//            qDebug() << "Piece moved: " << piece << endl;
-
-//            textbox *newBox = new textbox(this);
-//            newBox->richTextEdit->setText(piece);
-//            newBox->move(position - hotSpot);
-//            newBox->show();
-//            newBox->setAttribute(Qt::WA_DeleteOnClose);
-//            position += QPoint(newBox->width(), 0);
-
-////            if(piece.contains("CustomElement")) {
-////                textbox *newBox = new textbox(this);
-////                newBox->richTextEdit->setText(piece);
-////                newBox->move(position - hotSpot);
-////                newBox->show();
-////                newBox->setAttribute(Qt::WA_DeleteOnClose);
-////                position += QPoint(newBox->width(), 0);
-////            } else {
-////                QLabel *newLabel = createDragLabel(piece, this);
-////                newLabel->move(position - hotSpot);
-////                newLabel->show();
-////                newLabel->setAttribute(Qt::WA_DeleteOnClose);
-////                position += QPoint(newLabel->width(), 0);
-////            }
-
-//        }
+        position += QPoint(tBox->width(), 0);
 
         if (event->source() == this) {
             event->setDropAction(Qt::MoveAction);
@@ -166,31 +134,21 @@ void DragWidget::dropEvent(QDropEvent *event)
 
 void DragWidget::mousePressEvent(QMouseEvent *event)
 {
-    QWidget *child = qobject_cast<QWidget*>(childAt(event->pos()));
+    textbox *child = qobject_cast<textbox*>(childAt(event->pos()));
     if (!child)
         return;
 
     QPoint hotSpot = event->pos() - child->pos();
 
     QMimeData *mimeData = new QMimeData;
-
-    QString textString;
-    textbox *childText = qobject_cast<textbox*>(childAt(event->pos()));
-    if(childText) {
-        textString = childText->richTextEdit->toHtml();
-    }
-
-    qDebug() << "Setting text: " << textString << endl;
-    mimeData->setText(textString);
+    mimeData->setText(child->richTextEdit->toHtml());
     mimeData->setData(hotSpotMimeDataKey(),
                       QByteArray::number(hotSpot.x()) + ' ' + QByteArray::number(hotSpot.y()));
 
     qreal dpr = window()->windowHandle()->devicePixelRatio();
     QPixmap pixmap(child->size() * dpr);
     pixmap.setDevicePixelRatio(dpr);
-    if(child && !pixmap.isNull()) {
-        child->render(&pixmap);
-    }
+    child->render(&pixmap);
 
     QDrag *drag = new QDrag(this);
     drag->setMimeData(mimeData);
@@ -199,6 +157,6 @@ void DragWidget::mousePressEvent(QMouseEvent *event)
 
     Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
 
-    if (dropAction == Qt::MoveAction && child)
+    if (dropAction == Qt::MoveAction)
         child->close();
 }

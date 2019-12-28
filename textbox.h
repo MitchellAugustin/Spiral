@@ -16,8 +16,6 @@ public:
     textbox(QWidget *parent = nullptr);
     ~textbox() {}
     MRichTextEdit* richTextEdit = new MRichTextEdit(this);
-signals:
-    void updateFile();
 };
 
 #endif // TEXTBOX_H

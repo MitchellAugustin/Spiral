@@ -14,10 +14,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     MainWindow::setWindowTitle("Test Notebook");
     //Creates a new textEdit and adds it to the vertical layout.
-    textbox* tBox = new textbox(this);
-    DragWidget* customDragWidget = new DragWidget(nullptr, tBox);
-
+//    textbox* tBox = new textbox(this);
     QTabWidget *tabWidget = new QTabWidget(this);
+    DragWidget* customDragWidget = new DragWidget(tabWidget);
+
     tabWidget->addTab(customDragWidget, "DragWidgetTab");
 
     ui->verticalLayout->addWidget(tabWidget);
