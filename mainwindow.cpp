@@ -16,9 +16,10 @@ MainWindow::MainWindow(QWidget *parent)
     //Creates a new textEdit and adds it to the vertical layout.
 //    textbox* tBox = new textbox(this);
     QTabWidget *tabWidget = new QTabWidget(this);
-    DragWidget* customDragWidget = new DragWidget(tabWidget);
+//    DragWidget* customDragWidget = new DragWidget(tabWidget);
+    DragLayout* customDragLayout = new DragLayout(this);
 
-    tabWidget->addTab(customDragWidget, "DragWidgetTab");
+    tabWidget->addTab(customDragLayout, "DragLayoutTab");
 
     ui->verticalLayout->addWidget(tabWidget);
 //    ui->toolBar->addWidget(tBox->textEdit);

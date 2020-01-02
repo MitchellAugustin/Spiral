@@ -11,6 +11,7 @@
 #include <QTabWidget>
 
 #include "dragwidget.h"
+#include "draglayout.h"
 #include "textbox.h"
 //#include "breakpad/client/linux/handler/exception_handler.h"
 //#include "breakpad/client/linux/minidump_writer/minidump_writer.h"
