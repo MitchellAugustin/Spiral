@@ -17,7 +17,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     draglayout.cpp \
-    dragwidget.cpp \
     main.cpp \
     mainwindow.cpp \
     textbox.cpp \
@@ -26,7 +25,6 @@ SOURCES += \
 
 HEADERS += \
     draglayout.h \
-    dragwidget.h \
     mainwindow.h \
     textbox.h \
     mrichtextedit.h \

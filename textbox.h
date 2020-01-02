@@ -9,12 +9,12 @@
 
 #include "mrichtextedit.h"
 
-class textbox : public QWidget
+class TextBox : public QWidget
 {
     Q_OBJECT
 public:
-    textbox(QWidget *parent = nullptr);
-    ~textbox() {}
+    TextBox(QWidget *parent = nullptr);
+    ~TextBox() {}
     MRichTextEdit* richTextEdit = new MRichTextEdit(this);
 };
 

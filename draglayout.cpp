@@ -2,20 +2,13 @@
 
 #include <QtWidgets>
 
-static inline QString fridgetMagnetsMimeType() { return QStringLiteral("application/x-fridgemagnet"); }
+static inline QString spiralContentMimeType() { return QStringLiteral("application/x-spiralcontent"); }
 
-static textbox *createNewTextbox(const QString &htmlText, QWidget *parent) {
-    textbox *tBox = new textbox(parent);
-    tBox->richTextEdit->setHtml(htmlText);
-    return tBox;
-}
-//! [0]
-DragLayout::DragLayout(QWidget *parent)
-    : QWidget(parent)
+DragLayout::DragLayout(QWidget *parent) : QWidget(parent)
 {
     int x = 5;
     int y = 5;
-    textbox *tBox = new textbox(this);
+    TextBox *tBox = new TextBox(this);
     tBox->move(x, y);
     tBox->show();
     tBox->setAttribute(Qt::WA_DeleteOnClose);
@@ -25,36 +18,32 @@ DragLayout::DragLayout(QWidget *parent)
         y += tBox->height() + 2;
     }
 
-//! [2] //! [3]
     setAcceptDrops(true);
 }
-//! [3]
 
-//! [4]
+
 void DragLayout::dragEnterEvent(QDragEnterEvent *event)
 {
-//! [4] //! [5]
-    if (event->mimeData()->hasFormat(fridgetMagnetsMimeType())) {
+    //Handles movement of Spiral text boxes
+    if (event->mimeData()->hasFormat(spiralContentMimeType())) {
         if (children().contains(event->source())) {
             event->setDropAction(Qt::MoveAction);
             event->accept();
         } else {
             event->acceptProposedAction();
-//! [5] //! [6]
         }
-//! [6] //! [7]
+      //Handles movement of plain text dropped into the Spiral window
     } else if (event->mimeData()->hasText()) {
         event->acceptProposedAction();
     } else {
         event->ignore();
     }
 }
-//! [7]
 
-//! [8]
+
 void DragLayout::dragMoveEvent(QDragMoveEvent *event)
 {
-    if (event->mimeData()->hasFormat(fridgetMagnetsMimeType())) {
+    if (event->mimeData()->hasFormat(spiralContentMimeType())) {
         if (children().contains(event->source())) {
             event->setDropAction(Qt::MoveAction);
             event->accept();
@@ -67,23 +56,22 @@ void DragLayout::dragMoveEvent(QDragMoveEvent *event)
         event->ignore();
     }
 }
-//! [8]
 
-//! [9]
+
 void DragLayout::dropEvent(QDropEvent *event)
 {
-    if (event->mimeData()->hasFormat(fridgetMagnetsMimeType())) {
+    if (event->mimeData()->hasFormat(spiralContentMimeType())) {
         const QMimeData *mime = event->mimeData();
-//! [9] //! [10]
-        QByteArray itemData = mime->data(fridgetMagnetsMimeType());
+
+        QByteArray itemData = mime->data(spiralContentMimeType());
         QDataStream dataStream(&itemData, QIODevice::ReadOnly);
 
         QString text;
         QPoint offset;
         dataStream >> text >> offset;
-//! [10]
-//! [11]
-        textbox *tBox = new textbox(this);
+
+
+        TextBox *tBox = new TextBox(this);
         tBox->richTextEdit->setText(text);
         tBox->move(event->pos() - offset);
         tBox->show();
@@ -95,9 +83,9 @@ void DragLayout::dropEvent(QDropEvent *event)
         } else {
             event->acceptProposedAction();
         }
-//! [11] //! [12]
+
     } else if (event->mimeData()->hasText()) {
-        textbox *tBox = new textbox(this);
+        TextBox *tBox = new TextBox(this);
         tBox->richTextEdit->setText(event->mimeData()->text());
         tBox->move(event->pos());
         tBox->show();
@@ -108,14 +96,12 @@ void DragLayout::dropEvent(QDropEvent *event)
         event->ignore();
     }
 }
-//! [12]
 
-//! [13]
+
+
 void DragLayout::mousePressEvent(QMouseEvent *event)
 {
-//! [13]
-//! [14]
-    textbox *child = static_cast<textbox*>(childAt(event->pos()));
+    TextBox *child = static_cast<TextBox*>(childAt(event->pos()));
     if (!child)
         return;
 
@@ -124,26 +110,22 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
     QByteArray itemData;
     QDataStream dataStream(&itemData, QIODevice::WriteOnly);
     dataStream << child->richTextEdit->toHtml() << QPoint(hotSpot);
-//! [14]
 
-//! [15]
+
     QMimeData *mimeData = new QMimeData;
-    mimeData->setData(fridgetMagnetsMimeType(), itemData);
+    mimeData->setData(spiralContentMimeType(), itemData);
     mimeData->setText(child->richTextEdit->toHtml());
-//! [15]
 
-//! [16]
+
     QDrag *drag = new QDrag(this);
     drag->setMimeData(mimeData);
     drag->setHotSpot(hotSpot);
 
     child->hide();
-//! [16]
 
-//! [17]
+
     if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction)
         child->close();
     else
         child->show();
 }
-//! [17]
