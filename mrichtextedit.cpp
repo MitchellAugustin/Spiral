@@ -22,6 +22,8 @@
 */
 
 #include "mrichtextedit.h"
+#include "textbox.h"
+#include "draglayout.h"
 #include <QApplication>
 #include <QClipboard>
 #include <QMimeData>
@@ -39,7 +41,15 @@
 #include <QMenu>
 #include <QDialog>
 
+
 int MRichTextEdit::getHeight() {
+    //Note: I cannot delete the parent element here, so to prevent a memory leak, I still clear the document().
+    //However, it just sets the height to 0, so the TextBox will still "exist," but will be invisible until
+    //interacted with, at which point it will be properly deleted.
+    if(toPlainText().isEmpty()) {
+        document()->clear();
+        return 0;
+    }
     QTextDocument *doc = document();
     QAbstractTextDocumentLayout *layout = doc->documentLayout();
     int h = 45;
@@ -474,6 +484,11 @@ void MRichTextEdit::slotCursorPositionChanged() {
         }
 
     resize(width(), getHeight());
+    TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
+    if(parentTextBox) {
+        qDebug() << "Resizing parent TextBox";
+        parentTextBox->resize(width(), getHeight() + 45);
+    }
 }
 
 void MRichTextEdit::fontChanged(const QFont &f) {
@@ -514,6 +529,12 @@ void MRichTextEdit::fontChanged(const QFont &f) {
         f_list_ordered->setChecked(false);
       }
     resize(width(), getHeight());
+
+    TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
+    if(parentTextBox) {
+        qDebug() << "Resizing parent TextBox";
+        parentTextBox->resize(width(), getHeight() + 45);
+    }
 }
 
 void MRichTextEdit::fgColorChanged(const QColor &c) {
@@ -608,4 +629,10 @@ void MRichTextEdit::insertImage() {
 void MRichTextEdit::textChanged() {
     qDebug() << "Text changed from MRichTextEdit";
     resize(width(), getHeight());
+
+    TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
+    if(parentTextBox) {
+        qDebug() << "Resizing parent TextBox";
+        parentTextBox->resize(width(), getHeight() + 45);
+    }
 }

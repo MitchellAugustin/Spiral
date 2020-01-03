@@ -9,6 +9,7 @@ static int getHeight(TextBox *tBox) {
         delete tBox;
         return 0;
     }
+    return tBox->richTextEdit->getHeight() + 30;
     QTextDocument *doc = tBox->richTextEdit->document();
     QAbstractTextDocumentLayout *layout = doc->documentLayout();
     int h = 45;
@@ -22,17 +23,17 @@ static int getHeight(TextBox *tBox) {
 
 DragLayout::DragLayout(QWidget *parent) : QWidget(parent)
 {
-    int x = 5;
-    int y = 5;
-    TextBox *tBox = new TextBox(this);
-    tBox->move(x, y);
-    tBox->show();
-    tBox->setAttribute(Qt::WA_DeleteOnClose);
-    x += tBox->width() + 2;
-    if (x >= 245) {
-        x = 5;
-        y += tBox->height() + 2;
-    }
+//    int x = 5;
+//    int y = 5;
+//    TextBox *tBox = new TextBox(this);
+//    tBox->move(x, y);
+//    tBox->show();
+//    tBox->setAttribute(Qt::WA_DeleteOnClose);
+//    x += tBox->width() + 2;
+//    if (x >= 245) {
+//        x = 5;
+//        y += tBox->height() + 2;
+//    }
 
     setAcceptDrops(true);
 }
@@ -92,7 +93,7 @@ void DragLayout::dropEvent(QDropEvent *event)
         tBox->move(event->pos() - offset);
         tBox->show();
         tBox->setAttribute(Qt::WA_DeleteOnClose);
-        tBox->resize(tBox->width(), getHeight(tBox));
+        tBox->resize(1500, getHeight(tBox));
 
         if (event->source() == this) {
             event->setDropAction(Qt::MoveAction);
@@ -107,7 +108,7 @@ void DragLayout::dropEvent(QDropEvent *event)
         tBox->move(event->pos());
         tBox->show();
         tBox->setAttribute(Qt::WA_DeleteOnClose);
-        tBox->resize(tBox->width(), getHeight(tBox));
+        tBox->resize(1500, getHeight(tBox));
 
         event->acceptProposedAction();
     } else {
@@ -120,8 +121,15 @@ void DragLayout::dropEvent(QDropEvent *event)
 void DragLayout::mousePressEvent(QMouseEvent *event)
 {
     TextBox *child = static_cast<TextBox*>(childAt(event->pos()));
-    if (!child)
+    if (!child) {
+        TextBox *tBox = new TextBox(this);
+        tBox->richTextEdit->setText("Type here");
+        tBox->move(event->pos());
+        tBox->show();
+        tBox->setAttribute(Qt::WA_DeleteOnClose);
+        tBox->resize(1500, getHeight(tBox));
         return;
+    }
 
     QPoint hotSpot = event->pos() - child->pos();
 
