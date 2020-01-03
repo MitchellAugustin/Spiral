@@ -17,6 +17,10 @@ class MTextEdit : public QTextEdit {
     void        insertFromMimeData(const QMimeData *source);
     QMimeData  *createMimeDataFromSelection() const;
 
+
+  private slots:
+    void onTextChanged();
+    void onCursorPositionChanged();
 };
 
 #endif

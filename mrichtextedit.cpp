@@ -39,6 +39,18 @@
 #include <QMenu>
 #include <QDialog>
 
+int MRichTextEdit::getHeight() {
+    QTextDocument *doc = document();
+    QAbstractTextDocumentLayout *layout = doc->documentLayout();
+    int h = 45;
+    QTextBlock b = doc->begin();
+    while (b != doc->end()) {
+        h += layout->blockBoundingRect(b).height();
+        b = b.next();
+    }
+    return h;
+}
+
 MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
     setupUi(this);
     m_lastBlockList = 0;
@@ -101,6 +113,7 @@ MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
 
     connect(f_textedit, SIGNAL(copyAvailable(bool)), f_cut, SLOT(setEnabled(bool)));
     connect(f_textedit, SIGNAL(copyAvailable(bool)), f_copy, SLOT(setEnabled(bool)));
+    connect(f_textedit, SIGNAL(textChanged()), f_textedit, SLOT(onTextChanged()));
 
 #ifndef QT_NO_CLIPBOARD
     connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SLOT(slotClipboardDataChanged()));
@@ -459,6 +472,8 @@ void MRichTextEdit::slotCursorPositionChanged() {
         f_list_bullet->setChecked(false);
         f_list_ordered->setChecked(false);
         }
+
+    resize(width(), getHeight());
 }
 
 void MRichTextEdit::fontChanged(const QFont &f) {
@@ -498,6 +513,7 @@ void MRichTextEdit::fontChanged(const QFont &f) {
         f_list_bullet->setChecked(false);
         f_list_ordered->setChecked(false);
       }
+    resize(width(), getHeight());
 }
 
 void MRichTextEdit::fgColorChanged(const QColor &c) {
@@ -589,4 +605,7 @@ void MRichTextEdit::insertImage() {
 
 }
 
-
+void MRichTextEdit::textChanged() {
+    qDebug() << "Text changed from MRichTextEdit";
+    resize(width(), getHeight());
+}

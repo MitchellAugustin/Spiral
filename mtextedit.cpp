@@ -5,9 +5,11 @@
 #include <QByteArray>
 #include <QBuffer>
 #include <stdlib.h>
-
+#include <QDebug>
 
 MTextEdit::MTextEdit(QWidget *parent) : QTextEdit(parent) {
+    connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
 }
 
 
@@ -74,3 +76,10 @@ void MTextEdit::dropImage(const QImage& image, const QString& format) {
     cursor.insertImage    ( imageFormat );
 }
 
+void MTextEdit::onTextChanged() {
+//    qDebug() << "Text changed";
+}
+
+void MTextEdit::onCursorPositionChanged() {
+//    qDebug() << "Cursor position changed";
+}

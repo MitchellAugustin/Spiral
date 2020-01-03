@@ -7,7 +7,7 @@ static inline QString spiralContentMimeType() { return QStringLiteral("applicati
 static int getHeight(TextBox *tBox) {
     QTextDocument *doc = tBox->richTextEdit->document();
     QAbstractTextDocumentLayout *layout = doc->documentLayout();
-    int h = 0;
+    int h = 45;
     QTextBlock b = doc->begin();
     while (b != doc->end()) {
         h += layout->blockBoundingRect(b).height() + tBox->height();
@@ -29,7 +29,6 @@ DragLayout::DragLayout(QWidget *parent) : QWidget(parent)
         x = 5;
         y += tBox->height() + 2;
     }
-
 
     setAcceptDrops(true);
 }
