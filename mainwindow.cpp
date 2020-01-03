@@ -14,7 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
     MainWindow::setWindowTitle("Test Notebook");
 
     QTabWidget *tabWidget = new QTabWidget(this);
-    DragLayout* customDragLayout = new DragLayout(this);
+    DragLayout *customDragLayout = new DragLayout(tabWidget);
+
 
     //Adds a new tab to the tabWidget containing the dragLayout
     tabWidget->addTab(customDragLayout, "DragLayoutTab");

@@ -4,6 +4,18 @@
 
 static inline QString spiralContentMimeType() { return QStringLiteral("application/x-spiralcontent"); }
 
+static int getHeight(TextBox *tBox) {
+    QTextDocument *doc = tBox->richTextEdit->document();
+    QAbstractTextDocumentLayout *layout = doc->documentLayout();
+    int h = 0;
+    QTextBlock b = doc->begin();
+    while (b != doc->end()) {
+        h += layout->blockBoundingRect(b).height() + 25;
+        b = b.next();
+    }
+    return h;
+}
+
 DragLayout::DragLayout(QWidget *parent) : QWidget(parent)
 {
     int x = 5;
@@ -17,6 +29,7 @@ DragLayout::DragLayout(QWidget *parent) : QWidget(parent)
         x = 5;
         y += tBox->height() + 2;
     }
+
 
     setAcceptDrops(true);
 }
@@ -76,6 +89,7 @@ void DragLayout::dropEvent(QDropEvent *event)
         tBox->move(event->pos() - offset);
         tBox->show();
         tBox->setAttribute(Qt::WA_DeleteOnClose);
+        tBox->resize(tBox->width(), getHeight(tBox));
 
         if (event->source() == this) {
             event->setDropAction(Qt::MoveAction);
@@ -90,6 +104,7 @@ void DragLayout::dropEvent(QDropEvent *event)
         tBox->move(event->pos());
         tBox->show();
         tBox->setAttribute(Qt::WA_DeleteOnClose);
+        tBox->resize(tBox->width(), getHeight(tBox));
 
         event->acceptProposedAction();
     } else {

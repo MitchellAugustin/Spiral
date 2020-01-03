@@ -9,6 +9,7 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QTabWidget>
+#include <QScrollArea>
 
 #include "draglayout.h"
 #include "textbox.h"
