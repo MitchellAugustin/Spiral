@@ -5,6 +5,10 @@
 static inline QString spiralContentMimeType() { return QStringLiteral("application/x-spiralcontent"); }
 
 static int getHeight(TextBox *tBox) {
+    if(tBox->richTextEdit->toPlainText().isEmpty()) {
+        delete tBox;
+        return 0;
+    }
     QTextDocument *doc = tBox->richTextEdit->document();
     QAbstractTextDocumentLayout *layout = doc->documentLayout();
     int h = 45;
