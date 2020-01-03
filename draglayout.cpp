@@ -10,7 +10,7 @@ static int getHeight(TextBox *tBox) {
     int h = 0;
     QTextBlock b = doc->begin();
     while (b != doc->end()) {
-        h += layout->blockBoundingRect(b).height() + 25;
+        h += layout->blockBoundingRect(b).height() + tBox->height();
         b = b.next();
     }
     return h;
@@ -126,10 +126,18 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
     QDataStream dataStream(&itemData, QIODevice::WriteOnly);
     dataStream << child->richTextEdit->toHtml() << QPoint(hotSpot);
 
+    QByteArray htmlItemData;
+    QDataStream htmlDataStream(&htmlItemData, QIODevice::WriteOnly);
+    htmlDataStream << child->richTextEdit->toHtml();
+
+    QByteArray plainTextItemData;
+    QDataStream plainTextDataStream(&plainTextItemData, QIODevice::WriteOnly);
+    plainTextDataStream << child->richTextEdit->toPlainText();
 
     QMimeData *mimeData = new QMimeData;
     mimeData->setData(spiralContentMimeType(), itemData);
-    mimeData->setText(child->richTextEdit->toHtml());
+    mimeData->setData("text/html", htmlItemData);
+    mimeData->setData("text/plain", plainTextItemData);
 
 
     QDrag *drag = new QDrag(this);
