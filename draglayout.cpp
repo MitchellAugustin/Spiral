@@ -9,15 +9,7 @@ static int getHeight(TextBox *tBox) {
         delete tBox;
         return 0;
     }
-    QTextDocument *doc = tBox->richTextEdit->document();
-    QAbstractTextDocumentLayout *layout = doc->documentLayout();
-    int h = tBox->richTextEdit->f_toolbar->height() * 2;
-    QTextBlock b = doc->begin();
-    while (b != doc->end()) {
-        h += layout->blockBoundingRect(b).height();
-        b = b.next();
-    }
-    return h;
+    return utilities::getMRichTextEditHeight(tBox->richTextEdit);
 }
 
 DragLayout::DragLayout(QWidget *parent) : QWidget(parent)

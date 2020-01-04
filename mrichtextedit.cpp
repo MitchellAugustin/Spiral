@@ -50,15 +50,7 @@ int MRichTextEdit::getHeight() {
         document()->clear();
         return 0;
     }
-    QTextDocument *doc = document();
-    QAbstractTextDocumentLayout *layout = doc->documentLayout();
-    int h = f_toolbar->height() * 2;
-    QTextBlock b = doc->begin();
-    while (b != doc->end()) {
-        h += layout->blockBoundingRect(b).height();
-        b = b.next();
-    }
-    return h;
+    return utilities::getMRichTextEditHeight(this);
 }
 
 MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
