@@ -8,6 +8,7 @@
 #include <QTextEdit>
 #include <QSplitter>
 
+#include "constants.h"
 #include "mrichtextedit.h"
 
 class TextBox : public QWidget

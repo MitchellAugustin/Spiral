@@ -9,7 +9,6 @@ static int getHeight(TextBox *tBox) {
         delete tBox;
         return 0;
     }
-//    return tBox->richTextEdit->getHeight() + 30;
     QTextDocument *doc = tBox->richTextEdit->document();
     QAbstractTextDocumentLayout *layout = doc->documentLayout();
     int h = tBox->richTextEdit->f_toolbar->height() * 2;
@@ -23,18 +22,6 @@ static int getHeight(TextBox *tBox) {
 
 DragLayout::DragLayout(QWidget *parent) : QWidget(parent)
 {
-//    int x = 5;
-//    int y = 5;
-//    TextBox *tBox = new TextBox(this);
-//    tBox->move(x, y);
-//    tBox->show();
-//    tBox->setAttribute(Qt::WA_DeleteOnClose);
-//    x += tBox->width() + 2;
-//    if (x >= 245) {
-//        x = 5;
-//        y += tBox->height() + 2;
-//    }
-
     setAcceptDrops(true);
 }
 
@@ -93,7 +80,7 @@ void DragLayout::dropEvent(QDropEvent *event)
         tBox->move(event->pos() - offset);
         tBox->show();
         tBox->setAttribute(Qt::WA_DeleteOnClose);
-        tBox->resize(1000, getHeight(tBox));
+        tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
 
         if (event->source() == this) {
             event->setDropAction(Qt::MoveAction);
@@ -108,7 +95,7 @@ void DragLayout::dropEvent(QDropEvent *event)
         tBox->move(event->pos());
         tBox->show();
         tBox->setAttribute(Qt::WA_DeleteOnClose);
-        tBox->resize(1000, getHeight(tBox));
+        tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
 
         event->acceptProposedAction();
     } else {
@@ -127,7 +114,7 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
         tBox->move(event->pos());
         tBox->show();
         tBox->setAttribute(Qt::WA_DeleteOnClose);
-        tBox->resize(1000, getHeight(tBox));
+        tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
         return;
     }
 

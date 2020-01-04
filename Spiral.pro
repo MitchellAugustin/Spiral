@@ -24,6 +24,7 @@ SOURCES += \
     mtextedit.cpp
 
 HEADERS += \
+    constants.h \
     draglayout.h \
     mainwindow.h \
     textbox.h \
