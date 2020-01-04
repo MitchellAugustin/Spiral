@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QTextEdit>
+#include <QSplitter>
 
 #include "mrichtextedit.h"
 

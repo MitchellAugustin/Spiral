@@ -52,7 +52,7 @@ int MRichTextEdit::getHeight() {
     }
     QTextDocument *doc = document();
     QAbstractTextDocumentLayout *layout = doc->documentLayout();
-    int h = 45;
+    int h = f_toolbar->height() * 2;
     QTextBlock b = doc->begin();
     while (b != doc->end()) {
         h += layout->blockBoundingRect(b).height();
@@ -486,7 +486,6 @@ void MRichTextEdit::slotCursorPositionChanged() {
     resize(width(), getHeight());
     TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
     if(parentTextBox) {
-        qDebug() << "Resizing parent TextBox";
         parentTextBox->resize(width(), getHeight() + 45);
     }
 }
@@ -532,7 +531,6 @@ void MRichTextEdit::fontChanged(const QFont &f) {
 
     TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
     if(parentTextBox) {
-        qDebug() << "Resizing parent TextBox";
         parentTextBox->resize(width(), getHeight() + 45);
     }
 }
