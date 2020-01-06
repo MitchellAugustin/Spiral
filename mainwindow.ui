@@ -32,12 +32,24 @@
       <property name="enabled">
        <bool>true</bool>
       </property>
+      <property name="maximumSize">
+       <size>
+        <width>50</width>
+        <height>16777215</height>
+       </size>
+      </property>
      </widget>
     </item>
     <item row="0" column="0">
      <widget class="QListView" name="notebooksListView">
       <property name="enabled">
        <bool>true</bool>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>50</width>
+        <height>16777215</height>
+       </size>
       </property>
      </widget>
     </item>
