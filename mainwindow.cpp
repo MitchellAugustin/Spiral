@@ -17,8 +17,14 @@ MainWindow::MainWindow(QWidget *parent)
     DragLayout *customDragLayout = new DragLayout(tabWidget);
 
 
+    QScrollArea *scrollArea = new QScrollArea(this);
+    //Note: The customDragLayout has to be resized for it to be clickable within the scrollArea for some reason.
+    //TODO figure out how to make this automatic
+    customDragLayout->resize(DEFAULT_TAB_SIZE, DEFAULT_TAB_SIZE);
+    scrollArea->setWidget(customDragLayout);
+
     //Adds a new tab to the tabWidget containing the dragLayout
-    tabWidget->addTab(customDragLayout, "DragLayoutTab");
+    tabWidget->addTab(scrollArea, "DragLayoutTab");
 
     ui->verticalLayout->addWidget(tabWidget);
 }
