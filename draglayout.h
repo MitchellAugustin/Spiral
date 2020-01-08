@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <textbox.h>
+#include "constants.h"
 
 class DragLayout : public QWidget
 {

@@ -2,7 +2,7 @@
 
 #include <QtWidgets>
 
-static inline QString spiralContentMimeType() { return QStringLiteral("application/x-spiralcontent"); }
+static inline QString spiralContentMimeType() { return SPIRAL_CONTENT_MIME_TYPE; }
 
 static int getHeight(TextBox *tBox) {
     if(tBox->richTextEdit->toPlainText().isEmpty()) {
@@ -46,6 +46,16 @@ void DragLayout::dragMoveEvent(QDragMoveEvent *event)
         } else {
             event->acceptProposedAction();
         }
+
+        //Dynamically resize the DragLayout area
+        if(event->pos().x() + DEFAULT_TEXTBOX_WIDTH > this->width()) {
+            this->resize(this->width() + event->pos().x() + DEFAULT_TEXTBOX_WIDTH, this->height());
+        }
+        //Note: This uses DEFAULT_WIDTH for the movement calculation so the box can be moved, but the page must be resized again
+        //on drop so the actual TextBox size can be used in the calculation.
+        if(event->pos().y() + DEFAULT_TEXTBOX_WIDTH > this->height()) {
+            this->resize(this->width(), this->height() + event->pos().y() + DEFAULT_TEXTBOX_WIDTH);
+        }
     } else if (event->mimeData()->hasText()) {
         event->acceptProposedAction();
     } else {
@@ -81,6 +91,11 @@ void DragLayout::dropEvent(QDropEvent *event)
             event->acceptProposedAction();
         }
 
+        //Finalize resize operation
+        if(event->pos().y() + getHeight(tBox) > this->height()) {
+            this->resize(this->width(), this->height() + event->pos().y() + getHeight(tBox));
+        }
+        qDebug() << "TextBox moved to " << event->pos();
     } else if (event->mimeData()->hasText()) {
         TextBox *tBox = new TextBox(this);
         tBox->richTextEdit->setText(event->mimeData()->text());
@@ -90,6 +105,11 @@ void DragLayout::dropEvent(QDropEvent *event)
         tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
 
         event->acceptProposedAction();
+        //Finalize resize operation
+        if(event->pos().y() + getHeight(tBox) > this->height()) {
+            this->resize(this->width(), this->height() + event->pos().y() + getHeight(tBox));
+        }
+        qDebug() << "TextBox moved to " << event->pos();
     } else {
         event->ignore();
     }
