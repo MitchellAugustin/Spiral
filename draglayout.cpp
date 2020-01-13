@@ -6,7 +6,8 @@ static inline QString spiralContentMimeType() { return SPIRAL_CONTENT_MIME_TYPE;
 
 static int getHeight(TextBox *tBox) {
     if(tBox->richTextEdit->toPlainText().isEmpty()) {
-        delete tBox;
+        tBox->close();
+        qDebug() << "TextBox deleted from getHeight in draglayout";
         return 0;
     }
     return utilities::getMRichTextEditHeight(tBox->richTextEdit);
@@ -127,6 +128,7 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
         tBox->show();
         tBox->setAttribute(Qt::WA_DeleteOnClose);
         tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
+        event->accept();
         return;
     }
 

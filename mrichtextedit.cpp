@@ -43,11 +43,10 @@
 
 
 int MRichTextEdit::getHeight() {
-    //Note: I cannot delete the parent element here, so to prevent a memory leak, I still clear the document().
-    //However, it just sets the height to 0, so the TextBox will still "exist," but will be invisible until
-    //interacted with, at which point it will be properly deleted.
     if(toPlainText().isEmpty()) {
         document()->clear();
+        parentWidget()->close();
+        qDebug() << "TextBox deleted from getHeight in mrichtextedit";
         return 0;
     }
     return utilities::getMRichTextEditHeight(this);
