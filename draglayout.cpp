@@ -120,8 +120,18 @@ void DragLayout::dropEvent(QDropEvent *event)
 
 void DragLayout::mousePressEvent(QMouseEvent *event)
 {
-    TextBox *child = static_cast<TextBox*>(childAt(event->pos()));
-    if (!child) {
+    TextBox *child = dynamic_cast<TextBox*>(childAt(event->pos()));
+    QFrame *childQFrameCheck = dynamic_cast<QFrame*>(childAt(event->pos()));
+    MRichTextEdit *childMRichTextEditCheck = dynamic_cast<MRichTextEdit*>(childAt(event->pos()));
+
+//    qDebug() << "child: " << child;
+//    qDebug() << "childQFrame: " << childQFrameCheck;
+//    qDebug() << "childMText: " << childMRichTextEditCheck;
+
+    //Ensures that drag operations are not handled unless the user is dragging a TextBox object
+    bool childInnerCheck = child && !(childQFrameCheck || childMRichTextEditCheck);
+
+    if (!child && !childInnerCheck) {
         TextBox *tBox = new TextBox(this);
         tBox->richTextEdit->setText("Type here");
         tBox->move(event->pos());
@@ -132,35 +142,39 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
         return;
     }
 
-    QPoint hotSpot = event->pos() - child->pos();
+    //If the user is dragging a TextBox object by its draggable area and NOT touching an inner layout component
+//    qDebug() << "childInnerCheck: " << childInnerCheck;
+    if (child && childInnerCheck) {
+        QPoint hotSpot = event->pos() - child->pos();
 
-    QByteArray itemData;
-    QDataStream dataStream(&itemData, QIODevice::WriteOnly);
-    dataStream << child->richTextEdit->toHtml() << QPoint(hotSpot);
+        QByteArray itemData;
+        QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+        dataStream << child->richTextEdit->toHtml() << QPoint(hotSpot);
 
-    QByteArray htmlItemData;
-    QDataStream htmlDataStream(&htmlItemData, QIODevice::WriteOnly);
-    htmlDataStream << child->richTextEdit->toHtml();
+        QByteArray htmlItemData;
+        QDataStream htmlDataStream(&htmlItemData, QIODevice::WriteOnly);
+        htmlDataStream << child->richTextEdit->toHtml();
 
-    QByteArray plainTextItemData;
-    QDataStream plainTextDataStream(&plainTextItemData, QIODevice::WriteOnly);
-    plainTextDataStream << child->richTextEdit->toPlainText();
+        QByteArray plainTextItemData;
+        QDataStream plainTextDataStream(&plainTextItemData, QIODevice::WriteOnly);
+        plainTextDataStream << child->richTextEdit->toPlainText();
 
-    QMimeData *mimeData = new QMimeData;
-    mimeData->setData(spiralContentMimeType(), itemData);
-    mimeData->setData("text/html", htmlItemData);
-    mimeData->setData("text/plain", plainTextItemData);
-
-
-    QDrag *drag = new QDrag(this);
-    drag->setMimeData(mimeData);
-    drag->setHotSpot(hotSpot);
-
-    child->hide();
+        QMimeData *mimeData = new QMimeData;
+        mimeData->setData(spiralContentMimeType(), itemData);
+        mimeData->setData("text/html", htmlItemData);
+        mimeData->setData("text/plain", plainTextItemData);
 
 
-    if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction)
-        child->close();
-    else
-        child->show();
+        QDrag *drag = new QDrag(this);
+        drag->setMimeData(mimeData);
+        drag->setHotSpot(hotSpot);
+
+        child->hide();
+
+
+        if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction)
+            child->close();
+        else
+            child->show();
+    }
 }
