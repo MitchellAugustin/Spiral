@@ -111,7 +111,11 @@ void DragLayout::dropEvent(QDropEvent *event)
             this->resize(this->width(), this->height() + event->pos().y() + getHeight(tBox));
         }
         qDebug() << "TextBox moved to " << event->pos();
+    } else if (event->mimeData()->hasFormat(RESIZE_MIME_TYPE)) {
+        qDebug() << "Resize";
+        qDebug() << "Object to resize located at " << event->mimeData()->text();
     } else {
+        qDebug() << "Ignoring event with type " << event->mimeData()->formats();
         event->ignore();
     }
 }

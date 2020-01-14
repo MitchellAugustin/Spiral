@@ -10,6 +10,7 @@
 
 #include "constants.h"
 #include "mrichtextedit.h"
+#include "dragresizelabel.h"
 
 class TextBox : public QWidget
 {

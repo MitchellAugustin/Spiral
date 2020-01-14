@@ -7,4 +7,11 @@ TextBox::TextBox(QWidget *parent) : QWidget(parent)
 
     TextBox::richTextEdit->setText("Default text");
     layout->addWidget(TextBox::richTextEdit);
+
+    DragResizeLabel *contractLabel = new DragResizeLabel(this, false);
+    contractLabel->setText("<=");
+    DragResizeLabel *expandLabel = new DragResizeLabel(this, true);
+    expandLabel->setText("=>");
+    TextBox::richTextEdit->f_toolbar_layout->addWidget(contractLabel);
+    TextBox::richTextEdit->f_toolbar_layout->addWidget(expandLabel);
 }
