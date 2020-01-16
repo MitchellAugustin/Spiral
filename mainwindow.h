@@ -13,9 +13,6 @@
 
 #include "draglayout.h"
 #include "textbox.h"
-//#include "breakpad/client/linux/handler/exception_handler.h"
-//#include "breakpad/client/linux/minidump_writer/minidump_writer.h"
-//#include "breakpad/google_breakpad/common/minidump_exception_linux.h"
 
 
 QT_BEGIN_NAMESPACE

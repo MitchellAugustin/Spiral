@@ -20,4 +20,4 @@ protected:
 
 };
 
-#endif DRAGRESIZELABEL_H
+#endif //DRAGRESIZELABEL_H
