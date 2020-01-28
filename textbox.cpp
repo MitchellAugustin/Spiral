@@ -1,7 +1,9 @@
 #include "textbox.h"
 
-TextBox::TextBox(QWidget *parent) : QWidget(parent)
+TextBox::TextBox(QWidget *parent, QString uuid) : QWidget(parent)
 {
+    this->uuid = uuid;
+    qDebug() << "New TextBox object instantiated with UUID " << uuid;
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 30, 0, 0);
 

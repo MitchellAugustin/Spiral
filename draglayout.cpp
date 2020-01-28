@@ -7,7 +7,7 @@ static inline QString spiralContentMimeType() { return SPIRAL_CONTENT_MIME_TYPE;
 static int getHeight(TextBox *tBox) {
     if(tBox->richTextEdit->toPlainText().isEmpty()) {
         tBox->close();
-        qDebug() << "TextBox deleted from getHeight in draglayout";
+        qDebug() << "TextBox " << tBox->uuid << " deleted from getHeight in draglayout";
         return 0;
     }
     return utilities::getMRichTextEditHeight(tBox->richTextEdit);
@@ -75,10 +75,11 @@ void DragLayout::dropEvent(QDropEvent *event)
 
         QString text;
         QPoint offset;
-        dataStream >> text >> offset;
+        QString uuid;
+        dataStream >> text >> offset >> uuid;
 
 
-        TextBox *tBox = new TextBox(this);
+        TextBox *tBox = new TextBox(this, uuid);
         tBox->richTextEdit->setText(text);
         tBox->move(event->pos() - offset);
         tBox->show();
@@ -96,7 +97,7 @@ void DragLayout::dropEvent(QDropEvent *event)
         if(event->pos().y() + getHeight(tBox) > this->height()) {
             this->resize(this->width(), this->height() + event->pos().y() + getHeight(tBox));
         }
-        qDebug() << "TextBox moved to " << event->pos();
+        qDebug() << "TextBox " << tBox->uuid << " moved to " << event->pos();
     } else if (event->mimeData()->hasText()) {
         TextBox *tBox = new TextBox(this);
         tBox->richTextEdit->setText(event->mimeData()->text());
@@ -153,7 +154,7 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
 
         QByteArray itemData;
         QDataStream dataStream(&itemData, QIODevice::WriteOnly);
-        dataStream << child->richTextEdit->toHtml() << QPoint(hotSpot);
+        dataStream << child->richTextEdit->toHtml() << QPoint(hotSpot) << child->uuid;
 
         QByteArray htmlItemData;
         QDataStream htmlDataStream(&htmlItemData, QIODevice::WriteOnly);

@@ -7,6 +7,8 @@
 #include <QLabel>
 #include <QTextEdit>
 #include <QSplitter>
+#include <QUuid>
+#include <QTime>
 
 #include "constants.h"
 #include "mrichtextedit.h"
@@ -16,8 +18,10 @@ class TextBox : public QWidget
 {
     Q_OBJECT
 public:
-    TextBox(QWidget *parent = nullptr);
+    TextBox(QWidget *parent = nullptr, QString uuid = QUuid::createUuid().toString().split("{")[1].split("-")[0]);
     ~TextBox() {}
+
+    QString uuid;
     MRichTextEdit* richTextEdit = new MRichTextEdit(this);
 };
 

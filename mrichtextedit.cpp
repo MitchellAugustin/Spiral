@@ -478,6 +478,8 @@ void MRichTextEdit::slotCursorPositionChanged() {
     TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
     if(parentTextBox) {
         parentTextBox->resize(width(), getHeight() + 45);
+
+        qDebug() << "TextBox " << parentTextBox->uuid << " resized to " << this->width() << "x" << this->height() << " from MRichTextEdit::slotCursorPositionChanged()";
     }
 }
 
