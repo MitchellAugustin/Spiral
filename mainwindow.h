@@ -29,11 +29,17 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    Notebook *currentlyOpenNotebook;
+    void loadNotebook(Notebook *notebook);
     void openNotebook(Notebook *notebook);
     void openSection(Section *section);
+    Ui::MainWindow *ui;
+
+protected slots:
+    void notebookSelected(QModelIndex index);
+    void sectionSelected(QModelIndex index);
 
 private:
-    Ui::MainWindow *ui;
     QVector<Notebook*> *openNotebooks = new QVector<Notebook*>();
     SpiralStringList *notebookBrowserStringListModel = new SpiralStringList();
     SpiralStringList *sectionBrowserStringListModel = new SpiralStringList();

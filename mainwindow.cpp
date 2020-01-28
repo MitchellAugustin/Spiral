@@ -12,18 +12,22 @@ MainWindow::MainWindow(QWidget *parent)
     ui->browserToolBar->addWidget(ui->notebooksListView);
     ui->browserToolBar->addWidget(ui->sectionsListView);
 
+    //Set window title and instantiate tab widget
     MainWindow::setWindowTitle("Test Notebook");
-
     tabWidget = new QTabWidget(this);
 
 
+    //Add the UI Elements to their proper locations
     ui->verticalLayout->addWidget(tabWidget);
-
     ui->notebooksListView->setModel(notebookBrowserStringListModel);
     ui->sectionsListView->setModel(sectionBrowserStringListModel);
 
 
-    //Create a new notebook with one section that has one page (as a demo)
+    //Connect slots (listeners) for the NotebooksListView and SectionsListView
+    connect(ui->notebooksListView, SIGNAL(clicked(QModelIndex)), this, SLOT(notebookSelected(QModelIndex)));
+    connect(ui->sectionsListView, SIGNAL(clicked(QModelIndex)), this, SLOT(sectionSelected(QModelIndex)));
+
+    //The following is a demo using statically defined data of how the windowing system will be implemented
     Notebook *notebook = new Notebook();
     notebook->name = "New Notebook";
     Section *section = new Section();
@@ -43,7 +47,19 @@ MainWindow::MainWindow(QWidget *parent)
 
     notebook->addSection(section);
     notebook->addSection(section2);
+    loadNotebook(notebook);
     openNotebook(notebook);
+
+    Notebook *nb2 = new Notebook();
+    nb2->name = "Notebook 2";
+    Section *s2 = new Section();
+    s2->name = "N2, Sec2";
+    Page *n2s2p1 = new Page();
+    n2s2p1->name = "n2s2p1";
+    s2->addPage(n2s2p1);
+    nb2->addSection(s2);
+    loadNotebook(nb2);
+    //END SAMPLE
 }
 
 MainWindow::~MainWindow()
@@ -51,6 +67,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+/**
+ * @brief generateEditorPane - Generates a QWidget that will be used as the editor pane for a Tab
+ * @param parent
+ * @param tabWidget
+ * @return
+ */
 QWidget *generateEditorPane(QWidget *parent, QTabWidget *tabWidget) {
     DragLayout *customDragLayout = new DragLayout(tabWidget);
 
@@ -62,8 +84,21 @@ QWidget *generateEditorPane(QWidget *parent, QTabWidget *tabWidget) {
     return scrollArea;
 }
 
-void MainWindow::openNotebook(Notebook *notebook) {
+/**
+ * @brief MainWindow::loadNotebook - Loads a notebook into the browser (DOES NOT OPEN)
+ * @param notebook
+ */
+void MainWindow::loadNotebook(Notebook *notebook) {
     openNotebooks->append(notebook);
+    notebookBrowserStringListModel->append(notebook->name);
+    //TODO Open the actual notebook file as a Notebook object
+}
+
+/**
+ * @brief MainWindow::openNotebook - Opens a notebook and displays its sections in the UI
+ * @param notebook
+ */
+void MainWindow::openNotebook(Notebook *notebook) {
     sectionBrowserStringListModel->removeRows(0, sectionBrowserStringListModel->rowCount());
 
     //Open the Notebook's first section
@@ -74,9 +109,13 @@ void MainWindow::openNotebook(Notebook *notebook) {
         sectionBrowserStringListModel->append(curSection->name);
     }
     //Add Notebook to UI
-    notebookBrowserStringListModel->append(notebook->name);
+    currentlyOpenNotebook = notebook;
 }
 
+/**
+ * @brief MainWindow::openSection - Opens a section and displays its pages in the UI
+ * @param section
+ */
 void MainWindow::openSection(Section *section) {
     tabWidget->clear();
     //For each page in the section being opened
@@ -84,4 +123,21 @@ void MainWindow::openSection(Section *section) {
         Page *curPage = *p_it;
         tabWidget->addTab(generateEditorPane(this, tabWidget), curPage->name);
     }
+}
+
+
+/**
+ * @brief MainWindow::sectionSelected - Open the selected section in the UI
+ * @param index
+ */
+void MainWindow::sectionSelected(QModelIndex index) {
+    openSection(currentlyOpenNotebook->loadSectionsList()->at(index.row()));
+}
+
+/**
+ * @brief MainWindow::notebookSelected - Open the selected notebook in the UI
+ * @param index
+ */
+void MainWindow::notebookSelected(QModelIndex index) {
+    openNotebook(openNotebooks->at(index.row()));
 }
