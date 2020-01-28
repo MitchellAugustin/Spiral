@@ -7,12 +7,21 @@
 class Notebook : public SpiralComponent
 {
 public:
-    Notebook(ResourceHandler *resourceHandler) : SpiralComponent(resourceHandler) {
-        //ResourceHandler is set in SpiralComponent superclass
+    Notebook(QString uuid = QUuid::createUuid().toString().split("{")[1].split("-")[0]) : SpiralComponent(uuid) {
+        sectionsList = new QVector<Section*>();
+        qDebug() << "Notebook instantiated with UUID " << uuid;
+    }
+    void addSection(Section *section) {
+        sectionsList->append(section);
+        //Add section to UI
+    }
+    QVector<Section*> *loadSectionsList() {
+        return sectionsList;
     }
     const QString class_name = "Notebook";
-    QVector<Section> sectionsList = {};
     QString path = "";
+private:
+    QVector<Section*> *sectionsList = {};
 };
 
 #endif // NOTEBOOK_H

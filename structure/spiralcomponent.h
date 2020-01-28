@@ -3,21 +3,22 @@
 
 #include <QString>
 #include <QVector>
-
-#include "resourcehandler.h"
+#include <QUuid>
+#include <QStringList>
+#include <QDebug>
 
 class SpiralComponent
 {
 public:
-    SpiralComponent(ResourceHandler *resourceHandler) {
-        this->resourceHandler = resourceHandler;
+    SpiralComponent(QString uuid = QUuid::createUuid().toString().split("{")[1].split("-")[0]) {
+        this->uuid = uuid;
     }
     const QString class_name = "SpiralComponent";
     /** For the time being, I am going to provide a UUID variable,
      * but since everything will be saved in one file, it may not be necessary.
      * */
-    const QString uuid = "NOUUID";
-    ResourceHandler *resourceHandler;
+    QString uuid;
+    QString name;
 };
 
 #endif // SPIRALCOMPONENT_H

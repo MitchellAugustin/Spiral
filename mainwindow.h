@@ -10,9 +10,12 @@
 #include <QVBoxLayout>
 #include <QTabWidget>
 #include <QScrollArea>
+#include <QStringListModel>
 
 #include "draglayout.h"
 #include "textbox.h"
+#include "structure/notebook.h"
+#include "spiralstringlist.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -26,8 +29,14 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void openNotebook(Notebook *notebook);
+    void openSection(Section *section);
 
 private:
     Ui::MainWindow *ui;
+    QVector<Notebook*> *openNotebooks = new QVector<Notebook*>();
+    SpiralStringList *notebookBrowserStringListModel = new SpiralStringList();
+    SpiralStringList *sectionBrowserStringListModel = new SpiralStringList();
+    QTabWidget *tabWidget;
 };
 #endif // MAINWINDOW_H

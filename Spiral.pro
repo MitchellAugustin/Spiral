@@ -20,7 +20,6 @@ SOURCES += \
     dragresizelabel.cpp \
     main.cpp \
     mainwindow.cpp \
-    resourcehandler.cpp \
     textbox.cpp \
     mrichtextedit.cpp \
     mtextedit.cpp
@@ -30,7 +29,7 @@ HEADERS += \
     draglayout.h \
     dragresizelabel.h \
     mainwindow.h \
-    resourcehandler.h \
+    spiralstringlist.h \
     structure/notebook.h \
     structure/page.h \
     structure/section.h \

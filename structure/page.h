@@ -9,8 +9,8 @@
 class Page : public SpiralComponent
 {
 public:
-    Page(ResourceHandler *resourceHandler) : SpiralComponent(resourceHandler) {
-        //ResourceHandler is set in SpiralComponent superclass
+    Page(QString uuid = QUuid::createUuid().toString().split("{")[1].split("-")[0]) : SpiralComponent(uuid) {
+        qDebug() << "Page instantiated with UUID " << uuid;
     }
     const QString class_name = "Page";
     //TBD: Collection of page elements (representing TextBox content)
