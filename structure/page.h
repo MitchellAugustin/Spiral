@@ -5,7 +5,7 @@
 
 #include "spiralcomponent.h"
 #include "textbox.h"
-
+#include "draglayout.h"
 
 class Page : public SpiralComponent
 {
@@ -14,8 +14,8 @@ public:
         qDebug() << "Page instantiated with UUID " << uuid;
     }
     const QString class_name = "Page";
-    //TBD: Collection of page elements (representing TextBox content)
-    QVector<TextBox*> child_text_boxes;
+
+    QWidget *dragLayout = nullptr;
 };
 
 #endif // PAGE_H

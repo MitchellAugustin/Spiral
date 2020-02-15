@@ -121,7 +121,11 @@ void MainWindow::openSection(Section *section) {
     //For each page in the section being opened
     for(QVector<Page*>::Iterator p_it = section->loadPagesList()->begin(); p_it != section->loadPagesList()->end(); ++p_it) {
         Page *curPage = *p_it;
-        tabWidget->addTab(generateEditorPane(this, tabWidget), curPage->name);
+        if(curPage->dragLayout == nullptr) {
+            QWidget *editorPane = generateEditorPane(this, tabWidget);
+            curPage->dragLayout = editorPane;
+        }
+        tabWidget->addTab(curPage->dragLayout, curPage->name);
     }
 }
 
