@@ -76,15 +76,17 @@ void DragLayout::dropEvent(QDropEvent *event)
         QString text;
         QPoint offset;
         QString uuid;
-        dataStream >> text >> offset >> uuid;
+        int width;
+        dataStream >> text >> offset >> uuid >> width;
 
+        qDebug() << "Width from data stream: " << width;
 
         TextBox *tBox = new TextBox(this, uuid);
         tBox->richTextEdit->setText(text);
         tBox->move(event->pos() - offset);
         tBox->show();
         tBox->setAttribute(Qt::WA_DeleteOnClose);
-        tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
+        tBox->resize(width, getHeight(tBox));
 
         if (event->source() == this) {
             event->setDropAction(Qt::MoveAction);
@@ -154,7 +156,7 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
 
         QByteArray itemData;
         QDataStream dataStream(&itemData, QIODevice::WriteOnly);
-        dataStream << child->richTextEdit->toHtml() << QPoint(hotSpot) << child->uuid;
+        dataStream << child->richTextEdit->toHtml() << QPoint(hotSpot) << child->uuid << child->width();
 
         QByteArray htmlItemData;
         QDataStream htmlDataStream(&htmlItemData, QIODevice::WriteOnly);

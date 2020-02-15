@@ -4,6 +4,7 @@
 #include <QVector>
 
 #include "spiralcomponent.h"
+#include "textbox.h"
 
 
 class Page : public SpiralComponent
@@ -14,6 +15,7 @@ public:
     }
     const QString class_name = "Page";
     //TBD: Collection of page elements (representing TextBox content)
+    QVector<TextBox*> child_text_boxes;
 };
 
 #endif // PAGE_H
