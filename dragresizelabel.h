@@ -10,7 +10,6 @@ class DragResizeLabel : public QLabel
     Q_OBJECT
 public:
     explicit DragResizeLabel(QWidget *parent = nullptr, bool expand = true);
-    bool expand;
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
@@ -18,6 +17,8 @@ protected:
     void dropEvent(QDropEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
 
+private:
+    bool expand;
 };
 
 #endif //DRAGRESIZELABEL_H

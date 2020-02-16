@@ -29,20 +29,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     //The following is a demo using statically defined data of how the windowing system will be implemented
     Notebook *notebook = new Notebook();
-    notebook->name = "New Notebook";
+    notebook->setName("New Notebook");
     Section *section = new Section();
-    section->name = "New Section";
+    section->setName("New Section");
     Page *page = new Page();
-    page->name = "New Page";
+    page->setName("New Page");
     section->addPage(page);
     Page *p2 = new Page();
-    p2->name = "Page 2";
+    p2->setName("Page 2");
     section->addPage(p2);
 
     Section *section2 = new Section();
-    section2->name = "Sec 2";
+    section2->setName("Sec 2");
     Page *s2p1 = new Page();
-    s2p1->name = "s2P1";
+    s2p1->setName("s2p1");
     section2->addPage(s2p1);
 
     notebook->addSection(section);
@@ -51,15 +51,17 @@ MainWindow::MainWindow(QWidget *parent)
     openNotebook(notebook);
 
     Notebook *nb2 = new Notebook();
-    nb2->name = "Notebook 2";
+    nb2->setName("Notebook 2");
     Section *s2 = new Section();
-    s2->name = "N2, Sec2";
+    s2->setName("N2, Sec2");
     Page *n2s2p1 = new Page();
-    n2s2p1->name = "n2s2p1";
+    n2s2p1->setName("n2s2p1");
     s2->addPage(n2s2p1);
     nb2->addSection(s2);
     loadNotebook(nb2);
     //END SAMPLE
+    //NOTE: THESE OBJECTS MUST BE DELETED MANUALLY because of new being used!!!
+    //These aren't, but in the actual methods, they need to be.
 }
 
 MainWindow::~MainWindow()
@@ -90,7 +92,7 @@ QWidget *generateEditorPane(QWidget *parent, QTabWidget *tabWidget) {
  */
 void MainWindow::loadNotebook(Notebook *notebook) {
     openNotebooks->append(notebook);
-    notebookBrowserStringListModel->append(notebook->name);
+    notebookBrowserStringListModel->append(notebook->getName());
     //TODO Open the actual notebook file as a Notebook object
 }
 
@@ -106,7 +108,7 @@ void MainWindow::openNotebook(Notebook *notebook) {
     //For each section in the notebook being opened, add its name to the Section Browser
     for(QVector<Section*>::Iterator it = notebook->loadSectionsList()->begin(); it != notebook->loadSectionsList()->end(); ++it) {
         Section *curSection = *it;
-        sectionBrowserStringListModel->append(curSection->name);
+        sectionBrowserStringListModel->append(curSection->getName());
     }
     //Add Notebook to UI
     currentlyOpenNotebook = notebook;
@@ -127,7 +129,7 @@ void MainWindow::openSection(Section *section) {
             curPage->dragLayout = editorPane;
         }
         //Add the page to the UI with its DragLayout
-        tabWidget->addTab(curPage->dragLayout, curPage->name);
+        tabWidget->addTab(curPage->dragLayout, curPage->getName());
     }
 }
 

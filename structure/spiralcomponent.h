@@ -17,6 +17,23 @@ public:
     /** For the time being, I am going to provide a UUID variable,
      * but since everything will be saved in one file, it may not be necessary.
      * */
+    void setName(QString name) {
+        this->name = name;
+    }
+
+    void setUUID(QString uuid) {
+        this->uuid = uuid;
+    }
+
+    QString getName() {
+        return this->name;
+    }
+
+    QString getUUID() {
+        return this->uuid;
+    }
+
+private:
     QString uuid;
     QString name;
 };
