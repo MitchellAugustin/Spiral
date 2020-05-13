@@ -26,7 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
     //Connect slots (listeners) for the NotebooksListView and SectionsListView
     connect(ui->notebooksListView, SIGNAL(clicked(QModelIndex)), this, SLOT(notebookSelected(QModelIndex)));
     connect(ui->sectionsListView, SIGNAL(clicked(QModelIndex)), this, SLOT(sectionSelected(QModelIndex)));
+    connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(pageSelected(int)));
     connect(ui->actionPrint_Content_to_Log, SIGNAL(triggered()), this, SLOT(printContentToLog()));
+    connect(ui->actionTest_Add_Box, SIGNAL(triggered()), this, SLOT(testAddBoxProgrammatically()));
 
     //The following is a demo using statically defined data of how the windowing system will be implemented
     Notebook *notebook = new Notebook();
@@ -60,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent)
     s2->addPage(n2s2p1);
     nb2->addSection(s2);
     loadNotebook(nb2);
+    pageSelected(0);
     //END SAMPLE
     //NOTE: THESE OBJECTS MUST BE DELETED MANUALLY because of new being used!!!
     //These aren't, but in the actual methods, they need to be.
@@ -131,7 +134,9 @@ void MainWindow::openSection(Section *section) {
         }
         //Add the page to the UI with its DragLayout
         tabWidget->addTab(curPage->dragLayout, curPage->getName());
+        currentlyOpenPage = curPage;
     }
+    currentlyOpenSection = section;
 }
 
 
@@ -151,6 +156,29 @@ void MainWindow::notebookSelected(QModelIndex index) {
     openNotebook(openNotebooks->at(index.row()));
 }
 
+void MainWindow::pageSelected(int index) {
+    qDebug() << "Page selected: " << index;
+    if (currentlyOpenNotebook && currentlyOpenSection) {
+        bool validIndex = (index >= 0) && (index < currentlyOpenSection->loadPagesList()->size());
+        if (validIndex) {
+            currentlyOpenPage = currentlyOpenSection->loadPagesList()->at(index);
+        }
+    }
+}
+
+/**
+ * @brief MainWindow::testAddBoxProgrammatically - Adds a text box to the current page at 50, 50
+ */
+void MainWindow::testAddBoxProgrammatically() {
+    if (currentlyOpenPage && currentlyOpenPage->dragLayout) {
+        QWidget *childAt = currentlyOpenPage->dragLayout->childAt(50, 50);
+        DragLayout *childDrag = dynamic_cast<DragLayout*>(childAt);
+        if (childDrag) {
+            childDrag->newTextBoxAtLocation(QPoint(50, 50));
+        }
+    }
+}
+
 /**
  * @brief MainWindow::printContentToLog - Slot method that is called when the "Print Content To Log" button
  * is clicked that prints all open notebook content to the QDebug output stream
@@ -164,6 +192,7 @@ void MainWindow::printContentToLog() {
         for(QVector<Page*>::Iterator p_it = curSection->loadPagesList()->begin(); p_it != curSection->loadPagesList()->end(); ++p_it) {
             //TEMPORARY - Iterate through and display all of this page's child textbox objects
             Page *curPage = *p_it;
+
             qDebug() << "Page: " << curPage->getName() << "(UUID: " << curPage->getUUID() << ")";
             QVector<TextBox*> children = curPage->textBoxList;
             int iter = 0;

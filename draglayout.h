@@ -10,6 +10,7 @@ class DragLayout : public QWidget
 {
 public:
     explicit DragLayout(QWidget *parent = nullptr, Page *parentPage = nullptr);
+    void newTextBoxAtLocation(QPoint point);
     Page *parentPage;
 
 protected:

@@ -133,6 +133,18 @@ void DragLayout::dropEvent(QDropEvent *event)
     }
 }
 
+void DragLayout::newTextBoxAtLocation(QPoint point) {
+    TextBox *tBox = new TextBox(this);
+    parentPage->textBoxList.append(tBox);
+    qDebug() << "Appended in newTextBoxAtLocation";
+    tBox->richTextEdit->setText("Added programatically");
+    tBox->move(point);
+    tBox->location = point;
+    tBox->show();
+    tBox->setAttribute(Qt::WA_DeleteOnClose);
+    tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
+    return;
+}
 
 
 void DragLayout::mousePressEvent(QMouseEvent *event)

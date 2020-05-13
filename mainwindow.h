@@ -30,6 +30,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     Notebook *currentlyOpenNotebook;
+    Section *currentlyOpenSection;
+    Page *currentlyOpenPage;
     void loadNotebook(Notebook *notebook);
     void openNotebook(Notebook *notebook);
     void openSection(Section *section);
@@ -38,7 +40,9 @@ public:
 protected slots:
     void notebookSelected(QModelIndex index);
     void sectionSelected(QModelIndex index);
+    void pageSelected(int index);
     void printContentToLog();
+    void testAddBoxProgrammatically();
 
 private:
     QVector<Notebook*> *openNotebooks = new QVector<Notebook*>();

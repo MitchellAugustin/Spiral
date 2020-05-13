@@ -89,6 +89,7 @@
      <string>Tools</string>
     </property>
     <addaction name="actionPrint_Content_to_Log"/>
+    <addaction name="actionTest_Add_Box"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -195,6 +196,11 @@
   <action name="actionAbout_Spiral">
    <property name="text">
     <string>About Spiral</string>
+   </property>
+  </action>
+  <action name="actionTest_Add_Box">
+   <property name="text">
+    <string>Test Add Box</string>
    </property>
   </action>
  </widget>
