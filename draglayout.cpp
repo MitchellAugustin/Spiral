@@ -7,7 +7,8 @@ static inline QString spiralContentMimeType() { return SPIRAL_CONTENT_MIME_TYPE;
 static int getHeight(TextBox *tBox) {
     if(tBox->richTextEdit->toPlainText().isEmpty()) {
         DragLayout *parentDrag = (DragLayout*) tBox->parentWidget();
-        parentDrag->parentPage->textBoxList.remove(tBox->thisBoxIndex);
+//        parentDrag->parentPage->textBoxList.remove(tBox->thisBoxIndex);
+        parentDrag->parentPage->textBoxList.removeOne(tBox);
         tBox->close();
         qDebug() << "TextBox " << tBox->uuid << " deleted from getHeight in draglayout";
         return 0;
@@ -85,7 +86,6 @@ void DragLayout::dropEvent(QDropEvent *event)
         qDebug() << "Width from data stream: " << width;
 
         TextBox *tBox = new TextBox(this, uuid);
-        tBox->thisBoxIndex = parentPage->textBoxList.size();
         parentPage->textBoxList.append(tBox);
         qDebug() << "Appended in dropEvent1";
         tBox->richTextEdit->setText(text);
@@ -108,7 +108,6 @@ void DragLayout::dropEvent(QDropEvent *event)
         qDebug() << "TextBox " << tBox->uuid << " moved to " << event->pos();
     } else if (event->mimeData()->hasText()) {
         TextBox *tBox = new TextBox(this);
-        tBox->thisBoxIndex = parentPage->textBoxList.size();
         parentPage->textBoxList.append(tBox);
         qDebug() << "Appended in dropEvent2";
         tBox->richTextEdit->setText(event->mimeData()->text());
@@ -149,7 +148,6 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
 
     if (!child && !childInnerCheck) {
         TextBox *tBox = new TextBox(this);
-        tBox->thisBoxIndex = parentPage->textBoxList.size();
         parentPage->textBoxList.append(tBox);
         qDebug() << "Appended in mousePressEvent";
         tBox->richTextEdit->setText("Type here");
@@ -192,7 +190,9 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
 
 
         if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction) {
-            parentPage->textBoxList.remove(child->thisBoxIndex);
+            qDebug() << "TextBox removed from list in mousePressEvent";
+//            parentPage->textBoxList.remove(child->thisBoxIndex);
+            parentPage->textBoxList.removeOne(child);
             child->close();
         }
         else

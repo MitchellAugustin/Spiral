@@ -134,16 +134,18 @@ void MainWindow::openSection(Section *section) {
 
         //TEMPORARY - Iterate through and display all of this page's child textbox objects
         QVector<TextBox*> children = curPage->textBoxList;
+        int iter = 0;
         foreach(TextBox *obj, children) {
+            qDebug() << "Actually reading box #" << iter;
+            iter++;
             if (obj == nullptr || obj->richTextEdit == nullptr) {
                 qDebug() << "Removed TextBox was at this index";
                 continue;
             }
             if (obj->richTextEdit->toPlainText().isEmpty()) {
                 qDebug() << "Empty box found, deleting...";
-                int oldIndex = obj->thisBoxIndex;
+                curPage->textBoxList.removeOne(obj);
                 obj->close();
-                curPage->textBoxList.insert(oldIndex, nullptr);
             }
             else {
                 qDebug() << "HTML:";
