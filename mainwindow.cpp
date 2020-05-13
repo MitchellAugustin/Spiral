@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     //Connect slots (listeners) for the NotebooksListView and SectionsListView
     connect(ui->notebooksListView, SIGNAL(clicked(QModelIndex)), this, SLOT(notebookSelected(QModelIndex)));
     connect(ui->sectionsListView, SIGNAL(clicked(QModelIndex)), this, SLOT(sectionSelected(QModelIndex)));
+    connect(ui->actionPrint_Content_to_Log, SIGNAL(triggered()), this, SLOT(printContentToLog()));
 
     //The following is a demo using statically defined data of how the windowing system will be implemented
     Notebook *notebook = new Notebook();
@@ -130,28 +131,6 @@ void MainWindow::openSection(Section *section) {
         }
         //Add the page to the UI with its DragLayout
         tabWidget->addTab(curPage->dragLayout, curPage->getName());
-
-
-        //TEMPORARY - Iterate through and display all of this page's child textbox objects
-        QVector<TextBox*> children = curPage->textBoxList;
-        int iter = 0;
-        foreach(TextBox *obj, children) {
-            qDebug() << "Actually reading box #" << iter;
-            iter++;
-            if (obj == nullptr || obj->richTextEdit == nullptr) {
-                qDebug() << "Removed TextBox was at this index";
-                continue;
-            }
-            if (obj->richTextEdit->toPlainText().isEmpty()) {
-                qDebug() << "Empty box found, deleting...";
-                curPage->textBoxList.removeOne(obj);
-                obj->close();
-            }
-            else {
-                qDebug() << "HTML:";
-                qDebug() << obj->richTextEdit->toHtml();
-            }
-        }
     }
 }
 
@@ -170,4 +149,41 @@ void MainWindow::sectionSelected(QModelIndex index) {
  */
 void MainWindow::notebookSelected(QModelIndex index) {
     openNotebook(openNotebooks->at(index.row()));
+}
+
+/**
+ * @brief MainWindow::printContentToLog - Slot method that is called when the "Print Content To Log" button
+ * is clicked that prints all open notebook content to the QDebug output stream
+ */
+void MainWindow::printContentToLog() {
+    //Print all notebook content to the log
+    qDebug() << "Content in Notebook: " << currentlyOpenNotebook->getName() << "(UUID: " << currentlyOpenNotebook->getUUID() << ")";
+    for(QVector<Section*>::Iterator it = currentlyOpenNotebook->loadSectionsList()->begin(); it != currentlyOpenNotebook->loadSectionsList()->end(); ++it) {
+        Section *curSection = *it;
+        qDebug() << "Section: " << curSection->getName() << "(UUID: " << curSection->getUUID() << ")";
+        for(QVector<Page*>::Iterator p_it = curSection->loadPagesList()->begin(); p_it != curSection->loadPagesList()->end(); ++p_it) {
+            //TEMPORARY - Iterate through and display all of this page's child textbox objects
+            Page *curPage = *p_it;
+            qDebug() << "Page: " << curPage->getName() << "(UUID: " << curPage->getUUID() << ")";
+            QVector<TextBox*> children = curPage->textBoxList;
+            int iter = 0;
+            foreach(TextBox *obj, children) {
+                qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid << ") (#" << iter << ")";
+                iter++;
+                if (obj == nullptr || obj->richTextEdit == nullptr) {
+                    qDebug() << "Removed TextBox was at this index";
+                    continue;
+                }
+                if (obj->richTextEdit->toPlainText().isEmpty()) {
+                    qDebug() << "Empty box found, deleting...";
+                    curPage->textBoxList.removeOne(obj);
+                    obj->close();
+                }
+                else {
+                    qDebug() << "HTML:";
+                    qDebug() << obj->richTextEdit->toHtml();
+                }
+            }
+        }
+    }
 }

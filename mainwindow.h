@@ -38,6 +38,7 @@ public:
 protected slots:
     void notebookSelected(QModelIndex index);
     void sectionSelected(QModelIndex index);
+    void printContentToLog();
 
 private:
     QVector<Notebook*> *openNotebooks = new QVector<Notebook*>();

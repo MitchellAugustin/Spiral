@@ -90,6 +90,7 @@ void DragLayout::dropEvent(QDropEvent *event)
         qDebug() << "Appended in dropEvent1";
         tBox->richTextEdit->setText(text);
         tBox->move(event->pos() - offset);
+        tBox->location = event->pos();
         tBox->show();
         tBox->setAttribute(Qt::WA_DeleteOnClose);
         tBox->resize(width, getHeight(tBox));
@@ -112,6 +113,7 @@ void DragLayout::dropEvent(QDropEvent *event)
         qDebug() << "Appended in dropEvent2";
         tBox->richTextEdit->setText(event->mimeData()->text());
         tBox->move(event->pos());
+        tBox->location = event->pos();
         tBox->show();
         tBox->setAttribute(Qt::WA_DeleteOnClose);
         tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
@@ -152,6 +154,7 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
         qDebug() << "Appended in mousePressEvent";
         tBox->richTextEdit->setText("Type here");
         tBox->move(event->pos());
+        tBox->location = event->pos();
         tBox->show();
         tBox->setAttribute(Qt::WA_DeleteOnClose);
         tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
