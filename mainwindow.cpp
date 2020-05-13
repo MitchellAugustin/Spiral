@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->sectionsListView, SIGNAL(clicked(QModelIndex)), this, SLOT(sectionSelected(QModelIndex)));
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(pageSelected(int)));
     connect(ui->actionPrint_Content_to_Log, SIGNAL(triggered()), this, SLOT(printContentToLog()));
+    connect(ui->actionClean_Empty_Boxes, SIGNAL(triggered()), this, SLOT(emptyBoxCleanup()));
     connect(ui->actionTest_Add_Box, SIGNAL(triggered()), this, SLOT(testAddBoxProgrammatically()));
 
     //The following is a demo using statically defined data of how the windowing system will be implemented
@@ -162,6 +163,7 @@ void MainWindow::pageSelected(int index) {
         bool validIndex = (index >= 0) && (index < currentlyOpenSection->loadPagesList()->size());
         if (validIndex) {
             currentlyOpenPage = currentlyOpenSection->loadPagesList()->at(index);
+            emptyBoxCleanup();
         }
     }
 }
@@ -197,7 +199,9 @@ void MainWindow::printContentToLog() {
             QVector<TextBox*> children = curPage->textBoxList;
             int iter = 0;
             foreach(TextBox *obj, children) {
-                qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid << ") (#" << iter << ")";
+                qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid <<
+                            ") (" << obj->size().width() << "x" << obj->size().height() <<
+                            ") (#" << iter << ")";
                 iter++;
                 if (obj == nullptr || obj->richTextEdit == nullptr) {
                     qDebug() << "Removed TextBox was at this index";
@@ -211,6 +215,37 @@ void MainWindow::printContentToLog() {
                 else {
                     qDebug() << "HTML:";
                     qDebug() << obj->richTextEdit->toHtml();
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @brief MainWindow::emptyBoxCleanup - Removes all empty boxes
+ */
+void MainWindow::emptyBoxCleanup() {
+    //Print all notebook content to the log
+    for(QVector<Section*>::Iterator it = currentlyOpenNotebook->loadSectionsList()->begin(); it != currentlyOpenNotebook->loadSectionsList()->end(); ++it) {
+        Section *curSection = *it;
+        for(QVector<Page*>::Iterator p_it = curSection->loadPagesList()->begin(); p_it != curSection->loadPagesList()->end(); ++p_it) {
+            //TEMPORARY - Iterate through and display all of this page's child textbox objects
+            Page *curPage = *p_it;
+
+            QVector<TextBox*> children = curPage->textBoxList;
+            int iter = 0;
+            foreach(TextBox *obj, children) {
+                iter++;
+                if (obj == nullptr || obj->richTextEdit == nullptr) {
+                    qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid << ") (#" << iter << ") is empty, removing";
+                    qDebug() << "Removed TextBox was at this index";
+                    continue;
+                }
+                if (obj->richTextEdit->toPlainText().isEmpty()) {
+                    qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid << ") (#" << iter << ") is empty, removing";
+                    qDebug() << "Empty box found, deleting...";
+                    curPage->textBoxList.removeOne(obj);
+                    obj->close();
                 }
             }
         }

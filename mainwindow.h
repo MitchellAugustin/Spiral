@@ -36,6 +36,8 @@ public:
     void openNotebook(Notebook *notebook);
     void openSection(Section *section);
     Ui::MainWindow *ui;
+public slots:
+    void emptyBoxCleanup();
 
 protected slots:
     void notebookSelected(QModelIndex index);

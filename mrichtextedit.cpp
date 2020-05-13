@@ -24,6 +24,7 @@
 #include "mrichtextedit.h"
 #include "textbox.h"
 #include "draglayout.h"
+#include "mainwindow.h"
 #include <QApplication>
 #include <QClipboard>
 #include <QMimeData>
@@ -45,6 +46,13 @@
 int MRichTextEdit::getHeight() {
     if(toPlainText().isEmpty()) {
         document()->clear();
+        QWidget *parent = parentWidget();
+        MainWindow *win = dynamic_cast<MainWindow*>(parent);
+        while (!win) {
+            parent = parent->parentWidget();
+            win = dynamic_cast<MainWindow*>(parent);
+        }
+        win->emptyBoxCleanup();
 //        parentWidget()->close();
         qDebug() << "TextBox deleted from getHeight in mrichtextedit";
         return 0;
