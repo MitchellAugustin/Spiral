@@ -4,7 +4,6 @@
 #include <QVector>
 
 #include "spiralcomponent.h"
-#include "textbox.h"
 #include "draglayout.h"
 
 class Page : public SpiralComponent
@@ -16,6 +15,7 @@ public:
     const QString class_name = "Page";
 
     QWidget *dragLayout = nullptr;
+    QVector<TextBox*> textBoxList;
 };
 
 #endif // PAGE_H

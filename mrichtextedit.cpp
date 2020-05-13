@@ -45,7 +45,7 @@
 int MRichTextEdit::getHeight() {
     if(toPlainText().isEmpty()) {
         document()->clear();
-        parentWidget()->close();
+//        parentWidget()->close();
         qDebug() << "TextBox deleted from getHeight in mrichtextedit";
         return 0;
     }

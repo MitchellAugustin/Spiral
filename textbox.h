@@ -24,6 +24,7 @@ public:
     QString uuid;
     MRichTextEdit* richTextEdit = new MRichTextEdit(this);
     QPoint *location;
+    int thisBoxIndex;
 };
 
 #endif // TEXTBOX_H

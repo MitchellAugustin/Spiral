@@ -75,8 +75,8 @@ MainWindow::~MainWindow()
  * @param tabWidget
  * @return
  */
-QWidget *generateEditorPane(QWidget *parent, QTabWidget *tabWidget) {
-    DragLayout *customDragLayout = new DragLayout(tabWidget);
+QWidget *generateEditorPane(QWidget *parent, QTabWidget *tabWidget, Page *parentPage) {
+    DragLayout *customDragLayout = new DragLayout(tabWidget, parentPage);
 
 
     QScrollArea *scrollArea = new QScrollArea(parent);
@@ -125,11 +125,31 @@ void MainWindow::openSection(Section *section) {
         Page *curPage = *p_it;
         //If the page has not yet been generated a DragLayout, generate one
         if(curPage->dragLayout == nullptr) {
-            QWidget *editorPane = generateEditorPane(this, tabWidget);
+            QWidget *editorPane = generateEditorPane(this, tabWidget, curPage);
             curPage->dragLayout = editorPane;
         }
         //Add the page to the UI with its DragLayout
         tabWidget->addTab(curPage->dragLayout, curPage->getName());
+
+
+        //TEMPORARY - Iterate through and display all of this page's child textbox objects
+        QVector<TextBox*> children = curPage->textBoxList;
+        foreach(TextBox *obj, children) {
+            if (obj == nullptr || obj->richTextEdit == nullptr) {
+                qDebug() << "Removed TextBox was at this index";
+                continue;
+            }
+            if (obj->richTextEdit->toPlainText().isEmpty()) {
+                qDebug() << "Empty box found, deleting...";
+                int oldIndex = obj->thisBoxIndex;
+                obj->close();
+                curPage->textBoxList.insert(oldIndex, nullptr);
+            }
+            else {
+                qDebug() << "HTML:";
+                qDebug() << obj->richTextEdit->toHtml();
+            }
+        }
     }
 }
 

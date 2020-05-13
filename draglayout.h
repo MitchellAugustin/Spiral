@@ -3,12 +3,14 @@
 
 #include <QWidget>
 #include <textbox.h>
+#include "structure/page.h"
 #include "constants.h"
 
 class DragLayout : public QWidget
 {
 public:
-    explicit DragLayout(QWidget *parent = nullptr);
+    explicit DragLayout(QWidget *parent = nullptr, Page *parentPage = nullptr);
+    Page *parentPage;
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;

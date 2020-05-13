@@ -6,6 +6,8 @@ static inline QString spiralContentMimeType() { return SPIRAL_CONTENT_MIME_TYPE;
 
 static int getHeight(TextBox *tBox) {
     if(tBox->richTextEdit->toPlainText().isEmpty()) {
+        DragLayout *parentDrag = (DragLayout*) tBox->parentWidget();
+        parentDrag->parentPage->textBoxList.remove(tBox->thisBoxIndex);
         tBox->close();
         qDebug() << "TextBox " << tBox->uuid << " deleted from getHeight in draglayout";
         return 0;
@@ -13,9 +15,10 @@ static int getHeight(TextBox *tBox) {
     return utilities::getMRichTextEditHeight(tBox->richTextEdit);
 }
 
-DragLayout::DragLayout(QWidget *parent) : QWidget(parent)
+DragLayout::DragLayout(QWidget *parent, Page *parentPage) : QWidget(parent)
 {
     setAcceptDrops(true);
+    this->parentPage = parentPage;
 }
 
 
@@ -82,6 +85,9 @@ void DragLayout::dropEvent(QDropEvent *event)
         qDebug() << "Width from data stream: " << width;
 
         TextBox *tBox = new TextBox(this, uuid);
+        tBox->thisBoxIndex = parentPage->textBoxList.size();
+        parentPage->textBoxList.append(tBox);
+        qDebug() << "Appended in dropEvent1";
         tBox->richTextEdit->setText(text);
         tBox->move(event->pos() - offset);
         tBox->show();
@@ -102,6 +108,9 @@ void DragLayout::dropEvent(QDropEvent *event)
         qDebug() << "TextBox " << tBox->uuid << " moved to " << event->pos();
     } else if (event->mimeData()->hasText()) {
         TextBox *tBox = new TextBox(this);
+        tBox->thisBoxIndex = parentPage->textBoxList.size();
+        parentPage->textBoxList.append(tBox);
+        qDebug() << "Appended in dropEvent2";
         tBox->richTextEdit->setText(event->mimeData()->text());
         tBox->move(event->pos());
         tBox->show();
@@ -140,6 +149,9 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
 
     if (!child && !childInnerCheck) {
         TextBox *tBox = new TextBox(this);
+        tBox->thisBoxIndex = parentPage->textBoxList.size();
+        parentPage->textBoxList.append(tBox);
+        qDebug() << "Appended in mousePressEvent";
         tBox->richTextEdit->setText("Type here");
         tBox->move(event->pos());
         tBox->show();
@@ -179,8 +191,10 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
         child->hide();
 
 
-        if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction)
+        if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction) {
+            parentPage->textBoxList.remove(child->thisBoxIndex);
             child->close();
+        }
         else
             child->show();
     }
