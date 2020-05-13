@@ -4,10 +4,14 @@
 
 static inline QString spiralContentMimeType() { return SPIRAL_CONTENT_MIME_TYPE; }
 
+/**
+ * @brief getHeight - Returns the height of the parameterized TextBox and closes it if empty
+ * @param tBox
+ * @return
+ */
 static int getHeight(TextBox *tBox) {
     if(tBox->richTextEdit->toPlainText().isEmpty()) {
         DragLayout *parentDrag = (DragLayout*) tBox->parentWidget();
-//        parentDrag->parentPage->textBoxList.remove(tBox->thisBoxIndex);
         parentDrag->parentPage->textBoxList.removeOne(tBox);
         tBox->close();
         qDebug() << "TextBox " << tBox->uuid << " deleted from getHeight in draglayout";
@@ -16,6 +20,11 @@ static int getHeight(TextBox *tBox) {
     return utilities::getMRichTextEditHeight(tBox->richTextEdit);
 }
 
+/**
+ * @brief DragLayout::DragLayout - Initializes a new DragLayout()
+ * @param parent
+ * @param parentPage
+ */
 DragLayout::DragLayout(QWidget *parent, Page *parentPage) : QWidget(parent)
 {
     setAcceptDrops(true);
@@ -23,6 +32,10 @@ DragLayout::DragLayout(QWidget *parent, Page *parentPage) : QWidget(parent)
 }
 
 
+/**
+ * @brief DragLayout::dragEnterEvent - Handles this DragLayout's QDragEnterEvents
+ * @param event
+ */
 void DragLayout::dragEnterEvent(QDragEnterEvent *event)
 {
     //Handles movement of Spiral text boxes
@@ -42,6 +55,10 @@ void DragLayout::dragEnterEvent(QDragEnterEvent *event)
 }
 
 
+/**
+ * @brief DragLayout::dragMoveEvent - Handles this DragLayout's QDragMoveEvents
+ * @param event
+ */
 void DragLayout::dragMoveEvent(QDragMoveEvent *event)
 {
     if (event->mimeData()->hasFormat(spiralContentMimeType())) {
@@ -68,7 +85,10 @@ void DragLayout::dragMoveEvent(QDragMoveEvent *event)
     }
 }
 
-
+/**
+ * @brief DragLayout::dropEvent - Handles this DragLayout's QDropEvents
+ * @param event
+ */
 void DragLayout::dropEvent(QDropEvent *event)
 {
     if (event->mimeData()->hasFormat(spiralContentMimeType())) {
@@ -133,6 +153,11 @@ void DragLayout::dropEvent(QDropEvent *event)
     }
 }
 
+/**
+ * @brief DragLayout::newTextBoxAtLocation - Programmatically inserts a new TextBox at the parameterized point
+ * Note: This is mainly a proof-of-concept to show that this can be done upon file load
+ * @param point
+ */
 void DragLayout::newTextBoxAtLocation(QPoint point) {
     TextBox *tBox = new TextBox(this);
     parentPage->textBoxList.append(tBox);
@@ -146,16 +171,15 @@ void DragLayout::newTextBoxAtLocation(QPoint point) {
     return;
 }
 
-
+/**
+ * @brief DragLayout::mousePressEvent - Handles this DragLayout's QMouseEvents
+ * @param event
+ */
 void DragLayout::mousePressEvent(QMouseEvent *event)
 {
     TextBox *child = dynamic_cast<TextBox*>(childAt(event->pos()));
     QFrame *childQFrameCheck = dynamic_cast<QFrame*>(childAt(event->pos()));
     MRichTextEdit *childMRichTextEditCheck = dynamic_cast<MRichTextEdit*>(childAt(event->pos()));
-
-//    qDebug() << "child: " << child;
-//    qDebug() << "childQFrame: " << childQFrameCheck;
-//    qDebug() << "childMText: " << childMRichTextEditCheck;
 
     //Ensures that drag operations are not handled unless the user is dragging a TextBox object
     bool childInnerCheck = child && !(childQFrameCheck || childMRichTextEditCheck);
@@ -175,7 +199,6 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
     }
 
     //If the user is dragging a TextBox object by its draggable area and NOT touching an inner layout component
-//    qDebug() << "childInnerCheck: " << childInnerCheck;
     if (child && childInnerCheck) {
         QPoint hotSpot = event->pos() - child->pos();
 
@@ -206,7 +229,6 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
 
         if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction) {
             qDebug() << "TextBox removed from list in mousePressEvent";
-//            parentPage->textBoxList.remove(child->thisBoxIndex);
             parentPage->textBoxList.removeOne(child);
             child->close();
         }
