@@ -42,6 +42,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionPrint_Content_to_Log, SIGNAL(triggered()), this, SLOT(printContentToLog()));
     connect(ui->actionClean_Empty_Boxes, SIGNAL(triggered()), this, SLOT(emptyBoxCleanup()));
     connect(ui->actionTest_Add_Box, SIGNAL(triggered()), this, SLOT(testAddBoxProgrammatically()));
+    connect(ui->actionPage, SIGNAL(triggered()), this, SLOT(newPageButtonClicked()));
+    connect(ui->actionSection, SIGNAL(triggered()), this, SLOT(newSectionButtonClicked()));
+    connect(ui->actionNotebook, SIGNAL(triggered()), this, SLOT(newNotebookButtonClicked()));
 
     //The following is a demo using statically defined data of how the windowing system will be implemented
     Notebook *notebook = new Notebook();
@@ -154,6 +157,78 @@ void MainWindow::openSection(Section *section) {
     currentlyOpenSection = section;
 }
 
+
+/**
+ * @brief MainWindow::newPageButtonClicked - Called when the "New Page" button is clicked
+ */
+void MainWindow::newPageButtonClicked() {
+    bool res;
+    QString text = QInputDialog::getText(0, "New Page Name", "Name: ", QLineEdit::Normal, "", &res);
+    if (res && !text.isEmpty()) {
+        newPage(currentlyOpenSection, text);
+    }
+}
+
+/**
+ * @brief MainWindow::newSectionButtonClicked - Called when the "New Section" button is clicked
+ */
+void MainWindow::newSectionButtonClicked() {
+    bool res;
+    QString text = QInputDialog::getText(0, "New Section Name", "Name: ", QLineEdit::Normal, "", &res);
+    if (res && !text.isEmpty()) {
+        newSection(currentlyOpenNotebook, text);
+    }
+}
+
+/**
+ * @brief MainWindow::newNotebookButtonClicked - Called when the "New Notebook" button is clicked
+ */
+void MainWindow::newNotebookButtonClicked() {
+    //TODO Implement this after file I/O is implemented
+    qDebug() << "New notebook not implemented";
+}
+
+/**
+ * @brief MainWindow::newNotebook - Creates a new Notebook
+ * @param notebookName
+ */
+void MainWindow::newNotebook(QString notebookName) {
+    qDebug() << "New notebook:" << notebookName;
+}
+
+/**
+ * @brief MainWindow::newSection - Creates a new section within the parameterized Notebook
+ * @param notebook
+ * @param sectionName
+ */
+void MainWindow::newSection(Notebook *notebook, QString sectionName) {
+    qDebug() << "New section:" << sectionName;
+    Section *section = new Section();
+    section->setName(sectionName);
+    currentlyOpenNotebook->addSection(section);
+    openSection(section);
+    sectionBrowserStringListModel->append(section->getName());
+}
+
+/**
+ * @brief MainWindow::newPage - Adds a new page within the parameterized Section
+ * @param section
+ * @param pageName
+ */
+void MainWindow::newPage(Section *section, QString pageName) {
+    Page *curPage = new Page();
+    curPage->setName(pageName);
+    //If the page has not yet been generated a DragLayout, generate one
+    if(curPage->dragLayout == nullptr) {
+        QWidget *editorPane = generateEditorPane(this, tabWidget, curPage);
+        curPage->dragLayout = editorPane;
+    }
+    //Add the page to the UI with its DragLayout
+    tabWidget->addTab(curPage->dragLayout, curPage->getName());
+    tabWidget->setCurrentIndex(tabWidget->count() - 1);
+    currentlyOpenPage = curPage;
+    currentlyOpenSection->addPage(curPage);
+}
 
 /**
  * @brief MainWindow::sectionSelected - Open the selected section in the UI

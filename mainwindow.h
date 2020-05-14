@@ -35,6 +35,9 @@ public:
     void loadNotebook(Notebook *notebook);
     void openNotebook(Notebook *notebook);
     void openSection(Section *section);
+    void newNotebook(QString notebookName);
+    void newSection(Notebook *notebook, QString sectionName);
+    void newPage(Section *section, QString pageName);
     void checkNameChanges();
     Ui::MainWindow *ui;
 public slots:
@@ -47,6 +50,9 @@ protected slots:
     void sectionNameChanged(QModelIndex index);
     void pageDoubleClicked(int index);
     void pageSelected(int index);
+    void newPageButtonClicked();
+    void newSectionButtonClicked();
+    void newNotebookButtonClicked();
     void printContentToLog();
     void testAddBoxProgrammatically();
 
