@@ -35,6 +35,7 @@ public:
     void loadNotebook(Notebook *notebook);
     void openNotebook(Notebook *notebook);
     void openSection(Section *section);
+    void checkNameChanges();
     Ui::MainWindow *ui;
 public slots:
     void emptyBoxCleanup();
@@ -42,6 +43,9 @@ public slots:
 protected slots:
     void notebookSelected(QModelIndex index);
     void sectionSelected(QModelIndex index);
+    void notebookNameChanged(QModelIndex index);
+    void sectionNameChanged(QModelIndex index);
+    void pageDoubleClicked(int index);
     void pageSelected(int index);
     void printContentToLog();
     void testAddBoxProgrammatically();
