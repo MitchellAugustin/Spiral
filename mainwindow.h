@@ -53,6 +53,9 @@ protected slots:
     void newPageButtonClicked();
     void newSectionButtonClicked();
     void newNotebookButtonClicked();
+    void tabCloseRequested(int index);
+    void deletePageButtonClicked();
+    void deleteSectionButtonClicked();
     void printContentToLog();
     void testAddBoxProgrammatically();
 

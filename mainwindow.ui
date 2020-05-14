@@ -78,7 +78,15 @@
      <addaction name="separator"/>
      <addaction name="actionExplain_Choices_on_this_menu"/>
     </widget>
+    <widget class="QMenu" name="menuDelete">
+     <property name="title">
+      <string>Delete</string>
+     </property>
+     <addaction name="actionDelete_Current_Section"/>
+     <addaction name="actionDelete_Current_Page"/>
+    </widget>
     <addaction name="menuNew"/>
+    <addaction name="menuDelete"/>
     <addaction name="actionOpen"/>
     <addaction name="actionClose_This_Notebook"/>
     <addaction name="actionNotebook_Properties"/>
@@ -216,6 +224,22 @@
   <action name="actionClean_Empty_Boxes">
    <property name="text">
     <string>Clean Empty Boxes</string>
+   </property>
+  </action>
+  <action name="actionDelete_Current_Section">
+   <property name="text">
+    <string>Current Section</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+W</string>
+   </property>
+  </action>
+  <action name="actionDelete_Current_Page">
+   <property name="text">
+    <string>Current Page</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
    </property>
   </action>
  </widget>

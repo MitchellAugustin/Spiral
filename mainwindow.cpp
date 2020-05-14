@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     //Set window title and instantiate tab widget
     MainWindow::setWindowTitle("Test Notebook");
     tabWidget = new QTabWidget(this);
+    tabWidget->setTabsClosable(true);
 
 
     //Add the UI Elements to their proper locations
@@ -37,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->notebooksListView, SIGNAL(entered(QModelIndex)), this, SLOT(notebookNameChanged(QModelIndex)));
     connect(ui->sectionsListView, SIGNAL(entered(QModelIndex)), this, SLOT(sectionNameChanged(QModelIndex)));
     connect(tabWidget, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(pageDoubleClicked(int)));
+    connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
 
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(pageSelected(int)));
     connect(ui->actionPrint_Content_to_Log, SIGNAL(triggered()), this, SLOT(printContentToLog()));
@@ -45,6 +47,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionPage, SIGNAL(triggered()), this, SLOT(newPageButtonClicked()));
     connect(ui->actionSection, SIGNAL(triggered()), this, SLOT(newSectionButtonClicked()));
     connect(ui->actionNotebook, SIGNAL(triggered()), this, SLOT(newNotebookButtonClicked()));
+    connect(ui->actionDelete_Current_Page, SIGNAL(triggered()), this, SLOT(deletePageButtonClicked()));
+    connect(ui->actionDelete_Current_Section, SIGNAL(triggered()), this, SLOT(deleteSectionButtonClicked()));
 
     //The following is a demo using statically defined data of how the windowing system will be implemented
     Notebook *notebook = new Notebook();
@@ -157,6 +161,35 @@ void MainWindow::openSection(Section *section) {
     currentlyOpenSection = section;
 }
 
+/**
+ * @brief MainWindow::deletePageButtonClicked - Called when the "Delete Page" button is clicked
+ */
+void MainWindow::deletePageButtonClicked() {
+    tabCloseRequested(tabWidget->currentIndex());
+}
+
+/**
+ * @brief MainWindow::deleteSectionButtonClicked - Called when the "Delete Section" button is clicked
+ */
+void MainWindow::deleteSectionButtonClicked() {
+    QMessageBox::StandardButton res = QMessageBox::question(this, "Confirm Deletion", "Are you sure you want to delete this section?",
+                                                    QMessageBox::Yes|QMessageBox::No);
+    if (res == QMessageBox::Yes) {
+        if (currentlyOpenNotebook->loadSectionsList()->count() > 1) {
+            Section *toDelete = currentlyOpenSection;
+            int index = currentlyOpenNotebook->loadSectionsList()->indexOf(toDelete);
+            currentlyOpenNotebook->loadSectionsList()->removeAt(index);
+            sectionBrowserStringListModel->removeRow(index);
+            openSection(currentlyOpenNotebook->loadSectionsList()->first());
+            delete toDelete;
+        }
+        else {
+            QMessageBox::information(this, "Cannot Delete", "You cannot delete the only section of a notebook");
+        }
+    }
+
+}
+
 
 /**
  * @brief MainWindow::newPageButtonClicked - Called when the "New Page" button is clicked
@@ -186,6 +219,21 @@ void MainWindow::newSectionButtonClicked() {
 void MainWindow::newNotebookButtonClicked() {
     //TODO Implement this after file I/O is implemented
     qDebug() << "New notebook not implemented";
+}
+
+/**
+ * @brief MainWindow::tabCloseRequested - Removes the page from the notebook
+ * @param index
+ */
+void MainWindow::tabCloseRequested(int index) {
+    QMessageBox::StandardButton res = QMessageBox::question(this, "Confirm Deletion", "Are you sure you want to delete this page?",
+                                                    QMessageBox::Yes|QMessageBox::No);
+    if (res == QMessageBox::Yes) {
+        qDebug() << "Tab closed:" << index;
+        tabWidget->removeTab(index);
+        delete currentlyOpenSection->loadPagesList()->at(index)->dragLayout;
+        currentlyOpenSection->loadPagesList()->removeAt(index);
+    }
 }
 
 /**
