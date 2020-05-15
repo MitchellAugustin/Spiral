@@ -32,6 +32,8 @@ public:
     Notebook *currentlyOpenNotebook;
     Section *currentlyOpenSection;
     Page *currentlyOpenPage;
+    void newNotebookAtFile(QString filePath);
+    void openNotebookFromFile(QString filePath);
     void loadNotebook(Notebook *notebook);
     void openNotebook(Notebook *notebook);
     void openSection(Section *section);
@@ -56,8 +58,10 @@ protected slots:
     void tabCloseRequested(int index);
     void deletePageButtonClicked();
     void deleteSectionButtonClicked();
+    void closeNotebookButtonClicked();
     void printContentToLog();
     void testAddBoxProgrammatically();
+    void openNotebookButtonClicked();
 
 private:
     QVector<Notebook*> *openNotebooks = new QVector<Notebook*>();

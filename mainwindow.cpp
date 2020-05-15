@@ -49,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionNotebook, SIGNAL(triggered()), this, SLOT(newNotebookButtonClicked()));
     connect(ui->actionDelete_Current_Page, SIGNAL(triggered()), this, SLOT(deletePageButtonClicked()));
     connect(ui->actionDelete_Current_Section, SIGNAL(triggered()), this, SLOT(deleteSectionButtonClicked()));
+    connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openNotebookButtonClicked()));
+    connect(ui->actionClose_This_Notebook, SIGNAL(triggered()), this, SLOT(closeNotebookButtonClicked()));
 
     //The following is a demo using statically defined data of how the windowing system will be implemented
     Notebook *notebook = new Notebook();
@@ -109,6 +111,57 @@ QWidget *generateEditorPane(QWidget *parent, QTabWidget *tabWidget, Page *parent
     scrollArea->setWidget(customDragLayout);
 
     return scrollArea;
+}
+
+/**
+ * @brief MainWindow::newNotebookButtonClicked - Called when the "New Notebook" button is clicked
+ */
+void MainWindow::newNotebookButtonClicked() {
+    QString fileURL = QFileDialog::getSaveFileName(this, tr("Save File"), "/home/", tr("Spiral Notebooks (*.snb)"));
+    newNotebookAtFile(fileURL);
+}
+
+/**
+ * @brief MainWindow::openNotebookButtonPressed - Called when the "Open Notebook" button is clicked
+ */
+void MainWindow::openNotebookButtonClicked() {
+    QString fileURL = QFileDialog::getOpenFileName(this, tr("Open File"), "/home/", tr("Spiral Notebooks (*.snb)"));
+    openNotebookFromFile(fileURL);
+}
+
+/**
+ * @brief MainWindow::newNotebookAtFile - Generates a new Notebook object with the given path, loads it into the viewport,
+ * and saves it at that path
+ * @param filePath
+ */
+void MainWindow::newNotebookAtFile(QString filePath) {
+    Notebook *newNotebook = new Notebook();
+    newNotebook->path = filePath;
+    bool res;
+    QString text = QInputDialog::getText(0, "New Notebook Name", "Name: ", QLineEdit::Normal, "", &res);
+    if (res && !text.isEmpty()) {
+        newNotebook->setName(text);
+    }
+    else {
+        newNotebook->setName("New Notebook");
+    }
+    Section *newSection = new Section();
+    newSection->setName("New Section");
+    Page *newPage = new Page();
+    newPage->setName("New Page");
+    newSection->addPage(newPage);
+    newNotebook->addSection(newSection);
+    loadNotebook(newNotebook);
+    openNotebook(newNotebook);
+    //TODO Save this notebook to its corresponding .snb file
+}
+
+/**
+ * @brief MainWindow::openNotebookFromFile - Parses the notebook file at the given path and loads it into the viewport.
+ * @param filePath
+ */
+void MainWindow::openNotebookFromFile(QString filePath) {
+    qDebug() << "Opening notebook at location:" << filePath;
 }
 
 /**
@@ -190,6 +243,32 @@ void MainWindow::deleteSectionButtonClicked() {
 
 }
 
+/**
+ * @brief MainWindow::closeNotebookButtonClicked - Closes the currently open notebook
+ */
+void MainWindow::closeNotebookButtonClicked() {
+    QMessageBox::StandardButton res = QMessageBox::question(this, "Confirm Close", "Are you sure you want to close this notebook?"
+                                                                                   " (Closing the notebook will NOT delete it from the disk)",
+                                                    QMessageBox::Yes|QMessageBox::No);
+    if (res == QMessageBox::Yes) {
+        Notebook *toClose = currentlyOpenNotebook;
+        int index = openNotebooks->indexOf(currentlyOpenNotebook);
+        notebookBrowserStringListModel->removeRow(index);
+        openNotebooks->removeAt(index);
+        if (openNotebooks->count() > 0) {
+            openNotebook(openNotebooks->first());
+            delete toClose;
+        }
+        else {
+            sectionBrowserStringListModel->removeRows(0, sectionBrowserStringListModel->rowCount());
+            tabWidget->clear();
+            currentlyOpenNotebook = nullptr;
+            currentlyOpenSection = nullptr;
+            currentlyOpenPage = nullptr;
+            delete toClose;
+        }
+    }
+}
 
 /**
  * @brief MainWindow::newPageButtonClicked - Called when the "New Page" button is clicked
@@ -213,13 +292,6 @@ void MainWindow::newSectionButtonClicked() {
     }
 }
 
-/**
- * @brief MainWindow::newNotebookButtonClicked - Called when the "New Notebook" button is clicked
- */
-void MainWindow::newNotebookButtonClicked() {
-    //TODO Implement this after file I/O is implemented
-    qDebug() << "New notebook not implemented";
-}
 
 /**
  * @brief MainWindow::tabCloseRequested - Removes the page from the notebook
@@ -250,6 +322,10 @@ void MainWindow::newNotebook(QString notebookName) {
  * @param sectionName
  */
 void MainWindow::newSection(Notebook *notebook, QString sectionName) {
+    if (notebook == nullptr) {
+        QMessageBox::information(this, "Cannot Create Section", "Please open or create a new notebook before creating a new section");
+        return;
+    }
     qDebug() << "New section:" << sectionName;
     Section *section = new Section();
     section->setName(sectionName);
@@ -264,6 +340,10 @@ void MainWindow::newSection(Notebook *notebook, QString sectionName) {
  * @param pageName
  */
 void MainWindow::newPage(Section *section, QString pageName) {
+    if (section == nullptr) {
+        QMessageBox::information(this, "Cannot Create Page", "Please open or create a new notebook and section before creating a new page");
+        return;
+    }
     Page *curPage = new Page();
     curPage->setName(pageName);
     //If the page has not yet been generated a DragLayout, generate one
@@ -328,8 +408,10 @@ void MainWindow::checkNameChanges() {
  * @param newName
  */
 void MainWindow::notebookNameChanged(QModelIndex index) {
-    qDebug() << "Notebook name changed: " << openNotebooks->at(index.row())->getName() << "->" << index.data().toString();
-    openNotebooks->at(index.row())->setName(index.data().toString());
+    if (openNotebooks->at(index.row())->getName().compare(index.data().toString()) != 0) {
+        qDebug() << "Notebook name changed: " << openNotebooks->at(index.row())->getName() << "->" << index.data().toString();
+        openNotebooks->at(index.row())->setName(index.data().toString());
+    }
 }
 
 /**
@@ -337,8 +419,10 @@ void MainWindow::notebookNameChanged(QModelIndex index) {
  * @param newName
  */
 void MainWindow::sectionNameChanged(QModelIndex index) {
-    qDebug() << "Section name changed: " << currentlyOpenNotebook->loadSectionsList()->at(index.row())->getName() << "->" << index.data().toString();
-    currentlyOpenNotebook->loadSectionsList()->at(index.row())->setName(index.data().toString());
+    if (currentlyOpenNotebook->loadSectionsList()->at(index.row())->getName().compare(index.data().toString()) != 0) {
+        qDebug() << "Section name changed: " << currentlyOpenNotebook->loadSectionsList()->at(index.row())->getName() << "->" << index.data().toString();
+        currentlyOpenNotebook->loadSectionsList()->at(index.row())->setName(index.data().toString());
+    }
 }
 
 /**
