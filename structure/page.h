@@ -14,6 +14,7 @@ public:
     }
     const QString class_name = "Page";
 
+    QWidget *editorPane = nullptr;
     QWidget *dragLayout = nullptr;
     QVector<TextBox*> textBoxList;
 };

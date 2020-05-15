@@ -142,11 +142,11 @@ void MainWindow::loadSession() {
 QWidget *generateEditorPane(QWidget *parent, QTabWidget *tabWidget, Page *parentPage) {
     DragLayout *customDragLayout = new DragLayout(tabWidget, parentPage);
 
-
     QScrollArea *scrollArea = new QScrollArea(parent);
     customDragLayout->resize(DEFAULT_TAB_SIZE, DEFAULT_TAB_SIZE);
     scrollArea->setWidget(customDragLayout);
 
+    parentPage->dragLayout = customDragLayout;
     return scrollArea;
 }
 
@@ -327,19 +327,19 @@ void MainWindow::openNotebookFromFile(QString filePath) {
                         QJsonObject textboxJson = textboxesRef.toObject();
                         //Read textbox properties
                         //If the page has not yet been generated a DragLayout, generate one
-                        if(page->dragLayout == nullptr) {
+                        if(page->editorPane == nullptr) {
                             QWidget *editorPane = generateEditorPane(this, tabWidget, page);
-                            page->dragLayout = editorPane;
-                            tabWidget->addTab(page->dragLayout, page->getName());
+                            page->editorPane = editorPane;
+                            tabWidget->addTab(page->editorPane, page->getName());
                             tabWidget->setCurrentIndex(tabWidget->count() - 1);
                         }
 
                         checkNameChanges();
                         qDebug() << "Draglayout added";
-                        if (page && page->dragLayout) {
+                        if (page && page->editorPane) {
                             qDebug() << "Draglayout valid";
-                            QWidget *childAt = page->dragLayout->childAt(50, 50);
-                            DragLayout *childDrag = dynamic_cast<DragLayout*>(childAt);
+//                            QWidget *childAt = page->editorPane->childAt(50, 50);
+                            DragLayout *childDrag = (DragLayout*) page->dragLayout;
                             if (childDrag) {
                                 qDebug() << "Adding box to page:" << page->getName();
                                 QString locationString = textboxJson.value("box_location").toString();
@@ -433,12 +433,12 @@ void MainWindow::openSection(Section *section) {
     for(QVector<Page*>::Iterator p_it = section->loadPagesList()->begin(); p_it != section->loadPagesList()->end(); ++p_it) {
         Page *curPage = *p_it;
         //If the page has not yet been generated a DragLayout, generate one
-        if(curPage->dragLayout == nullptr) {
+        if(curPage->editorPane == nullptr) {
             QWidget *editorPane = generateEditorPane(this, tabWidget, curPage);
-            curPage->dragLayout = editorPane;
+            curPage->editorPane = editorPane;
         }
         //Add the page to the UI with its DragLayout
-        tabWidget->addTab(curPage->dragLayout, curPage->getName());
+        tabWidget->addTab(curPage->editorPane, curPage->getName());
         currentlyOpenPage = section->loadPagesList()->first();
         MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - Spiral");
     }
@@ -536,7 +536,7 @@ void MainWindow::tabCloseRequested(int index) {
     if (res == QMessageBox::Yes) {
         qDebug() << "Tab closed:" << index;
         tabWidget->removeTab(index);
-        delete currentlyOpenSection->loadPagesList()->at(index)->dragLayout;
+        delete currentlyOpenSection->loadPagesList()->at(index)->editorPane;
         currentlyOpenSection->loadPagesList()->removeAt(index);
     }
 }
@@ -580,12 +580,12 @@ void MainWindow::newPage(Section *section, QString pageName) {
     Page *curPage = new Page();
     curPage->setName(pageName);
     //If the page has not yet been generated a DragLayout, generate one
-    if(curPage->dragLayout == nullptr) {
+    if(curPage->editorPane == nullptr) {
         QWidget *editorPane = generateEditorPane(this, tabWidget, curPage);
-        curPage->dragLayout = editorPane;
+        curPage->editorPane = editorPane;
     }
     //Add the page to the UI with its DragLayout
-    tabWidget->addTab(curPage->dragLayout, curPage->getName());
+    tabWidget->addTab(curPage->editorPane, curPage->getName());
     tabWidget->setCurrentIndex(tabWidget->count() - 1);
     currentlyOpenPage = curPage;
     currentlyOpenSection->addPage(curPage);
@@ -679,9 +679,8 @@ void MainWindow::pageSelected(int index) {
  */
 void MainWindow::testAddBoxProgrammatically() {
     checkNameChanges();
-    if (currentlyOpenPage && currentlyOpenPage->dragLayout) {
-        QWidget *childAt = currentlyOpenPage->dragLayout->childAt(50, 50);
-        DragLayout *childDrag = dynamic_cast<DragLayout*>(childAt);
+    if (currentlyOpenPage && currentlyOpenPage->editorPane) {
+        DragLayout *childDrag = (DragLayout*) currentlyOpenPage->dragLayout;
         if (childDrag) {
             childDrag->newTextBoxAtLocation(QPoint(50, 50), DEFAULT_TEXTBOX_WIDTH);
         }
