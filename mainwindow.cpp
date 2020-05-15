@@ -51,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionDelete_Current_Section, SIGNAL(triggered()), this, SLOT(deleteSectionButtonClicked()));
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openNotebookButtonClicked()));
     connect(ui->actionClose_This_Notebook, SIGNAL(triggered()), this, SLOT(closeNotebookButtonClicked()));
+    connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveNotebookButtonClicked()));
 
     //The following is a demo using statically defined data of how the windowing system will be implemented
     Notebook *notebook = new Notebook();
@@ -154,6 +155,89 @@ void MainWindow::newNotebookAtFile(QString filePath) {
     loadNotebook(newNotebook);
     openNotebook(newNotebook);
     //TODO Save this notebook to its corresponding .snb file
+}
+
+/**
+ * @brief MainWindow::saveNotebookButtonClicked - Called when the "Save" button is clicked
+ * Saves the currently open notebook to its file
+ */
+void MainWindow::saveNotebookButtonClicked() {
+    if (currentlyOpenNotebook != nullptr) {
+        saveNotebookToDisk(currentlyOpenNotebook);
+    }
+}
+
+/**
+ * @brief MainWindow::saveNotebookToDisk - Saves the notebook to its corresponding .snb file
+ * @param notebook
+ */
+void MainWindow::saveNotebookToDisk(Notebook *notebook) {
+    if (notebook->path != nullptr) {
+        QFile file(notebook->path);
+        if (!file.open(QIODevice::WriteOnly)) {
+            QMessageBox::information(0, "Unable to save notebook:", file.errorString());
+        }
+        else {
+            QJsonObject obj;
+            obj.insert("notebook_name", notebook->getName());
+            obj.insert("notebook_uuid", notebook->getUUID());
+
+            QJsonArray sections;
+
+            QTextStream outputStream(&file);
+
+            for(QVector<Section*>::Iterator it = currentlyOpenNotebook->loadSectionsList()->begin(); it != currentlyOpenNotebook->loadSectionsList()->end(); ++it) {
+                Section *curSection = *it;
+                qDebug() << "Section: " << curSection->getName() << "(UUID: " << curSection->getUUID() << ")";
+                QJsonObject thisSectionJson;
+                thisSectionJson.insert("section_name", curSection->getName());
+                thisSectionJson.insert("section_uuid", curSection->getUUID());
+                QJsonArray pages;
+                for(QVector<Page*>::Iterator p_it = curSection->loadPagesList()->begin(); p_it != curSection->loadPagesList()->end(); ++p_it) {
+                    Page *curPage = *p_it;
+                    QJsonObject thisPageJson;
+                    thisPageJson.insert("page_name", curPage->getName());
+                    thisPageJson.insert("page_uuid", curPage->getUUID());
+                    qDebug() << "Page: " << curPage->getName() << "(UUID: " << curPage->getUUID() << ")";
+                    QVector<TextBox*> children = curPage->textBoxList;
+                    int iter = 0;
+                    QJsonArray textboxes;
+                    foreach(TextBox *obj, children) {
+                        qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid <<
+                                    ") (" << obj->size().width() << "x" << obj->size().height() <<
+                                    ") (#" << iter << ")";
+                        iter++;
+                        if (obj == nullptr || obj->richTextEdit == nullptr) {
+                            qDebug() << "Removed TextBox was at this index";
+                            continue;
+                        }
+                        if (obj->richTextEdit->toPlainText().isEmpty()) {
+                            qDebug() << "Empty box found, deleting...";
+                            curPage->textBoxList.removeOne(obj);
+                            obj->close();
+                        }
+                        else {
+                            QJsonObject thisTextboxJson;
+                            qDebug() << "HTML:";
+                            qDebug() << obj->richTextEdit->toHtml();
+                            thisTextboxJson.insert("box_uuid", obj->uuid);
+                            thisTextboxJson.insert("box_location", QString(obj->location.x()) + "," + QString(obj->location.y()));
+                            thisTextboxJson.insert("box_width", obj->width());
+                            thisTextboxJson.insert("box_html", obj->richTextEdit->toHtml());
+                            textboxes.append(thisTextboxJson);
+                        }
+                    }
+                    thisPageJson.insert("textboxes", textboxes);
+                    pages.append(thisPageJson);
+                }
+                thisSectionJson.insert("pages", pages);
+                sections.append(thisSectionJson);
+            }
+            obj.insert("sections", sections);
+            QJsonDocument doc(obj);
+            outputStream << doc.toJson() << endl;
+        }
+    }
 }
 
 /**

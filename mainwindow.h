@@ -41,6 +41,7 @@ public:
     void newSection(Notebook *notebook, QString sectionName);
     void newPage(Section *section, QString pageName);
     void checkNameChanges();
+    void saveNotebookToDisk(Notebook *notebook);
     Ui::MainWindow *ui;
 public slots:
     void emptyBoxCleanup();
@@ -62,6 +63,7 @@ protected slots:
     void printContentToLog();
     void testAddBoxProgrammatically();
     void openNotebookButtonClicked();
+    void saveNotebookButtonClicked();
 
 private:
     QVector<Notebook*> *openNotebooks = new QVector<Notebook*>();
