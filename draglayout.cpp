@@ -158,7 +158,7 @@ void DragLayout::dropEvent(QDropEvent *event)
  * Note: This is mainly a proof-of-concept to show that this can be done upon file load
  * @param point
  */
-void DragLayout::newTextBoxAtLocation(QPoint point) {
+TextBox *DragLayout::newTextBoxAtLocation(QPoint point, int width) {
     TextBox *tBox = new TextBox(this);
     parentPage->textBoxList.append(tBox);
     qDebug() << "Appended in newTextBoxAtLocation";
@@ -167,8 +167,8 @@ void DragLayout::newTextBoxAtLocation(QPoint point) {
     tBox->location = point;
     tBox->show();
     tBox->setAttribute(Qt::WA_DeleteOnClose);
-    tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
-    return;
+    tBox->resize(width, getHeight(tBox));
+    return tBox;
 }
 
 /**

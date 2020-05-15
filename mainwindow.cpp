@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->browserToolBar->addWidget(ui->sectionsListView);
 
     //Set window title and instantiate tab widget
-    MainWindow::setWindowTitle("Test Notebook");
+    MainWindow::setWindowTitle("Spiral");
     tabWidget = new QTabWidget(this);
     tabWidget->setTabsClosable(true);
 
@@ -54,42 +54,42 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveNotebookButtonClicked()));
 
     //The following is a demo using statically defined data of how the windowing system will be implemented
-    Notebook *notebook = new Notebook();
-    notebook->setName("New Notebook");
-    Section *section = new Section();
-    section->setName("New Section");
-    Page *page = new Page();
-    page->setName("New Page");
-    section->addPage(page);
-    Page *p2 = new Page();
-    p2->setName("Page 2");
-    section->addPage(p2);
+//    Notebook *notebook = new Notebook();
+//    notebook->setName("New Notebook");
+//    Section *section = new Section();
+//    section->setName("New Section");
+//    Page *page = new Page();
+//    page->setName("New Page");
+//    section->addPage(page);
+//    Page *p2 = new Page();
+//    p2->setName("Page 2");
+//    section->addPage(p2);
 
-    Section *section2 = new Section();
-    section2->setName("Sec 2");
-    Page *s2p1 = new Page();
-    s2p1->setName("s2p1");
-    section2->addPage(s2p1);
+//    Section *section2 = new Section();
+//    section2->setName("Sec 2");
+//    Page *s2p1 = new Page();
+//    s2p1->setName("s2p1");
+//    section2->addPage(s2p1);
 
-    notebook->addSection(section);
-    notebook->addSection(section2);
-    loadNotebook(notebook);
-    openNotebook(notebook);
+//    notebook->addSection(section);
+//    notebook->addSection(section2);
+//    loadNotebook(notebook);
+//    openNotebook(notebook);
 
-    Notebook *nb2 = new Notebook();
-    nb2->setName("Notebook 2");
-    Section *s2 = new Section();
-    s2->setName("N2, Sec2");
-    Page *n2s2p1 = new Page();
-    n2s2p1->setName("n2s2p1");
-    s2->addPage(n2s2p1);
-    nb2->addSection(s2);
-    loadNotebook(nb2);
-    pageSelected(0);
-    //END SAMPLE
-    //NOTE: THESE OBJECTS MUST BE DELETED MANUALLY because of new being used!!!
-    //These aren't, but in the actual methods, they need to be.
-    checkNameChanges();
+//    Notebook *nb2 = new Notebook();
+//    nb2->setName("Notebook 2");
+//    Section *s2 = new Section();
+//    s2->setName("N2, Sec2");
+//    Page *n2s2p1 = new Page();
+//    n2s2p1->setName("n2s2p1");
+//    s2->addPage(n2s2p1);
+//    nb2->addSection(s2);
+//    loadNotebook(nb2);
+//    pageSelected(0);
+//    //END SAMPLE
+//    //NOTE: THESE OBJECTS MUST BE DELETED MANUALLY because of new being used!!!
+//    //These aren't, but in the actual methods, they need to be.
+//    checkNameChanges();
 }
 
 MainWindow::~MainWindow()
@@ -119,7 +119,10 @@ QWidget *generateEditorPane(QWidget *parent, QTabWidget *tabWidget, Page *parent
  */
 void MainWindow::newNotebookButtonClicked() {
     QString fileURL = QFileDialog::getSaveFileName(this, tr("Save File"), "/home/", tr("Spiral Notebooks (*.snb)"));
-    newNotebookAtFile(fileURL);
+    if (fileURL != nullptr && !fileURL.isEmpty()) {
+        qDebug() << "New notebook URL:";
+        newNotebookAtFile(fileURL);
+    }
 }
 
 /**
@@ -127,7 +130,9 @@ void MainWindow::newNotebookButtonClicked() {
  */
 void MainWindow::openNotebookButtonClicked() {
     QString fileURL = QFileDialog::getOpenFileName(this, tr("Open File"), "/home/", tr("Spiral Notebooks (*.snb)"));
-    openNotebookFromFile(fileURL);
+    if (fileURL != nullptr && !fileURL.isEmpty()) {
+        openNotebookFromFile(fileURL);
+    }
 }
 
 /**
@@ -154,7 +159,8 @@ void MainWindow::newNotebookAtFile(QString filePath) {
     newNotebook->addSection(newSection);
     loadNotebook(newNotebook);
     openNotebook(newNotebook);
-    //TODO Save this notebook to its corresponding .snb file
+    //Save this notebook to its corresponding .snb file
+    saveNotebookToDisk(newNotebook);
 }
 
 /**
@@ -163,6 +169,7 @@ void MainWindow::newNotebookAtFile(QString filePath) {
  */
 void MainWindow::saveNotebookButtonClicked() {
     if (currentlyOpenNotebook != nullptr) {
+        qDebug() << "Saving currently open notebook to file";
         saveNotebookToDisk(currentlyOpenNotebook);
     }
 }
@@ -178,6 +185,7 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
             QMessageBox::information(0, "Unable to save notebook:", file.errorString());
         }
         else {
+            qDebug() << "Writing to path:" << notebook->path;
             QJsonObject obj;
             obj.insert("notebook_name", notebook->getName());
             obj.insert("notebook_uuid", notebook->getUUID());
@@ -221,7 +229,7 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
                             qDebug() << "HTML:";
                             qDebug() << obj->richTextEdit->toHtml();
                             thisTextboxJson.insert("box_uuid", obj->uuid);
-                            thisTextboxJson.insert("box_location", QString(obj->location.x()) + "," + QString(obj->location.y()));
+                            thisTextboxJson.insert("box_location", QString::number(obj->location.x()) + "," + QString::number(obj->location.y()));
                             thisTextboxJson.insert("box_width", obj->width());
                             thisTextboxJson.insert("box_html", obj->richTextEdit->toHtml());
                             textboxes.append(thisTextboxJson);
@@ -246,6 +254,84 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
  */
 void MainWindow::openNotebookFromFile(QString filePath) {
     qDebug() << "Opening notebook at location:" << filePath;
+    if (filePath != nullptr) {
+        QFile file(filePath);
+        if (!file.open(QIODevice::ReadOnly)) {
+            QMessageBox::information(0, "Unable to save notebook:", file.errorString());
+        }
+        else {
+            QTextStream inputStream(&file);
+            QString jsonString = inputStream.readAll();
+            QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
+            QJsonObject rootObj = doc.object();
+            //Read notebook properties
+            Notebook *notebook = new Notebook(rootObj.value("notebook_uuid").toString());
+            notebook->setName(rootObj.value("notebook_name").toString());
+            notebook->path = filePath;
+
+            //Read sections
+            QJsonArray sections = rootObj.value("sections").toArray();
+            for(QJsonValueRef sectionRef : sections) {
+                QJsonObject sectionJson = sectionRef.toObject();
+                //Read section properties
+                Section *section = new Section(sectionJson.value("section_uuid").toString());
+                section->setName(sectionJson.value("section_name").toString());
+
+                //Read pages
+                QJsonArray pages = sectionJson.value("pages").toArray();
+                for(QJsonValueRef pagesRef : pages) {
+                    QJsonObject pageJson = pagesRef.toObject();
+                    //Read page properties
+                    Page *page = new Page(pageJson.value("page_uuid)").toString());
+                    page->setName(pageJson.value("page_name").toString());
+
+                    //Read textboxes
+                    QJsonArray textboxes = pageJson.value("textboxes").toArray();
+                    for (QJsonValueRef textboxesRef : textboxes) {
+                        QJsonObject textboxJson = textboxesRef.toObject();
+                        //Read textbox properties
+                        //If the page has not yet been generated a DragLayout, generate one
+                        if(page->dragLayout == nullptr) {
+                            QWidget *editorPane = generateEditorPane(this, tabWidget, page);
+                            page->dragLayout = editorPane;
+                            tabWidget->addTab(page->dragLayout, page->getName());
+                            tabWidget->setCurrentIndex(tabWidget->count() - 1);
+                        }
+
+                        checkNameChanges();
+                        qDebug() << "Draglayout added";
+                        if (page && page->dragLayout) {
+                            qDebug() << "Draglayout valid";
+                            QWidget *childAt = page->dragLayout->childAt(50, 50);
+                            DragLayout *childDrag = dynamic_cast<DragLayout*>(childAt);
+                            if (childDrag) {
+                                qDebug() << "Adding box to page:" << page->getName();
+                                QString locationString = textboxJson.value("box_location").toString();
+                                int boxX = locationString.split(",")[0].toInt();
+                                int boxY = locationString.split(",")[1].toInt();
+                                int boxWidth = textboxJson.value("box_width").toInt();
+                                TextBox *thisBox = childDrag->newTextBoxAtLocation(QPoint(boxX, boxY), boxWidth);
+                                thisBox->uuid = textboxJson.value("box_uuid").toString();
+                                thisBox->richTextEdit->setHtml(textboxJson.value("box_html").toString());
+                            }
+                        }
+                    }
+
+                    //Add page to section
+                    section->addPage(page);
+                }
+
+                //Add section to notebook
+                notebook->addSection(section);
+            }
+
+
+
+            //Load and open notebook
+            loadNotebook(notebook);
+            openNotebook(notebook);
+        }
+    }
 }
 
 /**
@@ -255,7 +341,6 @@ void MainWindow::openNotebookFromFile(QString filePath) {
 void MainWindow::loadNotebook(Notebook *notebook) {
     openNotebooks->append(notebook);
     notebookBrowserStringListModel->append(notebook->getName());
-    //TODO Open the actual notebook file as a Notebook object
 }
 
 /**
@@ -275,6 +360,7 @@ void MainWindow::openNotebook(Notebook *notebook) {
     }
     //Add Notebook to UI
     currentlyOpenNotebook = notebook;
+    MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - Spiral");
 }
 
 /**
@@ -293,7 +379,8 @@ void MainWindow::openSection(Section *section) {
         }
         //Add the page to the UI with its DragLayout
         tabWidget->addTab(curPage->dragLayout, curPage->getName());
-        currentlyOpenPage = curPage;
+        currentlyOpenPage = section->loadPagesList()->first();
+        MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - Spiral");
     }
     currentlyOpenSection = section;
 }
@@ -350,6 +437,7 @@ void MainWindow::closeNotebookButtonClicked() {
             currentlyOpenSection = nullptr;
             currentlyOpenPage = nullptr;
             delete toClose;
+            MainWindow::setWindowTitle("Spiral");
         }
     }
 }
@@ -514,12 +602,13 @@ void MainWindow::sectionNameChanged(QModelIndex index) {
  * @param index
  */
 void MainWindow::pageSelected(int index) {
-    qDebug() << "Page selected: " << index;
+//    qDebug() << "Page selected: " << index;
     if (currentlyOpenNotebook && currentlyOpenSection) {
         bool validIndex = (index >= 0) && (index < currentlyOpenSection->loadPagesList()->size());
         if (validIndex) {
             currentlyOpenPage = currentlyOpenSection->loadPagesList()->at(index);
             emptyBoxCleanup();
+            MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - Spiral");
         }
     }
 }
@@ -533,7 +622,7 @@ void MainWindow::testAddBoxProgrammatically() {
         QWidget *childAt = currentlyOpenPage->dragLayout->childAt(50, 50);
         DragLayout *childDrag = dynamic_cast<DragLayout*>(childAt);
         if (childDrag) {
-            childDrag->newTextBoxAtLocation(QPoint(50, 50));
+            childDrag->newTextBoxAtLocation(QPoint(50, 50), DEFAULT_TEXTBOX_WIDTH);
         }
     }
 }
@@ -583,6 +672,9 @@ void MainWindow::printContentToLog() {
  * @brief MainWindow::emptyBoxCleanup - Removes all empty boxes
  */
 void MainWindow::emptyBoxCleanup() {
+    if (currentlyOpenNotebook == nullptr) {
+        return;
+    }
     checkNameChanges();
     //Print all notebook content to the log
     for(QVector<Section*>::Iterator it = currentlyOpenNotebook->loadSectionsList()->begin(); it != currentlyOpenNotebook->loadSectionsList()->end(); ++it) {
