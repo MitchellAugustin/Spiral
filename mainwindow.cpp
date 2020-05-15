@@ -98,8 +98,12 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 
+
 MainWindow::~MainWindow()
 {
+    for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
+        saveNotebookToDisk(*n_it);
+    }
     delete ui;
 }
 
