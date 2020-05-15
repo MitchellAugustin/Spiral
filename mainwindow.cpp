@@ -318,7 +318,7 @@ void MainWindow::openNotebookFromFile(QString filePath) {
                 for(QJsonValueRef pagesRef : pages) {
                     QJsonObject pageJson = pagesRef.toObject();
                     //Read page properties
-                    Page *page = new Page(pageJson.value("page_uuid)").toString());
+                    Page *page = new Page(pageJson.value("page_uuid").toString());
                     page->setName(pageJson.value("page_name").toString());
 
                     //Read textboxes
@@ -349,6 +349,7 @@ void MainWindow::openNotebookFromFile(QString filePath) {
                                 TextBox *thisBox = childDrag->newTextBoxAtLocation(QPoint(boxX, boxY), boxWidth);
                                 thisBox->uuid = textboxJson.value("box_uuid").toString();
                                 thisBox->richTextEdit->setHtml(textboxJson.value("box_html").toString());
+                                qDebug() << "Box has content:" << textboxJson.value("box_html").toString();
                             }
                         }
                     }
