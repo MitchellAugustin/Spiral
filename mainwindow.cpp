@@ -729,9 +729,16 @@ void MainWindow::printContentToLog() {
 }
 
 /**
- * @brief MainWindow::emptyBoxCleanup - Removes all empty boxes
+ * @brief MainWindow::emptyBoxCleanup - Slot wrapper for emptyBoxCleanupExternal()
  */
 void MainWindow::emptyBoxCleanup() {
+    emptyBoxCleanupExternal();
+}
+
+/**
+ * @brief MainWindow::emptyBoxCleanup - Removes all empty boxes
+ */
+void MainWindow::emptyBoxCleanupExternal() {
     if (currentlyOpenNotebook == nullptr) {
         return;
     }

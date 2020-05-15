@@ -43,6 +43,7 @@ public:
     void checkNameChanges();
     void saveNotebookToDisk(Notebook *notebook);
     Ui::MainWindow *ui;
+    void emptyBoxCleanupExternal();
 public slots:
     void emptyBoxCleanup();
 

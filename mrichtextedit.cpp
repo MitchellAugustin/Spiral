@@ -52,7 +52,9 @@ int MRichTextEdit::getHeight() {
             parent = parent->parentWidget();
             win = dynamic_cast<MainWindow*>(parent);
         }
-        win->emptyBoxCleanup();
+        if (win) {
+            win->emptyBoxCleanupExternal();
+        }
 //        parentWidget()->close();
         qDebug() << "TextBox deleted from getHeight in mrichtextedit";
         return 0;
