@@ -105,7 +105,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::loadSession() {
     ui->openSession->hide();
-    QString sessionFilePath = QDir::currentPath() + "/session.json";
     if (sessionFilePath != nullptr) {
         QFile file(sessionFilePath);
         if (!file.open(QIODevice::ReadOnly)) {
@@ -374,6 +373,29 @@ void MainWindow::openNotebookFromFile(QString filePath) {
 void MainWindow::loadNotebook(Notebook *notebook) {
     openNotebooks->append(notebook);
     notebookBrowserStringListModel->append(notebook->getName());
+    updateSessionFile();
+}
+
+/**
+ * @brief MainWindow::updateSessionFile - Updates session.json with the list of currently open notebooks
+ */
+void MainWindow::updateSessionFile() {
+    if (sessionFilePath != nullptr) {
+        QFile file(sessionFilePath);
+        if (!file.open(QIODevice::WriteOnly)) {
+            QMessageBox::information(0, "Unable to access session file", file.errorString());
+        }
+        else {
+            QJsonObject obj;
+            QJsonArray openNotebooksArray;
+            for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
+                openNotebooksArray.append((*n_it)->path);
+            }
+            obj.insert("open_notebooks", openNotebooksArray);
+            QTextStream outputStream(&file);
+            outputStream << QJsonDocument(obj).toJson();
+        }
+    }
 }
 
 /**
@@ -473,6 +495,7 @@ void MainWindow::closeNotebookButtonClicked() {
             MainWindow::setWindowTitle("Spiral");
         }
     }
+    updateSessionFile();
 }
 
 /**

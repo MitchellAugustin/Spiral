@@ -71,5 +71,7 @@ private:
     SpiralStringList *notebookBrowserStringListModel = new SpiralStringList();
     SpiralStringList *sectionBrowserStringListModel = new SpiralStringList();
     QTabWidget *tabWidget;
+    QString sessionFilePath = QDir::currentPath() + "/session.json";
+    void updateSessionFile();
 };
 #endif // MAINWINDOW_H
