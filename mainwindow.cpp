@@ -53,6 +53,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionClose_This_Notebook, SIGNAL(triggered()), this, SLOT(closeNotebookButtonClicked()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveNotebookButtonClicked()));
 
+    connect(ui->openSession, SIGNAL(clicked()), this, SLOT(loadSession()));
+
+
+
+
     //The following is a demo using statically defined data of how the windowing system will be implemented
 //    Notebook *notebook = new Notebook();
 //    notebook->setName("New Notebook");
@@ -92,9 +97,37 @@ MainWindow::MainWindow(QWidget *parent)
 //    checkNameChanges();
 }
 
+
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::loadSession() {
+    ui->openSession->hide();
+    QString sessionFilePath = QDir::currentPath() + "/session.json";
+    if (sessionFilePath != nullptr) {
+        QFile file(sessionFilePath);
+        if (!file.open(QIODevice::ReadOnly)) {
+            qDebug() << "Session file not found.";
+        }
+        else {
+            QTextStream inputStream(&file);
+
+            QString jsonString = inputStream.readAll();
+            inputStream.flush();
+            QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
+            QJsonObject rootObj = doc.object();
+            QJsonArray arr = rootObj.value("open_notebooks").toArray();
+
+            for(QJsonValueRef notebookRef : arr) {
+                QString notebookPathJson = notebookRef.toString();
+                if (notebookPathJson != nullptr && !notebookPathJson.isEmpty()) {
+                    openNotebookFromFile(notebookPathJson);
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -257,7 +290,7 @@ void MainWindow::openNotebookFromFile(QString filePath) {
     if (filePath != nullptr) {
         QFile file(filePath);
         if (!file.open(QIODevice::ReadOnly)) {
-            QMessageBox::information(0, "Unable to save notebook:", file.errorString());
+            QMessageBox::information(0, "Unable to open notebook:", file.errorString());
         }
         else {
             QTextStream inputStream(&file);

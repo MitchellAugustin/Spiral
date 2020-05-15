@@ -64,6 +64,7 @@ protected slots:
     void testAddBoxProgrammatically();
     void openNotebookButtonClicked();
     void saveNotebookButtonClicked();
+    void loadSession();
 
 private:
     QVector<Notebook*> *openNotebooks = new QVector<Notebook*>();
