@@ -330,6 +330,9 @@ void MainWindow::openNotebookFromFile(QString filePath) {
                         if(page->editorPane == nullptr) {
                             QWidget *editorPane = generateEditorPane(this, tabWidget, page);
                             page->editorPane = editorPane;
+                            currentlyOpenNotebook = notebook;
+                            currentlyOpenSection = section;
+                            currentlyOpenPage = page;
                             tabWidget->addTab(page->editorPane, page->getName());
                             tabWidget->setCurrentIndex(tabWidget->count() - 1);
                         }

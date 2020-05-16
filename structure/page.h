@@ -4,7 +4,7 @@
 #include <QVector>
 
 #include "spiralcomponent.h"
-#include "draglayout.h"
+#include "textbox.h"
 
 class Page : public SpiralComponent
 {
