@@ -10,6 +10,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->notebooksListView->setMouseTracking(true);
     ui->sectionsListView->setMouseTracking(true);
 
+    ui->toolBar->addWidget(ui->f_toolbar);
+    ui->toolBar->setVisible(false);
+
     //Setup browsing tools
     ui->browserToolBar->addWidget(ui->notebooksListView);
     ui->browserToolBar->addWidget(ui->sectionsListView);
