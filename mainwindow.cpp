@@ -338,7 +338,6 @@ void MainWindow::openNotebookFromFile(QString filePath) {
                         qDebug() << "Draglayout added";
                         if (page && page->editorPane) {
                             qDebug() << "Draglayout valid";
-//                            QWidget *childAt = page->editorPane->childAt(50, 50);
                             DragLayout *childDrag = (DragLayout*) page->dragLayout;
                             if (childDrag) {
                                 qDebug() << "Adding box to page:" << page->getName();
@@ -747,7 +746,6 @@ void MainWindow::emptyBoxCleanupExternal() {
     for(QVector<Section*>::Iterator it = currentlyOpenNotebook->loadSectionsList()->begin(); it != currentlyOpenNotebook->loadSectionsList()->end(); ++it) {
         Section *curSection = *it;
         for(QVector<Page*>::Iterator p_it = curSection->loadPagesList()->begin(); p_it != curSection->loadPagesList()->end(); ++p_it) {
-            //TEMPORARY - Iterate through and display all of this page's child textbox objects
             Page *curPage = *p_it;
 
             QVector<TextBox*> children = curPage->textBoxList;
