@@ -104,9 +104,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
-        saveNotebookToDisk(*n_it);
-    }
+    //NOTE: DO NOT AUTOSAVE RIGHT NOW. This appears to cause notebooks to be overwritten for some reason.
+//    for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
+//        saveNotebookToDisk(*n_it);
+//    }
     delete ui;
 }
 
@@ -416,6 +417,7 @@ void MainWindow::openNotebook(Notebook *notebook) {
     checkNameChanges();
     sectionBrowserStringListModel->removeRows(0, sectionBrowserStringListModel->rowCount());
 
+    qDebug() << "Notebook opened" << notebook->getName();
     //Open the Notebook's first section
     openSection(*(notebook->loadSectionsList()->begin()));
     //For each section in the notebook being opened, add its name to the Section Browser
@@ -633,6 +635,7 @@ void MainWindow::pageDoubleClicked(int index) {
  * Note: This must be called on any list transitions and whenever the file is saved in order to prevent naming conflicts.
  */
 void MainWindow::checkNameChanges() {
+    return;
     for (int i = 0; i < sectionBrowserStringListModel->rowCount(); ++i) {
         sectionNameChanged(sectionBrowserStringListModel->index(i, 0));
     }
@@ -646,7 +649,7 @@ void MainWindow::checkNameChanges() {
  * @param newName
  */
 void MainWindow::notebookNameChanged(QModelIndex index) {
-    if (openNotebooks->at(index.row())->getName().compare(index.data().toString()) != 0) {
+    if (index.row() < openNotebooks->count() && openNotebooks->at(index.row())->getName().compare(index.data().toString()) != 0) {
         qDebug() << "Notebook name changed: " << openNotebooks->at(index.row())->getName() << "->" << index.data().toString();
         openNotebooks->at(index.row())->setName(index.data().toString());
     }
@@ -657,7 +660,7 @@ void MainWindow::notebookNameChanged(QModelIndex index) {
  * @param newName
  */
 void MainWindow::sectionNameChanged(QModelIndex index) {
-    if (currentlyOpenNotebook->loadSectionsList()->at(index.row())->getName().compare(index.data().toString()) != 0) {
+    if (index.row() < currentlyOpenNotebook->loadSectionsList()->count() && currentlyOpenNotebook->loadSectionsList()->at(index.row())->getName().compare(index.data().toString()) != 0) {
         qDebug() << "Section name changed: " << currentlyOpenNotebook->loadSectionsList()->at(index.row())->getName() << "->" << index.data().toString();
         currentlyOpenNotebook->loadSectionsList()->at(index.row())->setName(index.data().toString());
     }
