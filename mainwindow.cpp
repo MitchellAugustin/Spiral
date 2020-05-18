@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     //Set window title and instantiate tab widget
     MainWindow::setWindowTitle("Spiral");
     tabWidget = new QTabWidget(this);
+    tabWidget->setToolTip("Pages");
     tabWidget->setTabsClosable(true);
 
 

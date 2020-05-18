@@ -27,22 +27,12 @@
       </property>
       <property name="maximumSize">
        <size>
-        <width>50</width>
+        <width>75</width>
         <height>16777215</height>
        </size>
       </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QListView" name="sectionsListView">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>50</width>
-        <height>16777215</height>
-       </size>
+      <property name="toolTip">
+       <string>Notebooks</string>
       </property>
      </widget>
     </item>
@@ -575,6 +565,22 @@
        </widget>
       </item>
      </layout>
+    </item>
+    <item row="1" column="0">
+     <widget class="QListView" name="sectionsListView">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>75</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Sections</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
