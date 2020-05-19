@@ -60,6 +60,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openNotebookButtonClicked()));
     connect(ui->actionClose_This_Notebook, SIGNAL(triggered()), this, SLOT(closeNotebookButtonClicked()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveNotebookButtonClicked()));
+    connect(ui->actionNotebook_Properties, SIGNAL(triggered()), this, SLOT(notebookInfoButtonClicked()));
+    connect(ui->actionExplain_Choices_on_this_menu, SIGNAL(triggered()), this, SLOT(explainChoicesButtonClicked()));
+    connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(exitButtonClicked()));
 
     connect(ui->openSession, SIGNAL(clicked()), this, SLOT(loadSession()));
 
@@ -829,4 +832,35 @@ void MainWindow::emptyBoxCleanupExternal() {
             }
         }
     }
+}
+
+/**
+ * @brief MainWindow::notebookInfoButtonClicked - Called when the notebook info button is clicked
+ */
+void MainWindow::notebookInfoButtonClicked() {
+    int pages = 0;
+    for(QVector<Section*>::Iterator it = currentlyOpenNotebook->loadSectionsList()->begin(); it != currentlyOpenNotebook->loadSectionsList()->end(); ++it) {
+        pages += (*it)->loadPagesList()->count();
+    }
+    QString notebookInfoString("File: " + currentlyOpenNotebook->path + "\nNotebook Name: " + currentlyOpenNotebook->getName()
+                               + "\nNotebook UUID: " + currentlyOpenNotebook->getUUID() + "\nTotal Sections: " +
+                               QString::number(currentlyOpenNotebook->loadSectionsList()->count()) + "\nTotal Pages: " +
+                               QString::number(pages));
+    QMessageBox::information(this, "Notebook Information", notebookInfoString);
+}
+
+/**
+ * @brief MainWindow::explainChoicesButtonClicked - Called when the "Explain Choices on this menu" button is clicked
+ */
+void MainWindow::explainChoicesButtonClicked() {
+    QMessageBox::information(this, "Notebook Divisions", "A Spiral notebook is structured like a real-life \"spiral notebook.\""
+        " Every notebook has several sections (usually separated by topic), and every section has many pages. Spiral (the app)"
+        " structures notebooks in the same way.");
+}
+
+/**
+ * @brief MainWindow::exitButtonClicked - Exits Spiral
+ */
+void MainWindow::exitButtonClicked() {
+    QApplication::exit(0);
 }
