@@ -116,47 +116,49 @@ MainWindow::~MainWindow()
 }
 
 
+/**
+ * @brief MainWindow::focusChanged - Handles toolbar switching when the focus is changed between widgets
+ * @param oldWidget
+ * @param newWidget
+ */
 void MainWindow::focusChanged(QWidget *oldWidget, QWidget *newWidget) {
+    qDebug() << "Focus changed, old:" << oldWidget;
     qDebug() << "Focus changed, new:" << newWidget;
-    //oldWidget:
-    QWidget *parentOld = oldWidget;
-    MRichTextEdit *oldRichText = dynamic_cast<MRichTextEdit*>(parentOld);
-    while (parentOld && !oldRichText) {
-        parentOld = parentOld->parentWidget();
-        oldRichText = dynamic_cast<MRichTextEdit*>(parentOld);
-    }
 
-    QWidget *parentToolbar = newWidget;
-    QToolBar *newToolbar = dynamic_cast<QToolBar*>(parentToolbar);
-    while (parentToolbar && !newToolbar) {
-        parentToolbar = parentToolbar->parentWidget();
-        newToolbar = dynamic_cast<QToolBar*>(parentToolbar);
-    }
-
-    //Hides the toolbar of the focus-losing text edit only if it is not losing focus to a toolbar.
-    if (parentOld) {
-        qDebug() << "Text edit lost focus: HTML:" << oldRichText->toHtml();
-//        oldRichText->f_toolbar->setVisible(false);
-        ui->hiddenToolBar->addWidget(oldRichText->f_toolbar);
-    }
-
-
+    //Loops through all the parents of the widget that gained focus to see if any of the parents are an MRichTextEdit.
     QWidget *parentNew = newWidget;
     MRichTextEdit *newRichText = dynamic_cast<MRichTextEdit*>(parentNew);
     while (parentNew && !newRichText) {
         parentNew = parentNew->parentWidget();
         newRichText = dynamic_cast<MRichTextEdit*>(parentNew);
     }
-    if (parentNew) {
-        qDebug() << "Text edit gained focus: HTML:" << newRichText->toHtml();
-        newRichText->f_toolbar->setVisible(true);
-        ui->hiddenToolBar->addWidget(ui->f_toolbar);
-        ui->toolBar->addWidget(newRichText->f_toolbar);
-    }
 
-    if (!parentNew) {
-//        qDebug() << "Focus lost. Dummy toolbar added.";
-//        ui->toolBar->addWidget(ui->f_toolbar);
+    //If the focused widget is a child of a valid MRichTextEdit, swap in its toolbar and hide all other toolbars.
+    if (newRichText) {
+        newRichText->f_toolbar->setVisible(true);
+        bool currentlyVisible = false;
+
+        //Loop through all children of the UI's formatting toolbar.
+        foreach (QObject *child, ui->toolBar->children()) {
+            if(QWidget *w = dynamic_cast<QWidget*>(child)) {
+
+                //If the toolbar that we want to swap in is already there, set the currentlyVisible flag to true.
+                if (w == newRichText->f_toolbar) {
+                    currentlyVisible = true;
+                }
+
+                //Hide all other toolbars
+                else {
+                    ui->hiddenToolBar->addWidget(w);
+                }
+            }
+        }
+
+        //If the toolbar we want to make visible is NOT already visible, make it visible.
+        if (!currentlyVisible) {
+            qDebug() << "Toolbar is now visible";
+            ui->toolBar->addWidget(newRichText->f_toolbar);
+        }
     }
 }
 

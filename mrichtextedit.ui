@@ -559,7 +559,7 @@
      <zorder>line_6</zorder>
      <zorder>f_menu</zorder>
      <zorder>f_fgcolor</zorder>
-     <zorder></zorder>
+     <zorder>horizontalSpacer</zorder>
     </widget>
    </item>
    <item>
