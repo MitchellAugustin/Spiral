@@ -5,11 +5,12 @@
 #include <QtWidgets>
 #include "constants.h"
 
+class TextBox;
 class DragResizeLabel : public QLabel
 {
     Q_OBJECT
 public:
-    explicit DragResizeLabel(QWidget *parent = nullptr, bool expand = true);
+    explicit DragResizeLabel(TextBox *parent = nullptr, bool expand = true);
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
@@ -19,6 +20,7 @@ protected:
 
 private:
     bool expand;
+    TextBox *parentTextBox;
 };
 
 #endif //DRAGRESIZELABEL_H

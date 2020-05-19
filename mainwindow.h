@@ -66,6 +66,7 @@ protected slots:
     void openNotebookButtonClicked();
     void saveNotebookButtonClicked();
     void loadSession();
+    void focusChanged(QWidget *, QWidget *);
 
 private:
     QVector<Notebook*> *openNotebooks = new QVector<Notebook*>();

@@ -11,7 +11,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->sectionsListView->setMouseTracking(true);
 
     ui->toolBar->addWidget(ui->f_toolbar);
-    ui->toolBar->setVisible(false);
+    ui->toolBar->setMinimumHeight(ui->f_toolbar->height());
+    ui->hiddenToolBar->setVisible(false);
+//    ui->toolBar->setVisible(false);
 
     //Setup browsing tools
     ui->browserToolBar->addWidget(ui->notebooksListView);
@@ -28,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->verticalLayout->addWidget(tabWidget);
     ui->notebooksListView->setModel(notebookBrowserStringListModel);
     ui->sectionsListView->setModel(sectionBrowserStringListModel);
+
+    connect(QApplication::instance(), SIGNAL(focusChanged(QWidget *, QWidget*)), this, SLOT(focusChanged(QWidget *, QWidget *)));
 
     //Connect slots (listeners) for the NotebooksListView and SectionsListView
     connect(ui->notebooksListView, SIGNAL(clicked(QModelIndex)), this, SLOT(notebookSelected(QModelIndex)));
@@ -102,7 +106,6 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 
-
 MainWindow::~MainWindow()
 {
     //NOTE: DO NOT AUTOSAVE RIGHT NOW. This appears to cause notebooks to be overwritten for some reason.
@@ -111,6 +114,52 @@ MainWindow::~MainWindow()
 //    }
     delete ui;
 }
+
+
+void MainWindow::focusChanged(QWidget *oldWidget, QWidget *newWidget) {
+    qDebug() << "Focus changed, new:" << newWidget;
+    //oldWidget:
+    QWidget *parentOld = oldWidget;
+    MRichTextEdit *oldRichText = dynamic_cast<MRichTextEdit*>(parentOld);
+    while (parentOld && !oldRichText) {
+        parentOld = parentOld->parentWidget();
+        oldRichText = dynamic_cast<MRichTextEdit*>(parentOld);
+    }
+
+    QWidget *parentToolbar = newWidget;
+    QToolBar *newToolbar = dynamic_cast<QToolBar*>(parentToolbar);
+    while (parentToolbar && !newToolbar) {
+        parentToolbar = parentToolbar->parentWidget();
+        newToolbar = dynamic_cast<QToolBar*>(parentToolbar);
+    }
+
+    //Hides the toolbar of the focus-losing text edit only if it is not losing focus to a toolbar.
+    if (parentOld) {
+        qDebug() << "Text edit lost focus: HTML:" << oldRichText->toHtml();
+//        oldRichText->f_toolbar->setVisible(false);
+        ui->hiddenToolBar->addWidget(oldRichText->f_toolbar);
+    }
+
+
+    QWidget *parentNew = newWidget;
+    MRichTextEdit *newRichText = dynamic_cast<MRichTextEdit*>(parentNew);
+    while (parentNew && !newRichText) {
+        parentNew = parentNew->parentWidget();
+        newRichText = dynamic_cast<MRichTextEdit*>(parentNew);
+    }
+    if (parentNew) {
+        qDebug() << "Text edit gained focus: HTML:" << newRichText->toHtml();
+        newRichText->f_toolbar->setVisible(true);
+        ui->hiddenToolBar->addWidget(ui->f_toolbar);
+        ui->toolBar->addWidget(newRichText->f_toolbar);
+    }
+
+    if (!parentNew) {
+//        qDebug() << "Focus lost. Dummy toolbar added.";
+//        ui->toolBar->addWidget(ui->f_toolbar);
+    }
+}
+
 
 void MainWindow::loadSession() {
     ui->openSession->hide();
@@ -356,6 +405,8 @@ void MainWindow::openNotebookFromFile(QString filePath) {
                                 TextBox *thisBox = childDrag->newTextBoxAtLocation(QPoint(boxX, boxY), boxWidth);
                                 thisBox->uuid = textboxJson.value("box_uuid").toString();
                                 thisBox->richTextEdit->setHtml(textboxJson.value("box_html").toString());
+//                                ui->toolBar->addWidget(thisBox->richTextEdit->f_toolbar);
+                                thisBox->richTextEdit->f_toolbar->setVisible(false);
                                 qDebug() << "Box has content:" << textboxJson.value("box_html").toString();
                             }
                         }

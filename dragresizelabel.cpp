@@ -1,16 +1,16 @@
 #include "dragresizelabel.h"
 #include "textbox.h"
 
-DragResizeLabel::DragResizeLabel(QWidget *parent, bool expand)
+DragResizeLabel::DragResizeLabel(TextBox *parent, bool expand)
 {
     DragResizeLabel::expand = expand;
+    this->parentTextBox = parent;
     setAcceptDrops(true);
 }
 
 void DragResizeLabel::dragEnterEvent(QDragEnterEvent *event)
 {
-    QWidget *parent = parentWidget();
-    TextBox *textBox = dynamic_cast<TextBox*>(parent->parentWidget()->parentWidget());
+    TextBox *textBox = parentTextBox;
     textBox->resize(textBox->width() + (expand ? 20 : -20), textBox->height());
     qDebug() << "TextBox " << (expand ? "expanded" : "contracted");
 }
@@ -29,7 +29,7 @@ void DragResizeLabel::mousePressEvent(QMouseEvent *event)
 {
     qDebug() << "mousePressEvent";
     QWidget *parent = parentWidget();
-    TextBox *textBox = dynamic_cast<TextBox*>(parent->parentWidget()->parentWidget());
+    TextBox *textBox = parentTextBox;
 
 //    qDebug() << "Parent: " << parent;
 //    qDebug() << "TextBox: " << textBox;
