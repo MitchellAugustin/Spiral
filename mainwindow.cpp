@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->sectionsListView->setMouseTracking(true);
 
     ui->toolBar->addWidget(ui->f_toolbar);
-    ui->toolBar->setMinimumHeight(ui->f_toolbar->height());
+    ui->toolBar->setMinimumHeight(ui->f_toolbar->height() + 15);
     ui->hiddenToolBar->setVisible(false);
 //    ui->toolBar->setVisible(false);
 
