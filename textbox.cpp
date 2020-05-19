@@ -13,6 +13,7 @@ TextBox::TextBox(QWidget *parent, QString uuid) : QWidget(parent)
     contractLabel->setText("<=");
     DragResizeLabel *expandLabel = new DragResizeLabel(this, true);
     expandLabel->setText("=>");
+    TextBox::richTextEdit->f_toolbar->setVisible(false);
     TextBox::richTextEdit->f_toolbar_layout->addWidget(contractLabel);
     TextBox::richTextEdit->f_toolbar_layout->addWidget(expandLabel);
 //    layout->addWidget(contractLabel);
