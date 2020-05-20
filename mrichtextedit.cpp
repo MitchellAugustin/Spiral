@@ -157,7 +157,6 @@ MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
     f_textedit->addAction(removeAllFormat);
 
     QAction *textsource = new QAction(tr("Edit document source"), this);
-    textsource->setShortcut(QKeySequence("CTRL+O"));
     connect(textsource, SIGNAL(triggered()), this, SLOT(textSource()));
     f_textedit->addAction(textsource);
 
