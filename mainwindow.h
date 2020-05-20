@@ -29,9 +29,9 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    Notebook *currentlyOpenNotebook;
-    Section *currentlyOpenSection;
-    Page *currentlyOpenPage;
+    Notebook *currentlyOpenNotebook = nullptr;
+    Section *currentlyOpenSection = nullptr;
+    Page *currentlyOpenPage = nullptr;
     void newNotebookAtFile(QString filePath);
     void openNotebookFromFile(QString filePath);
     void loadNotebook(Notebook *notebook);

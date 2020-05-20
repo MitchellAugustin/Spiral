@@ -519,6 +519,10 @@ void MainWindow::openSection(Section *section) {
  * @brief MainWindow::deletePageButtonClicked - Called when the "Delete Page" button is clicked
  */
 void MainWindow::deletePageButtonClicked() {
+    if (tabWidget == nullptr) {
+        QMessageBox::information(this, "Cannot Delete Page", "No pages are open.");
+        return;
+    }
     tabCloseRequested(tabWidget->currentIndex());
 }
 
@@ -526,6 +530,10 @@ void MainWindow::deletePageButtonClicked() {
  * @brief MainWindow::deleteSectionButtonClicked - Called when the "Delete Section" button is clicked
  */
 void MainWindow::deleteSectionButtonClicked() {
+    if (currentlyOpenNotebook == nullptr || currentlyOpenSection == nullptr) {
+        QMessageBox::information(this, "Cannot Delete Section", "No sections are open.");
+        return;
+    }
     QMessageBox::StandardButton res = QMessageBox::question(this, "Confirm Deletion", "Are you sure you want to delete this section?",
                                                     QMessageBox::Yes|QMessageBox::No);
     if (res == QMessageBox::Yes) {
@@ -548,6 +556,10 @@ void MainWindow::deleteSectionButtonClicked() {
  * @brief MainWindow::closeNotebookButtonClicked - Closes the currently open notebook
  */
 void MainWindow::closeNotebookButtonClicked() {
+    if (currentlyOpenNotebook == nullptr) {
+        QMessageBox::information(this, "Cannot Close Notebook", "No notebooks are open.");
+        return;
+    }
     QMessageBox::StandardButton res = QMessageBox::question(this, "Confirm Close", "Are you sure you want to close this notebook?"
                                                                                    " (Closing the notebook will NOT delete it from the disk)",
                                                     QMessageBox::Yes|QMessageBox::No);
@@ -577,6 +589,10 @@ void MainWindow::closeNotebookButtonClicked() {
  * @brief MainWindow::newPageButtonClicked - Called when the "New Page" button is clicked
  */
 void MainWindow::newPageButtonClicked() {
+    if (currentlyOpenNotebook == nullptr || currentlyOpenSection == nullptr) {
+        QMessageBox::information(this, "Cannot Create Page", "You are not currently in a section.");
+        return;
+    }
     bool res;
     QString text = QInputDialog::getText(0, "New Page Name", "Name: ", QLineEdit::Normal, "", &res);
     if (res && !text.isEmpty()) {
@@ -588,6 +604,10 @@ void MainWindow::newPageButtonClicked() {
  * @brief MainWindow::newSectionButtonClicked - Called when the "New Section" button is clicked
  */
 void MainWindow::newSectionButtonClicked() {
+    if (currentlyOpenNotebook == nullptr) {
+        QMessageBox::information(this, "Cannot Create Section", "You are not currently in a notebook.");
+        return;
+    }
     bool res;
     QString text = QInputDialog::getText(0, "New Section Name", "Name: ", QLineEdit::Normal, "", &res);
     if (res && !text.isEmpty()) {
@@ -601,6 +621,10 @@ void MainWindow::newSectionButtonClicked() {
  * @param index
  */
 void MainWindow::tabCloseRequested(int index) {
+    if (currentlyOpenSection == nullptr || currentlyOpenPage == nullptr) {
+        QMessageBox::information(this, "Cannot Delete Page", "You are not currently in a page.");
+        return;
+    }
     QMessageBox::StandardButton res = QMessageBox::question(this, "Confirm Deletion", "Are you sure you want to delete this page?",
                                                     QMessageBox::Yes|QMessageBox::No);
     if (res == QMessageBox::Yes) {
@@ -763,6 +787,9 @@ void MainWindow::testAddBoxProgrammatically() {
  * is clicked that prints all open notebook content to the QDebug output stream
  */
 void MainWindow::printContentToLog() {
+    if (currentlyOpenNotebook == nullptr) {
+        return;
+    }
     checkNameChanges();
     //Print all notebook content to the log
     qDebug() << "Content in Notebook: " << currentlyOpenNotebook->getName() << "(UUID: " << currentlyOpenNotebook->getUUID() << ")";
@@ -844,6 +871,10 @@ void MainWindow::emptyBoxCleanupExternal() {
  * @brief MainWindow::notebookInfoButtonClicked - Called when the notebook info button is clicked
  */
 void MainWindow::notebookInfoButtonClicked() {
+    if (currentlyOpenNotebook == nullptr) {
+        QMessageBox::information(this, "No Information Available", "You are not currently in a notebook.");
+        return;
+    }
     int pages = 0;
     for(QVector<Section*>::Iterator it = currentlyOpenNotebook->loadSectionsList()->begin(); it != currentlyOpenNotebook->loadSectionsList()->end(); ++it) {
         pages += (*it)->loadPagesList()->count();
