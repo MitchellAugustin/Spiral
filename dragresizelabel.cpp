@@ -10,45 +10,22 @@ DragResizeLabel::DragResizeLabel(TextBox *parent, bool expand)
 
 void DragResizeLabel::dragEnterEvent(QDragEnterEvent *event)
 {
-    TextBox *textBox = parentTextBox;
-    textBox->resize(textBox->width() + (expand ? 20 : -20), textBox->height());
-    qDebug() << "TextBox " << (expand ? "expanded" : "contracted");
+    //No implementation needed
 }
 
 void DragResizeLabel::dragMoveEvent(QDragMoveEvent *event)
 {
-    qDebug() << "dragMoveEvent";
+    //No implementation needed
 }
 
 void DragResizeLabel::dropEvent(QDropEvent *event)
 {
-    qDebug() << "dropEvent";
+    //No implementation needed
 }
 
 void DragResizeLabel::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << "mousePressEvent";
-    QWidget *parent = parentWidget();
     TextBox *textBox = parentTextBox;
-
-//    qDebug() << "Parent: " << parent;
-//    qDebug() << "TextBox: " << textBox;
-//    textBox->resize(textBox->width() + 20, textBox->height());
-
-
-    QPoint hotSpot = event->pos() - parent->pos();
-
-    QMimeData *mimeData = new QMimeData;
-    //Set the location of the TextBox as the MIME data so it can be resized from DragLayout when received
-    QByteArray plainTextItemData;
-    QDataStream plainTextDataStream(&plainTextItemData, QIODevice::WriteOnly);
-    plainTextDataStream << textBox->pos().rx() << "," << textBox->pos().ry();
-
-    mimeData->setData(RESIZE_MIME_TYPE, plainTextItemData);
-
-    QDrag *drag = new QDrag(this);
-    drag->setMimeData(mimeData);
-    drag->setHotSpot(hotSpot);
-
-    drag->exec();
+    textBox->resize(textBox->width() + (expand ? 20 : -20), textBox->height());
+    qDebug() << "TextBox" << (expand ? "expanded" : "contracted");
 }

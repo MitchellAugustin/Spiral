@@ -69,6 +69,10 @@ protected slots:
     void focusChanged(QWidget *, QWidget *);
     void notebookInfoButtonClicked();
     void explainChoicesButtonClicked();
+    void aboutSpiralButtonClicked();
+    void userManualButtonClicked();
+    void contributeButtonClicked();
+    void checkUpdatesButtonClicked();
     void exitButtonClicked();
 
 private:

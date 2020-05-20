@@ -22,7 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
     //Set window title and instantiate tab widget
     MainWindow::setWindowTitle("Spiral");
     tabWidget = new QTabWidget(this);
-    tabWidget->setToolTip("Pages");
     tabWidget->setTabsClosable(true);
 
 
@@ -62,6 +61,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveNotebookButtonClicked()));
     connect(ui->actionNotebook_Properties, SIGNAL(triggered()), this, SLOT(notebookInfoButtonClicked()));
     connect(ui->actionExplain_Choices_on_this_menu, SIGNAL(triggered()), this, SLOT(explainChoicesButtonClicked()));
+    connect(ui->actionAbout_Spiral, SIGNAL(triggered()), this, SLOT(aboutSpiralButtonClicked()));
+    connect(ui->actionUser_Manual, SIGNAL(triggered()), this, SLOT(userManualButtonClicked()));
+    connect(ui->actionContact_Us_Contribute, SIGNAL(triggered()), this, SLOT(contributeButtonClicked()));
+    connect(ui->actionCheck_for_Updates, SIGNAL(triggered()), this, SLOT(checkUpdatesButtonClicked()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(exitButtonClicked()));
 
     connect(ui->openSession, SIGNAL(clicked()), this, SLOT(loadSession()));
@@ -856,6 +859,46 @@ void MainWindow::explainChoicesButtonClicked() {
     QMessageBox::information(this, "Notebook Divisions", "A Spiral notebook is structured like a real-life \"spiral notebook.\""
         " Every notebook has several sections (usually separated by topic), and every section has many pages. Spiral (the app)"
         " structures notebooks in the same way.");
+}
+
+/**
+ * @brief MainWindow::userManualButtonClicked - Called when the "User Manual" button is clicked
+ * Opens the manual on Spiral's website in the user's main browser
+ */
+void MainWindow::userManualButtonClicked() {
+    QDesktopServices::openUrl(QUrl("https://mitchellaugustin.com/spiral/manual.html"));
+}
+
+/**
+ * @brief MainWindow::contributeButtonClicked - Called when the "Contribute" button is clicked
+ * Opens the contribute page on Spiral's website in the user's main browser
+ */
+void MainWindow::contributeButtonClicked() {
+    QDesktopServices::openUrl(QUrl("https://mitchellaugustin.com/spiral/contribute.html"));
+}
+
+/**
+ * @brief MainWindow::checkUpdatesButtonClicked - Called when the "Check Updates" button is clicked
+ * Opens the downloads page on Spiral's website in the user's main browser
+ */
+void MainWindow::checkUpdatesButtonClicked() {
+    QDesktopServices::openUrl(QUrl("https://mitchellaugustin.com/spiral/downloads.html"));
+}
+
+/**
+ * @brief MainWindow::aboutSpiralButtonClicked - Called when the "About Spiral" button is clicked
+ */
+void MainWindow::aboutSpiralButtonClicked() {
+    QMessageBox aboutSpiralBox(this);
+    aboutSpiralBox.setIconPixmap(QPixmap("logo.png").scaled(110, 100));
+    aboutSpiralBox.setWindowTitle("About Spiral");
+    aboutSpiralBox.setText("Spiral - https://mitchellaugustin.com/spiral/\n\nVersion: " + SPIRAL_VERSION + "\n\nAuthor: Mitchell Augustin\n\n" +
+        "Licensed under the GNU General Public License v3\n\nSpiral was built on the QT framework and utilizes elements from " +
+                           "Anchakor's MRichTextEdit, which can be found at \nhttps://github.com/Anchakor/MRichTextEditor." +
+                           "\n\nThe Spiral logo is based on the following image from WikiMedia Commons, which is labeled for " +
+                           "reuse with modification:\nhttps://commons.wikimedia.org/wiki/File:Triple-Spiral-Symbol-filled.svg");
+    aboutSpiralBox.setParent(this);
+    aboutSpiralBox.exec();
 }
 
 /**

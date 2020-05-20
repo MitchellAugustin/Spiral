@@ -634,8 +634,7 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionNotebook_Help"/>
-    <addaction name="actionKeyboard_Shortcuts"/>
+    <addaction name="actionUser_Manual"/>
     <addaction name="actionContact_Us_Contribute"/>
     <addaction name="actionCheck_for_Updates"/>
     <addaction name="actionAbout_Spiral"/>
@@ -735,9 +734,9 @@
     <string>Print Content to Log</string>
    </property>
   </action>
-  <action name="actionNotebook_Help">
+  <action name="actionUser_Manual">
    <property name="text">
-    <string>Notebook Help</string>
+    <string>User Manual</string>
    </property>
   </action>
   <action name="actionKeyboard_Shortcuts">

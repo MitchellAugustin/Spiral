@@ -8,6 +8,7 @@
 
 static const int DEFAULT_TEXTBOX_WIDTH = 1000;
 static const int DEFAULT_TAB_SIZE = 2000;
+static const QString SPIRAL_VERSION = "Beta 1.0";
 static const QString SPIRAL_CONTENT_MIME_TYPE = "application/x-spiralcontent";
 static const QString RESIZE_MIME_TYPE = "application/x-spiralresize";
 namespace utilities {
