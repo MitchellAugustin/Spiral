@@ -256,6 +256,9 @@ void MainWindow::newNotebookAtFile(QString filePath) {
     newSection->addPage(newPage);
     newNotebook->addSection(newSection);
     loadNotebook(newNotebook);
+    currentlyOpenPage = newPage;
+    currentlyOpenSection = newSection;
+    currentlyOpenNotebook = newNotebook;
     openNotebook(newNotebook);
     //Save this notebook to its corresponding .snb file
     saveNotebookToDisk(newNotebook);
