@@ -6,6 +6,10 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    #ifdef Q_OS_WIN
+    QIcon::setThemeName("tango");
+    #endif
+
     ui->setupUi(this);
     ui->notebooksListView->setMouseTracking(true);
     ui->sectionsListView->setMouseTracking(true);
@@ -940,7 +944,7 @@ void MainWindow::aboutSpiralButtonClicked() {
     aboutSpiralBox.setIconPixmap(QPixmap("logo.png").scaled(110, 100));
     aboutSpiralBox.setWindowTitle("About Spiral");
     aboutSpiralBox.setText("Spiral - https://mitchellaugustin.com/spiral/\n\nVersion: " + SPIRAL_VERSION + "\n\nAuthor: Mitchell Augustin\n\n" +
-        "Licensed under the GNU General Public License v3\n\nSpiral was built on the QT framework and utilizes elements from " +
+        "Licensed under the GNU General Public License v3\nhttps://www.gnu.org/licenses/gpl-3.0.en.html\n\nSpiral was built on the QT framework (https://www.qt.io/) and utilizes elements from " +
                            "Anchakor's MRichTextEdit, which can be found at \nhttps://github.com/Anchakor/MRichTextEditor." +
                            "\n\nThe Spiral logo is based on the following image from WikiMedia Commons, which is labeled for " +
                            "reuse with modification:\nhttps://commons.wikimedia.org/wiki/File:Triple-Spiral-Symbol-filled.svg");
