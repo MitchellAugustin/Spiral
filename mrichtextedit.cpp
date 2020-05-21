@@ -42,6 +42,9 @@
 #include <QMenu>
 #include <QDialog>
 
+bool QWidget::focusNextPrevChild(bool next) {
+    return false;
+}
 
 int MRichTextEdit::getHeight() {
     if(toPlainText().isEmpty()) {

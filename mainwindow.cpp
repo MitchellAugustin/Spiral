@@ -1,7 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-
+/**
+ * @brief MainWindow::MainWindow - Constructs the main window
+ * @param parent
+ */
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -9,6 +12,11 @@ MainWindow::MainWindow(QWidget *parent)
     #ifdef Q_OS_WIN
     QIcon::setThemeName("tango");
     #endif
+
+    //Use the existence of the "bold" icon to check to see if there is an icon theme on the system. If not, use Tango.
+    if (!QIcon::hasThemeIcon("format-text-bold")) {
+        QIcon::setThemeName("tango");
+    }
 
     ui->setupUi(this);
     ui->notebooksListView->setMouseTracking(true);
@@ -83,59 +91,29 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(exitButtonClicked()));
 
     connect(ui->openSession, SIGNAL(clicked()), this, SLOT(loadSession()));
-
-
-
-
-    //The following is a demo using statically defined data of how the windowing system will be implemented
-//    Notebook *notebook = new Notebook();
-//    notebook->setName("New Notebook");
-//    Section *section = new Section();
-//    section->setName("New Section");
-//    Page *page = new Page();
-//    page->setName("New Page");
-//    section->addPage(page);
-//    Page *p2 = new Page();
-//    p2->setName("Page 2");
-//    section->addPage(p2);
-
-//    Section *section2 = new Section();
-//    section2->setName("Sec 2");
-//    Page *s2p1 = new Page();
-//    s2p1->setName("s2p1");
-//    section2->addPage(s2p1);
-
-//    notebook->addSection(section);
-//    notebook->addSection(section2);
-//    loadNotebook(notebook);
-//    openNotebook(notebook);
-
-//    Notebook *nb2 = new Notebook();
-//    nb2->setName("Notebook 2");
-//    Section *s2 = new Section();
-//    s2->setName("N2, Sec2");
-//    Page *n2s2p1 = new Page();
-//    n2s2p1->setName("n2s2p1");
-//    s2->addPage(n2s2p1);
-//    nb2->addSection(s2);
-//    loadNotebook(nb2);
-//    pageSelected(0);
-//    //END SAMPLE
-//    //NOTE: THESE OBJECTS MUST BE DELETED MANUALLY because of new being used!!!
-//    //These aren't, but in the actual methods, they need to be.
-//    checkNameChanges();
 }
 
 
+/**
+ * @brief MainWindow::~MainWindow - Autosaves all open notebooks and destroys the window
+ */
 MainWindow::~MainWindow()
 {
-    //NOTE: DO NOT AUTOSAVE RIGHT NOW. This appears to cause notebooks to be overwritten for some reason.
-//    for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
-//        saveNotebookToDisk(*n_it);
-//    }
+    autosave();
     delete ui;
 }
 
+/**
+ * @brief MainWindow::autosave - Autosaves all open notebooks
+ */
+void MainWindow::autosave() {
+    if (!openNotebooks) {
+        return;
+    }
+    for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
+        saveNotebookToDisk(*n_it);
+    }
+}
 
 /**
  * @brief MainWindow::focusChanged - Handles toolbar switching when the focus is changed between widgets
@@ -143,6 +121,8 @@ MainWindow::~MainWindow()
  * @param newWidget
  */
 void MainWindow::focusChanged(QWidget *oldWidget, QWidget *newWidget) {
+    //Autosave notebooks on every focus change
+    autosave();
     qDebug() << "Focus changed, old:" << oldWidget;
     qDebug() << "Focus changed, new:" << newWidget;
 
@@ -184,6 +164,9 @@ void MainWindow::focusChanged(QWidget *oldWidget, QWidget *newWidget) {
 }
 
 
+/**
+ * @brief MainWindow::loadSession - Loads the notebooks located in session.json
+ */
 void MainWindow::loadSession() {
     ui->openSession->hide();
     if (sessionFilePath != nullptr) {
@@ -310,7 +293,7 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
 
             QTextStream outputStream(&file);
 
-            for(QVector<Section*>::Iterator it = currentlyOpenNotebook->loadSectionsList()->begin(); it != currentlyOpenNotebook->loadSectionsList()->end(); ++it) {
+            for(QVector<Section*>::Iterator it = notebook->loadSectionsList()->begin(); it != notebook->loadSectionsList()->end(); ++it) {
                 Section *curSection = *it;
                 qDebug() << "Section: " << curSection->getName() << "(UUID: " << curSection->getUUID() << ")";
                 QJsonObject thisSectionJson;
@@ -369,6 +352,15 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
  * @param filePath
  */
 void MainWindow::openNotebookFromFile(QString filePath) {
+    if (ui->openSession->isVisible()) {
+        loadSession();
+    }
+    for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
+        if ((*n_it)->path.compare(filePath) == 0) {
+            QMessageBox::information(this, "Cannot open notebook", "This notebook is already open.");
+            return;
+        }
+    }
     qDebug() << "Opening notebook at location:" << filePath;
     if (filePath != nullptr) {
         QFile file(filePath);
@@ -947,7 +939,11 @@ void MainWindow::aboutSpiralButtonClicked() {
         "Licensed under the GNU General Public License v3\nhttps://www.gnu.org/licenses/gpl-3.0.en.html\n\nSpiral was built on the QT framework (https://www.qt.io/) and utilizes elements from " +
                            "Anchakor's MRichTextEdit, which can be found at \nhttps://github.com/Anchakor/MRichTextEditor." +
                            "\n\nThe Spiral logo is based on the following image from WikiMedia Commons, which is labeled for " +
-                           "reuse with modification:\nhttps://commons.wikimedia.org/wiki/File:Triple-Spiral-Symbol-filled.svg");
+                           "reuse with modification:\nhttps://commons.wikimedia.org/wiki/File:Triple-Spiral-Symbol-filled.svg.\n\n" +
+                           "Spiral's build for Windows also utilizes an adaptation of Jürgen Skrotzky's QT dark style, which can be found at \n" +
+                           "https://github.com/Jorgen-VikingGod/Qt-Frameless-Window-DarkStyle.\n\n" +
+                           "On systems without the freedesktop.org icon set, Spiral uses the Tango Icon Library.\n" +
+                           "http://tango-project.org/Tango_Icon_Library/");
     aboutSpiralBox.setParent(this);
     aboutSpiralBox.exec();
 }

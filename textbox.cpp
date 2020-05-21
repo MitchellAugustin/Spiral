@@ -14,6 +14,7 @@ TextBox::TextBox(QWidget *parent, QString uuid) : QWidget(parent)
     TextBox::richTextEdit->f_toolbar->setVisible(false);
     TextBox::richTextEdit->f_toolbar_layout->addWidget(contractLabel);
     TextBox::richTextEdit->f_toolbar_layout->addWidget(expandLabel);
+    TextBox::richTextEdit->f_toolbar->setFocusPolicy(Qt::NoFocus);
 //    layout->addWidget(contractLabel);
 //    layout->addWidget(expandLabel);
 //    layout->setAlignment(contractLabel, Qt::AlignRight);

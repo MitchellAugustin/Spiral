@@ -82,5 +82,6 @@ private:
     QTabWidget *tabWidget;
     QString sessionFilePath = QDir::currentPath() + "/session.json";
     void updateSessionFile();
+    void autosave();
 };
 #endif // MAINWINDOW_H
