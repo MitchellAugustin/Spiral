@@ -12,12 +12,23 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->toolBar->addWidget(ui->f_toolbar);
     ui->toolBar->setMinimumHeight(ui->f_toolbar->height() + 15);
+    ui->toolBar->setObjectName("Formatting Toolbar");
+    ui->toolBar->setAccessibleName("Formatting Toolbar");
+    ui->toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
     ui->hiddenToolBar->setVisible(false);
+    ui->hiddenToolBar->setDisabled(true);
+    ui->hiddenToolBar->setFloatable(false);
+    ui->hiddenToolBar->setMovable(false);
+    ui->hiddenToolBar->setAllowedAreas(Qt::NoToolBarArea);
+    ui->hiddenToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
 //    ui->toolBar->setVisible(false);
 
     //Setup browsing tools
+    ui->browserToolBar->setObjectName("Notebook/Section Browser");
+    ui->browserToolBar->setAccessibleName("Notebook/Section Browser");
     ui->browserToolBar->addWidget(ui->notebooksListView);
     ui->browserToolBar->addWidget(ui->sectionsListView);
+    ui->browserToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
 
     //Set window title and instantiate tab widget
     MainWindow::setWindowTitle("Spiral");
