@@ -9,9 +9,7 @@ TextBox::TextBox(QWidget *parent, QString uuid) : QWidget(parent)
 
     TextBox::richTextEdit->setText("Default text");
 
-    DragResizeLabel *contractLabel = new DragResizeLabel(this, false);
     contractLabel->setText("<=");
-    DragResizeLabel *expandLabel = new DragResizeLabel(this, true);
     expandLabel->setText("=>");
     TextBox::richTextEdit->f_toolbar->setVisible(false);
     TextBox::richTextEdit->f_toolbar_layout->addWidget(contractLabel);

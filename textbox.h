@@ -24,6 +24,8 @@ public:
     QString uuid;
     MRichTextEdit* richTextEdit = new MRichTextEdit(this);
     QPoint location;
+    DragResizeLabel *contractLabel = new DragResizeLabel(this, false);
+    DragResizeLabel *expandLabel = new DragResizeLabel(this, true);
 };
 
 #endif // TEXTBOX_H

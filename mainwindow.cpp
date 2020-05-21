@@ -860,6 +860,8 @@ void MainWindow::emptyBoxCleanupExternal() {
                     qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid << ") (#" << iter << ") is empty, removing";
                     qDebug() << "Empty box found, deleting...";
                     curPage->textBoxList.removeOne(obj);
+                    obj->expandLabel->close();
+                    obj->contractLabel->close();
                     obj->close();
                 }
             }
