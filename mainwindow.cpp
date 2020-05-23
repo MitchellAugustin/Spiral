@@ -82,6 +82,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openNotebookButtonClicked()));
     connect(ui->actionClose_This_Notebook, SIGNAL(triggered()), this, SLOT(closeNotebookButtonClicked()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveNotebookButtonClicked()));
+    connect(ui->actionSave_All, SIGNAL(triggered()), this, SLOT(saveAllButtonClicked()));
     connect(ui->actionNotebook_Properties, SIGNAL(triggered()), this, SLOT(notebookInfoButtonClicked()));
     connect(ui->actionExplain_Choices_on_this_menu, SIGNAL(triggered()), this, SLOT(explainChoicesButtonClicked()));
     connect(ui->actionAbout_Spiral, SIGNAL(triggered()), this, SLOT(aboutSpiralButtonClicked()));
@@ -89,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionContact_Us_Contribute, SIGNAL(triggered()), this, SLOT(contributeButtonClicked()));
     connect(ui->actionCheck_for_Updates, SIGNAL(triggered()), this, SLOT(checkUpdatesButtonClicked()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(exitButtonClicked()));
+    connect(ui->actionAutosave, SIGNAL(toggled(bool)), this, SLOT(setAutosaveEnabled(bool)));
 
     connect(ui->openSession, SIGNAL(clicked()), this, SLOT(loadSession()));
 }
@@ -99,6 +101,13 @@ MainWindow::MainWindow(QWidget *parent)
  */
 MainWindow::~MainWindow()
 {
+    if (!autosaveEnabled) {
+        QMessageBox::StandardButton res = QMessageBox::question(this, "Unsaved Work", "Would you like to save your unsaved work?",
+                                                        QMessageBox::Yes|QMessageBox::No);
+        if (res == QMessageBox::Yes) {
+            saveAllButtonClicked();
+        }
+    }
     autosave();
     delete ui;
 }
@@ -107,6 +116,10 @@ MainWindow::~MainWindow()
  * @brief MainWindow::autosave - Autosaves all open notebooks
  */
 void MainWindow::autosave() {
+    if (!autosaveEnabled) {
+        MainWindow::setWindowTitle(currentlyOpenPage->getName() + "* - Spiral");
+        return;
+    }
     if (!openNotebooks) {
         return;
     }
@@ -163,6 +176,15 @@ void MainWindow::focusChanged(QWidget *oldWidget, QWidget *newWidget) {
     }
 }
 
+/**
+ * @brief MainWindow::setAutosaveEnabled - Enables/disables autosave in the current session
+ * @param autosaveEnabled
+ */
+void MainWindow::setAutosaveEnabled(bool autosaveEnabled) {
+    this->autosaveEnabled = autosaveEnabled;
+    ui->actionAutosave->setChecked(autosaveEnabled);
+    updateSessionFile();
+}
 
 /**
  * @brief MainWindow::loadSession - Loads the notebooks located in session.json
@@ -181,6 +203,9 @@ void MainWindow::loadSession() {
             inputStream.flush();
             QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
             QJsonObject rootObj = doc.object();
+            bool autosave = rootObj.value("autosave").toBool();
+            setAutosaveEnabled(autosave);
+
             QJsonArray arr = rootObj.value("open_notebooks").toArray();
 
             for(QJsonValueRef notebookRef : arr) {
@@ -271,6 +296,19 @@ void MainWindow::saveNotebookButtonClicked() {
         qDebug() << "Saving currently open notebook to file";
         saveNotebookToDisk(currentlyOpenNotebook);
     }
+}
+
+/**
+ * @brief MainWindow::saveAllButtonClicked - Saves all currently open notebooks
+ */
+void MainWindow::saveAllButtonClicked() {
+    if (!openNotebooks) {
+        return;
+    }
+    for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
+        saveNotebookToDisk(*n_it);
+    }
+    MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - Spiral");
 }
 
 /**
@@ -473,6 +511,8 @@ void MainWindow::updateSessionFile() {
                 openNotebooksArray.append((*n_it)->path);
             }
             obj.insert("open_notebooks", openNotebooksArray);
+            obj.insert("autosave", autosaveEnabled);
+            qDebug() << "Autosave? " << autosaveEnabled;
             QTextStream outputStream(&file);
             outputStream << QJsonDocument(obj).toJson();
         }

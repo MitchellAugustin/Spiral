@@ -65,6 +65,7 @@ protected slots:
     void testAddBoxProgrammatically();
     void openNotebookButtonClicked();
     void saveNotebookButtonClicked();
+    void saveAllButtonClicked();
     void loadSession();
     void focusChanged(QWidget *, QWidget *);
     void notebookInfoButtonClicked();
@@ -74,6 +75,7 @@ protected slots:
     void contributeButtonClicked();
     void checkUpdatesButtonClicked();
     void exitButtonClicked();
+    void setAutosaveEnabled(bool autosaveEnabled);
 
 private:
     QVector<Notebook*> *openNotebooks = new QVector<Notebook*>();
@@ -83,5 +85,6 @@ private:
     QString sessionFilePath = QDir::currentPath() + "/session.json";
     void updateSessionFile();
     void autosave();
+    bool autosaveEnabled = true;
 };
 #endif // MAINWINDOW_H

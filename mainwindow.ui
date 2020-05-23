@@ -617,6 +617,7 @@
     <addaction name="menuNew"/>
     <addaction name="menuDelete"/>
     <addaction name="actionSave"/>
+    <addaction name="actionSave_All"/>
     <addaction name="actionOpen"/>
     <addaction name="actionClose_This_Notebook"/>
     <addaction name="actionNotebook_Properties"/>
@@ -629,6 +630,7 @@
     <addaction name="actionPrint_Content_to_Log"/>
     <addaction name="actionTest_Add_Box"/>
     <addaction name="actionClean_Empty_Boxes"/>
+    <addaction name="actionAutosave"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -791,6 +793,25 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionAutosave">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Autosave</string>
+   </property>
+  </action>
+  <action name="actionSave_All">
+   <property name="text">
+    <string>Save All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
  </widget>
