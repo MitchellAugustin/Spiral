@@ -134,8 +134,10 @@ void MainWindow::autosave() {
  * @param newWidget
  */
 void MainWindow::focusChanged(QWidget *oldWidget, QWidget *newWidget) {
-    //Autosave notebooks on every focus change
-    autosave();
+    //Autosave notebooks any time the user leaves the Spiral window
+    if (newWidget == nullptr) {
+        autosave();
+    }
     qDebug() << "Focus changed, old:" << oldWidget;
     qDebug() << "Focus changed, new:" << newWidget;
 
@@ -173,6 +175,7 @@ void MainWindow::focusChanged(QWidget *oldWidget, QWidget *newWidget) {
             qDebug() << "Toolbar is now visible";
             ui->toolBar->addWidget(newRichText->f_toolbar);
         }
+        newRichText->f_toolbar->setEnabled(true);
     }
 }
 
@@ -901,6 +904,7 @@ void MainWindow::emptyBoxCleanupExternal() {
                 if (obj == nullptr || obj->richTextEdit == nullptr) {
                     qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid << ") (#" << iter << ") is empty, removing";
                     qDebug() << "Removed TextBox was at this index";
+                    obj->richTextEdit->f_toolbar->setEnabled(false);
                     continue;
                 }
                 if (obj->richTextEdit->toPlainText().isEmpty()) {
@@ -910,6 +914,7 @@ void MainWindow::emptyBoxCleanupExternal() {
                     obj->expandLabel->close();
                     obj->contractLabel->close();
                     obj->close();
+                    obj->richTextEdit->f_toolbar->setEnabled(false);
                 }
             }
         }

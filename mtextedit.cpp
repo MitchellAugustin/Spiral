@@ -41,7 +41,9 @@ void MTextEdit::insertFromMimeData(const QMimeData *source) {
             return;
             }
         }
-    QTextEdit::insertFromMimeData(source);
+    if (!source->formats().contains("application/x-spiralcontent")) {
+        QTextEdit::insertFromMimeData(source);
+    }
 }
 
 

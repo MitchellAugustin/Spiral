@@ -204,6 +204,7 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
         tBox->setAttribute(Qt::WA_DeleteOnClose);
         tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
         event->accept();
+        tBox->richTextEdit->f_textedit->setFocus();
         return;
     }
 
