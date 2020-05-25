@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent/qtconcurrentrun.h>
 #include <QMainWindow>
 #include <QFontDialog>
 #include <QFontComboBox>
@@ -41,9 +43,10 @@ public:
     void newSection(Notebook *notebook, QString sectionName);
     void newPage(Section *section, QString pageName);
     void checkNameChanges();
-    void saveNotebookToDisk(Notebook *notebook);
+    static void saveNotebookToDisk(Notebook *notebook);
     Ui::MainWindow *ui;
     void emptyBoxCleanupExternal();
+    void autosave();
 public slots:
     void emptyBoxCleanup();
 
@@ -84,7 +87,7 @@ private:
     QTabWidget *tabWidget;
     QString sessionFilePath = QDir::currentPath() + "/session.json";
     void updateSessionFile();
-    void autosave();
     bool autosaveEnabled = true;
+    QVector<QFuture<void>> *saveThreads = new QVector<QFuture<void>>();
 };
 #endif // MAINWINDOW_H

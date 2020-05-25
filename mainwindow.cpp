@@ -109,6 +109,11 @@ MainWindow::~MainWindow()
         }
     }
     autosave();
+
+    //Wait for all save threads to finish
+    for(QVector<QFuture<void>>::iterator f_it = saveThreads->begin(); f_it != saveThreads->end(); ++f_it) {
+        (*f_it).waitForFinished();
+    }
     delete ui;
 }
 
@@ -124,7 +129,8 @@ void MainWindow::autosave() {
         return;
     }
     for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
-        saveNotebookToDisk(*n_it);
+        QFuture<void> saveNotebookThread = QtConcurrent::run(saveNotebookToDisk, *n_it);
+        saveThreads->append(saveNotebookThread);
     }
 }
 
