@@ -422,14 +422,14 @@ void MRichTextEdit::textBgColor() {
 void MRichTextEdit::listBullet(bool checked) {
     if (checked) {
         f_list_ordered->setChecked(false);
-        }
+    }
     list(checked, QTextListFormat::ListDisc);
 }
 
 void MRichTextEdit::listOrdered(bool checked) {
     if (checked) {
         f_list_bullet->setChecked(false);
-        }
+    }
     list(checked, QTextListFormat::ListDecimal);
 }
 

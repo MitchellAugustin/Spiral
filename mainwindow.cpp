@@ -123,6 +123,7 @@ MainWindow::~MainWindow()
 void MainWindow::autosave() {
     if (!autosaveEnabled) {
         MainWindow::setWindowTitle(currentlyOpenPage->getName() + "* - Spiral");
+        savedFlag = false;
         return;
     }
     if (!openNotebooks) {
@@ -132,6 +133,7 @@ void MainWindow::autosave() {
         QFuture<void> saveNotebookThread = QtConcurrent::run(saveNotebookToDisk, *n_it);
         saveThreads->append(saveNotebookThread);
     }
+    savedFlag = true;
 }
 
 /**
@@ -193,6 +195,10 @@ void MainWindow::setAutosaveEnabled(bool autosaveEnabled) {
     this->autosaveEnabled = autosaveEnabled;
     ui->actionAutosave->setChecked(autosaveEnabled);
     updateSessionFile();
+    if (currentlyOpenPage) {
+        MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - Spiral");
+    }
+    savedFlag = true;
 }
 
 /**
@@ -318,6 +324,7 @@ void MainWindow::saveAllButtonClicked() {
         saveNotebookToDisk(*n_it);
     }
     MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - Spiral");
+    savedFlag = true;
 }
 
 /**
@@ -546,7 +553,7 @@ void MainWindow::openNotebook(Notebook *notebook) {
     }
     //Add Notebook to UI
     currentlyOpenNotebook = notebook;
-    MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - Spiral");
+    MainWindow::setWindowTitle(currentlyOpenPage->getName() +  (savedFlag ? "" : "*") + " - Spiral");
 }
 
 /**
@@ -566,7 +573,7 @@ void MainWindow::openSection(Section *section) {
         //Add the page to the UI with its DragLayout
         tabWidget->addTab(curPage->editorPane, curPage->getName());
         currentlyOpenPage = section->loadPagesList()->first();
-        MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - Spiral");
+        MainWindow::setWindowTitle(currentlyOpenPage->getName() +  (savedFlag ? "" : "*") + " - Spiral");
     }
     currentlyOpenSection = section;
 }
@@ -820,7 +827,7 @@ void MainWindow::pageSelected(int index) {
         if (validIndex) {
             currentlyOpenPage = currentlyOpenSection->loadPagesList()->at(index);
             emptyBoxCleanup();
-            MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - Spiral");
+            MainWindow::setWindowTitle(currentlyOpenPage->getName() + (savedFlag ? "" : "*") + " - Spiral");
         }
     }
 }

@@ -88,6 +88,7 @@ private:
     QString sessionFilePath = QDir::currentPath() + "/session.json";
     void updateSessionFile();
     bool autosaveEnabled = true;
+    bool savedFlag = true;
     QVector<QFuture<void>> *saveThreads = new QVector<QFuture<void>>();
 };
 #endif // MAINWINDOW_H

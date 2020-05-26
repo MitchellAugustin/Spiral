@@ -1,4 +1,11 @@
 Spiral Changelog:
 
+Version Beta 1.1 (Work in progress - Expected release date: 5/29/2020):
+*  Autosaving is now multithreaded for improved performance
+*  Autosave can now be disabled in the Tools menu
+*  Fixed a bug that caused HTML from one textbox to be added to any textbox it is dragged into
+*  Toolbar is now disabled after textbox deletion until another textbox is focused
+*  Textboxes now autofocus on creation
+
 Version Beta 1.0:
 *  First public beta release of Spiral native for Linux and Windows.
