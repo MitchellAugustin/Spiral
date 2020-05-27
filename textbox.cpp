@@ -1,11 +1,13 @@
 #include "textbox.h"
 
-TextBox::TextBox(QWidget *parent, QString uuid) : QWidget(parent)
+TextBox::TextBox(QWidget *parent, QString uuid) : QFrame(parent)
 {
     this->uuid = uuid;
+    setFrameShape(QFrame::Panel);
+    setFrameShadow(QFrame::Raised);
     qDebug() << "New TextBox object instantiated with UUID " << uuid;
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 30, 0, 0);
+    layout->setContentsMargins(0, 15, 0, 0);
 
     TextBox::richTextEdit->setText("Default text");
 

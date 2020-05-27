@@ -121,7 +121,7 @@ MainWindow::~MainWindow()
  * @brief MainWindow::autosave - Autosaves all open notebooks
  */
 void MainWindow::autosave() {
-    if (!autosaveEnabled) {
+    if (!autosaveEnabled && currentlyOpenPage) {
         MainWindow::setWindowTitle(currentlyOpenPage->getName() + "* - Spiral");
         savedFlag = false;
         return;
@@ -627,6 +627,11 @@ void MainWindow::closeNotebookButtonClicked() {
                                                                                    " (Closing the notebook will NOT delete it from the disk)",
                                                     QMessageBox::Yes|QMessageBox::No);
     if (res == QMessageBox::Yes) {
+        //Wait for all save threads to finish
+        for(QVector<QFuture<void>>::iterator f_it = saveThreads->begin(); f_it != saveThreads->end(); ++f_it) {
+            (*f_it).waitForFinished();
+        }
+
         Notebook *toClose = currentlyOpenNotebook;
         int index = openNotebooks->indexOf(currentlyOpenNotebook);
         notebookBrowserStringListModel->removeRow(index);

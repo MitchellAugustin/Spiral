@@ -6,6 +6,7 @@ Version Beta 1.1 (Work in progress - Expected release date: 5/29/2020):
 *  Fixed a bug that caused HTML from one textbox to be added to any textbox it is dragged into
 *  Toolbar is now disabled after textbox deletion until another textbox is focused
 *  Textboxes now autofocus on creation
+*  Added border to textboxes so draggable region is more easily visible
 
 Version Beta 1.0:
 *  First public beta release of Spiral native for Linux and Windows.

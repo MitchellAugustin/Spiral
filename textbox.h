@@ -14,7 +14,7 @@
 #include "mrichtextedit.h"
 #include "dragresizelabel.h"
 
-class TextBox : public QWidget
+class TextBox : public QFrame
 {
     Q_OBJECT
 public:

@@ -113,7 +113,9 @@ void DragLayout::dropEvent(QDropEvent *event)
         tBox->location = event->pos();
         tBox->show();
         tBox->setAttribute(Qt::WA_DeleteOnClose);
-        tBox->resize(width, getHeight(tBox));
+        int tHeight = getHeight(tBox);
+        qDebug() << "dropevent1 height:" << tHeight;
+        tBox->resize(width, tHeight);
 
         if (event->source() == this) {
             event->setDropAction(Qt::MoveAction);
@@ -122,7 +124,10 @@ void DragLayout::dropEvent(QDropEvent *event)
             event->acceptProposedAction();
         }
 
-        //Finalize resize operation
+        tBox->resize(width, getHeight(tBox));
+        qDebug() << "Final dropevent1 height:" << tHeight;
+
+        //Finalize resize operation (Resizes canvas if necessary)
         if(event->pos().y() + getHeight(tBox) > this->height()) {
             this->resize(this->width(), this->height() + event->pos().y() + getHeight(tBox));
         }
@@ -191,7 +196,7 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
     MRichTextEdit *childMRichTextEditCheck = dynamic_cast<MRichTextEdit*>(childAt(event->pos()));
 
     //Ensures that drag operations are not handled unless the user is dragging a TextBox object
-    bool childInnerCheck = child && !(childQFrameCheck || childMRichTextEditCheck);
+    bool childInnerCheck = child && !(childMRichTextEditCheck);
 
     if (!child && !childInnerCheck) {
         TextBox *tBox = new TextBox(this);

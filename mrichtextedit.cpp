@@ -486,12 +486,12 @@ void MRichTextEdit::slotCursorPositionChanged() {
         f_list_ordered->setChecked(false);
         }
 
-    resize(width(), getHeight());
     TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
     if(parentTextBox) {
-        parentTextBox->resize(width(), getHeight() + 45);
+        resize(parentTextBox->width(), getHeight());
+        parentTextBox->resize(parentTextBox->width(), getHeight() + 15);
 
-        qDebug() << "TextBox " << parentTextBox->uuid << " resized to " << this->width() << "x" << this->height() << " from MRichTextEdit::slotCursorPositionChanged()";
+        qDebug() << "TextBox " << parentTextBox->uuid << " resized to " << parentTextBox->width() << "x" << this->height() << " from MRichTextEdit::slotCursorPositionChanged()";
     }
 }
 
@@ -532,11 +532,11 @@ void MRichTextEdit::fontChanged(const QFont &f) {
         f_list_bullet->setChecked(false);
         f_list_ordered->setChecked(false);
       }
-    resize(width(), getHeight());
 
     TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
     if(parentTextBox) {
-        parentTextBox->resize(width(), getHeight() + 45);
+        resize(parentTextBox->width(), getHeight());
+        parentTextBox->resize(width(), getHeight() + 15);
     }
 }
 
@@ -631,11 +631,11 @@ void MRichTextEdit::insertImage() {
 
 void MRichTextEdit::textChanged() {
     qDebug() << "Text changed from MRichTextEdit";
-    resize(width(), getHeight());
 
     TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
     if(parentTextBox) {
+        resize(parentTextBox->width(), getHeight());
         qDebug() << "Resizing parent TextBox";
-        parentTextBox->resize(width(), getHeight() + 45);
+        parentTextBox->resize(width(), getHeight() + 15);
     }
 }
