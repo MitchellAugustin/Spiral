@@ -104,5 +104,6 @@ private:
     bool queryUpdated = false;
     QVector<SearchResult*> *searchResults = new QVector<SearchResult*>();
     QVector<SearchResult*>::Iterator searchResultsIterator = nullptr;
+    void findIterate(int direction);
 };
 #endif // MAINWINDOW_H

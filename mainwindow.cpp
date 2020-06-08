@@ -940,11 +940,14 @@ void MainWindow::emptyBoxCleanupExternal() {
     }
 }
 
-void MainWindow::findPreviousButtonClicked() {
-
-}
-
-void MainWindow::findNextButtonClicked() {
+void MainWindow::findIterate(int direction) {
+    //Alert the user that the search has looped back to the beginning
+    if (direction == 1 && searchResultsIterator == searchResults->begin()) {
+        QApplication::beep();
+    }
+    else if (direction == -1 && searchResultsIterator == searchResults->end()) {
+        QApplication::beep();
+    }
     if (!queryUpdated) {
         searchResults->clear();
         for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
@@ -965,7 +968,16 @@ void MainWindow::findNextButtonClicked() {
         }
         qDebug() << "Results:" << searchResults->count();
         queryUpdated = true;
-        searchResultsIterator = searchResults->begin();
+        if (direction == -1) {
+            searchResultsIterator = searchResults->end();
+        }
+        else {
+            searchResultsIterator = searchResults->begin();
+        }
+    }
+    if (searchResults->count() == 0) {
+        QApplication::beep();
+        return;
     }
 
     //TODO Navigate to next found item
@@ -988,12 +1000,31 @@ void MainWindow::findNextButtonClicked() {
         }
     }
 
+
     //Increment the iterator or loop back to beginning if it is at the end
-    searchResultsIterator++;
-    if (searchResultsIterator == searchResults->end()) {
-        searchResultsIterator = searchResults->begin();
-        QApplication::beep();
+    if (direction == -1) {
+        searchResultsIterator--;
+        if (searchResultsIterator == searchResults->begin()) {
+            searchResultsIterator = searchResults->end();
+        }
     }
+    else {
+        searchResultsIterator++;
+        if (searchResultsIterator == searchResults->end()) {
+            searchResultsIterator = searchResults->begin();
+        }
+    }
+}
+
+void MainWindow::findPreviousButtonClicked() {
+    qDebug() << "Previous";
+//    findIterate(-1);
+
+}
+
+void MainWindow::findNextButtonClicked() {
+    qDebug() << "Next";
+    findIterate(1);
 }
 
 
@@ -1047,6 +1078,7 @@ void MainWindow::findButtonClicked() {
     findLayout->addLayout(buttonLayout);
     findDialog->setLayout(findLayout);
     findDialog->setAttribute(Qt::WA_DeleteOnClose);
+    findDialog->setWindowTitle("Find and Replace");
     findDialog->setModal(false);
     findDialog->show();
     findDialog->raise();
