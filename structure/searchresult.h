@@ -8,9 +8,18 @@ class TextBox;
 
 class SearchResult {
 public:
-    SearchResult(Notebook *notebook, Section *section, Page *page, TextBox *textBox) {
+    SearchResult() {
 
     }
+
+    bool valid() {
+        return notebook && section && page && textBox;
+    }
+
+    Notebook *notebook = nullptr;
+    Section *section = nullptr;
+    Page *page = nullptr;
+    TextBox *textBox = nullptr;
 };
 
 #endif // SEARCHRESULT_H

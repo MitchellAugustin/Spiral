@@ -945,8 +945,57 @@ void MainWindow::findPreviousButtonClicked() {
 }
 
 void MainWindow::findNextButtonClicked() {
+    if (!queryUpdated) {
+        searchResults->clear();
+        for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
+            for(QVector<Section*>::Iterator s_it = (*n_it)->loadSectionsList()->begin(); s_it != (*n_it)->loadSectionsList()->end(); ++s_it) {
+                for (QVector<Page*>::Iterator p_it = (*s_it)->loadPagesList()->begin(); p_it != (*s_it)->loadPagesList()->end(); ++p_it) {
+                    for (QVector<TextBox*>::Iterator t_it = (*p_it)->textBoxList.begin(); t_it != (*p_it)->textBoxList.end(); ++t_it) {
+                        if ((*t_it)->richTextEdit->toPlainText().contains(currentSearchQuery)) {
+                            SearchResult *thisResult = new SearchResult();
+                            thisResult->notebook = (*n_it);
+                            thisResult->section = (*s_it);
+                            thisResult->page = (*p_it);
+                            thisResult->textBox = (*t_it);
+                            searchResults->append(thisResult);
+                        }
+                    }
+                }
+            }
+        }
+        qDebug() << "Results:" << searchResults->count();
+        queryUpdated = true;
+        searchResultsIterator = searchResults->begin();
+    }
 
+    //TODO Navigate to next found item
+    //Show the item
+    if ((*searchResultsIterator)->valid()) {
+        if (currentlyOpenNotebook != (*searchResultsIterator)->notebook) {
+            openNotebook((*searchResultsIterator)->notebook);
+        }
+        if (currentlyOpenSection != (*searchResultsIterator)->section) {
+            openSection((*searchResultsIterator)->section);
+        }
+        if (currentlyOpenPage != (*searchResultsIterator)->page && currentlyOpenSection->loadPagesList()->contains((*searchResultsIterator)->page)) {
+            tabWidget->setCurrentIndex(currentlyOpenSection->loadPagesList()->indexOf((*searchResultsIterator)->page));
+        }
+        if (currentlyOpenPage->textBoxList.contains((*searchResultsIterator)->textBox)) {
+            QScrollArea *scrollArea = dynamic_cast<QScrollArea*>(currentlyOpenPage->editorPane);
+            scrollArea->verticalScrollBar()->setValue((*searchResultsIterator)->textBox->location.y());
+            scrollArea->horizontalScrollBar()->setValue((*searchResultsIterator)->textBox->location.x());
+            (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setFocus();
+        }
+    }
+
+    //Increment the iterator or loop back to beginning if it is at the end
+    searchResultsIterator++;
+    if (searchResultsIterator == searchResults->end()) {
+        searchResultsIterator = searchResults->begin();
+        QApplication::beep();
+    }
 }
+
 
 void MainWindow::findReplaceButtonClicked() {
 
@@ -958,6 +1007,8 @@ void MainWindow::findCloseButtonClicked() {
 
 void MainWindow::findTextChanged(QString text) {
     qDebug() << "Find text:" << text;
+    currentSearchQuery = text;
+    queryUpdated = false;
 }
 
 /**

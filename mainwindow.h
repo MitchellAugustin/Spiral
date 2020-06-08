@@ -100,7 +100,9 @@ private:
     QDialog *findDialog = nullptr;
     QLineEdit *findTextLineEdit = nullptr;
     QLineEdit *replaceTextLineEdit = nullptr;
-    QString *currentSearchQuery = nullptr;
-
+    QString currentSearchQuery = nullptr;
+    bool queryUpdated = false;
+    QVector<SearchResult*> *searchResults = new QVector<SearchResult*>();
+    QVector<SearchResult*>::Iterator searchResultsIterator = nullptr;
 };
 #endif // MAINWINDOW_H
