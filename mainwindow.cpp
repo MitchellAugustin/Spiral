@@ -91,6 +91,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionCheck_for_Updates, SIGNAL(triggered()), this, SLOT(checkUpdatesButtonClicked()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(exitButtonClicked()));
     connect(ui->actionAutosave, SIGNAL(toggled(bool)), this, SLOT(setAutosaveEnabled(bool)));
+    connect(ui->actionFind, SIGNAL(triggered()), this, SLOT(findButtonClicked()));
 
     connect(ui->openSession, SIGNAL(clicked()), this, SLOT(loadSession()));
 }
@@ -937,6 +938,75 @@ void MainWindow::emptyBoxCleanupExternal() {
             }
         }
     }
+}
+
+void MainWindow::findPreviousButtonClicked() {
+
+}
+
+void MainWindow::findNextButtonClicked() {
+
+}
+
+void MainWindow::findReplaceButtonClicked() {
+
+}
+
+void MainWindow::findCloseButtonClicked() {
+    findDialog->close();
+}
+
+void MainWindow::findTextChanged(QString text) {
+    qDebug() << "Find text:" << text;
+}
+
+/**
+ * @brief MainWindow::findButtonClicked - Opens find and replace dialog
+ */
+void MainWindow::findButtonClicked() {
+    qDebug() << "Find button clicked";
+    findDialog = new QDialog(this);
+    QVBoxLayout *findLayout = new QVBoxLayout(findDialog);
+    QHBoxLayout *findBoxLayout = new QHBoxLayout(findDialog);
+    QHBoxLayout *replaceBoxLayout = new QHBoxLayout(findDialog);
+    QHBoxLayout *buttonLayout = new QHBoxLayout(findDialog);
+    QPushButton *previousButton = new QPushButton();
+    previousButton->setText("Find Previous");
+    QPushButton *nextButton = new QPushButton();
+    nextButton->setText("Find Next");
+    QPushButton *replaceAllButton = new QPushButton();
+    replaceAllButton->setText("Replace All");
+    QPushButton *closeButton = new QPushButton();
+    closeButton->setText("Close");
+    buttonLayout->addWidget(previousButton);
+    buttonLayout->addWidget(nextButton);
+    buttonLayout->addWidget(closeButton);
+    QLabel *findLabel = new QLabel();
+    QLabel *replaceLabel = new QLabel();
+    findLabel->setText("Text to Find:");
+    replaceLabel->setText("Replacement Text:");
+    findTextLineEdit = new QLineEdit(findDialog);
+    replaceTextLineEdit = new QLineEdit(findDialog);
+    findBoxLayout->addWidget(findLabel);
+    findBoxLayout->addWidget(findTextLineEdit);
+    replaceBoxLayout->addWidget(replaceLabel);
+    replaceBoxLayout->addWidget(replaceTextLineEdit);
+    findLayout->addLayout(findBoxLayout);
+    findLayout->addLayout(replaceBoxLayout);
+    findLayout->addLayout(buttonLayout);
+    findDialog->setLayout(findLayout);
+    findDialog->setAttribute(Qt::WA_DeleteOnClose);
+    findDialog->setModal(false);
+    findDialog->show();
+    findDialog->raise();
+    findDialog->activateWindow();
+
+    connect(previousButton, SIGNAL(clicked()), this, SLOT(findPreviousButtonClicked()));
+    connect(nextButton, SIGNAL(clicked()), this, SLOT(findNextButtonClicked()));
+    connect(findTextLineEdit, SIGNAL(returnPressed()), this, SLOT(findNextButtonClicked()));
+    connect(findTextLineEdit, SIGNAL(textChanged(QString)), this, SLOT(findTextChanged(QString)));
+    connect(replaceAllButton, SIGNAL(clicked()), this, SLOT(findReplaceButtonClicked()));
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(findCloseButtonClicked()));
 }
 
 /**

@@ -33,6 +33,7 @@ HEADERS += \
     spiralstringlist.h \
     structure/notebook.h \
     structure/page.h \
+    structure/searchresult.h \
     structure/section.h \
     structure/spiralcomponent.h \
     textbox.h \

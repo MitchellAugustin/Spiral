@@ -627,6 +627,7 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionFind"/>
     <addaction name="actionPrint_Content_to_Log"/>
     <addaction name="actionTest_Add_Box"/>
     <addaction name="actionClean_Empty_Boxes"/>
@@ -812,6 +813,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="text">
+    <string>Find</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>

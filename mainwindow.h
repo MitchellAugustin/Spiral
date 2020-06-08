@@ -18,6 +18,7 @@
 #include "textbox.h"
 #include "structure/notebook.h"
 #include "spiralstringlist.h"
+#include "structure/searchresult.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -79,6 +80,12 @@ protected slots:
     void checkUpdatesButtonClicked();
     void exitButtonClicked();
     void setAutosaveEnabled(bool autosaveEnabled);
+    void findButtonClicked();
+    void findPreviousButtonClicked();
+    void findNextButtonClicked();
+    void findReplaceButtonClicked();
+    void findCloseButtonClicked();
+    void findTextChanged(QString text);
 
 private:
     QVector<Notebook*> *openNotebooks = new QVector<Notebook*>();
@@ -90,5 +97,10 @@ private:
     bool autosaveEnabled = true;
     bool savedFlag = true;
     QVector<QFuture<void>> *saveThreads = new QVector<QFuture<void>>();
+    QDialog *findDialog = nullptr;
+    QLineEdit *findTextLineEdit = nullptr;
+    QLineEdit *replaceTextLineEdit = nullptr;
+    QString *currentSearchQuery = nullptr;
+
 };
 #endif // MAINWINDOW_H
