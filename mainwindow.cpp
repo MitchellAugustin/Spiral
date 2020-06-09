@@ -941,6 +941,11 @@ void MainWindow::emptyBoxCleanupExternal() {
 }
 
 void MainWindow::findIterate(int direction) {
+    //Deselect last selected text
+    if (searchResultsIterator && searchResultsIterator != searchResults->end() && (*searchResultsIterator)->valid() && (*searchResultsIterator)->textBox) {
+        (*searchResultsIterator)->textBox->richTextEdit->f_textedit->moveCursor(QTextCursor::Start);
+    }
+
     //Alert the user that the search has looped back to the beginning
     if (direction == 1 && searchResultsIterator == searchResults->end()) {
         QApplication::beep();
@@ -999,8 +1004,7 @@ void MainWindow::findIterate(int direction) {
         }
     }
 
-    //TODO Navigate to next found item
-    //Show the item
+    //Navigate to next found item and show
     if (searchResultsIterator != searchResults->end() && (*searchResultsIterator)->valid()) {
         if (currentlyOpenNotebook != (*searchResultsIterator)->notebook) {
             openNotebook((*searchResultsIterator)->notebook);
@@ -1016,6 +1020,7 @@ void MainWindow::findIterate(int direction) {
             scrollArea->verticalScrollBar()->setValue((*searchResultsIterator)->textBox->location.y());
             scrollArea->horizontalScrollBar()->setValue((*searchResultsIterator)->textBox->location.x());
             (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setFocus();
+            (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setTextCursor((*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery));
         }
     }
 }
@@ -1058,11 +1063,19 @@ void MainWindow::findButtonClicked() {
     QHBoxLayout *buttonLayout = new QHBoxLayout(findDialog);
     QPushButton *previousButton = new QPushButton();
     previousButton->setText("Find Previous");
+    previousButton->setProperty("autoDefault", false);
+    previousButton->setProperty("default", false);
     QPushButton *nextButton = new QPushButton();
     nextButton->setText("Find Next");
+    nextButton->setProperty("autoDefault", false);
+    nextButton->setProperty("default", false);
     QPushButton *replaceAllButton = new QPushButton();
+    replaceAllButton->setProperty("autoDefault", false);
+    replaceAllButton->setProperty("default", false);
     replaceAllButton->setText("Replace All");
     QPushButton *closeButton = new QPushButton();
+    closeButton->setProperty("autoDefault", false);
+    closeButton->setProperty("default", false);
     closeButton->setText("Close");
     buttonLayout->addWidget(previousButton);
     buttonLayout->addWidget(nextButton);
