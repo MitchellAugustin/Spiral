@@ -942,10 +942,10 @@ void MainWindow::emptyBoxCleanupExternal() {
 
 void MainWindow::findIterate(int direction) {
     //Alert the user that the search has looped back to the beginning
-    if (direction == 1 && searchResultsIterator == searchResults->begin()) {
+    if (direction == 1 && searchResultsIterator == searchResults->end()) {
         QApplication::beep();
     }
-    else if (direction == -1 && searchResultsIterator == searchResults->end()) {
+    else if (direction == -1 && searchResultsIterator == searchResults->begin()) {
         QApplication::beep();
     }
     if (!queryUpdated) {
@@ -980,9 +980,28 @@ void MainWindow::findIterate(int direction) {
         return;
     }
 
+    //Increment the iterator or loop back to beginning if it is at the end
+    if (direction == -1) {
+        if (searchResultsIterator == searchResults->begin()) {
+            searchResultsIterator = searchResults->end();
+            searchResultsIterator--;
+        }
+        else {
+            searchResultsIterator--;
+        }
+    }
+    else {
+        if (searchResultsIterator == searchResults->end()) {
+            searchResultsIterator = searchResults->begin();
+        }
+        else {
+            searchResultsIterator++;
+        }
+    }
+
     //TODO Navigate to next found item
     //Show the item
-    if ((*searchResultsIterator)->valid()) {
+    if (searchResultsIterator != searchResults->end() && (*searchResultsIterator)->valid()) {
         if (currentlyOpenNotebook != (*searchResultsIterator)->notebook) {
             openNotebook((*searchResultsIterator)->notebook);
         }
@@ -999,26 +1018,11 @@ void MainWindow::findIterate(int direction) {
             (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setFocus();
         }
     }
-
-
-    //Increment the iterator or loop back to beginning if it is at the end
-    if (direction == -1) {
-        searchResultsIterator--;
-        if (searchResultsIterator == searchResults->begin()) {
-            searchResultsIterator = searchResults->end();
-        }
-    }
-    else {
-        searchResultsIterator++;
-        if (searchResultsIterator == searchResults->end()) {
-            searchResultsIterator = searchResults->begin();
-        }
-    }
 }
 
 void MainWindow::findPreviousButtonClicked() {
     qDebug() << "Previous";
-//    findIterate(-1);
+    findIterate(-1);
 
 }
 
