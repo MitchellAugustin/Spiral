@@ -143,6 +143,20 @@ void MainWindow::autosave() {
  * @param newWidget
  */
 void MainWindow::focusChanged(QWidget *oldWidget, QWidget *newWidget) {
+    //If focus is lost, reset the find and replace query
+    queryUpdated = false;
+    //Deselect text if the widget losing focus is a QTextEdit
+    QWidget *parentNewToolbar = newWidget;
+    QToolBar *newToolbar = dynamic_cast<QToolBar*>(parentNewToolbar);
+    while (parentNewToolbar && !newToolbar) {
+        parentNewToolbar = parentNewToolbar->parentWidget();
+        newToolbar = dynamic_cast<QToolBar*>(parentNewToolbar);
+    }
+    QTextEdit *oldTextEdit = dynamic_cast<QTextEdit*>(oldWidget);
+    if (!newToolbar && oldTextEdit) {
+        oldTextEdit->moveCursor(QTextCursor::Start);
+    }
+
     //Autosave notebooks any time the user leaves the Spiral window
     if (newWidget == nullptr) {
         autosave();
@@ -940,12 +954,11 @@ void MainWindow::emptyBoxCleanupExternal() {
     }
 }
 
+/**
+ * @brief MainWindow::findIterate - Iterates to the next or previous found search result depending on the direction parameter.
+ * @param direction -1: Previous, 1: Next
+ */
 void MainWindow::findIterate(int direction) {
-    //Deselect last selected text
-    if (searchResultsIterator && searchResultsIterator != searchResults->end() && (*searchResultsIterator)->valid() && (*searchResultsIterator)->textBox) {
-        (*searchResultsIterator)->textBox->richTextEdit->f_textedit->moveCursor(QTextCursor::Start);
-    }
-
     //Alert the user that the search has looped back to the beginning
     if (direction == 1 && searchResultsIterator == searchResults->end()) {
         QApplication::beep();
@@ -983,6 +996,10 @@ void MainWindow::findIterate(int direction) {
     if (searchResults->count() == 0) {
         QApplication::beep();
         return;
+    }
+
+    if (searchResultsIterator != searchResults->end() && (*searchResultsIterator)->valid()) {
+        (*searchResultsIterator)->textBox->richTextEdit->f_textedit->moveCursor(QTextCursor::Start);
     }
 
     //Increment the iterator or loop back to beginning if it is at the end
@@ -1025,26 +1042,48 @@ void MainWindow::findIterate(int direction) {
     }
 }
 
+/**
+ * @brief MainWindow::findPreviousButtonClicked - Iterates to previous found search result
+ */
 void MainWindow::findPreviousButtonClicked() {
-    qDebug() << "Previous";
     findIterate(-1);
 
 }
 
+/**
+ * @brief MainWindow::findNextButtonClicked - Iterates to next found search result
+ */
 void MainWindow::findNextButtonClicked() {
-    qDebug() << "Next";
     findIterate(1);
 }
 
-
+/**
+ * @brief MainWindow::findReplaceButtonClicked - Replaces all instances of the text in the "Text to find" QLineEdit with that in the "Replacement Text" QLineEdit
+ */
 void MainWindow::findReplaceButtonClicked() {
 
 }
 
+/**
+ * @brief MainWindow::findDialogFinished - Called when the find/replace dialog is closed
+ * @param result
+ */
+void MainWindow::findDialogFinished(int result) {
+    findCloseButtonClicked();
+}
+
+/**
+ * @brief MainWindow::findCloseButtonClicked - Handles find/replace dialog disposal
+ */
 void MainWindow::findCloseButtonClicked() {
+    searchResults->clear();
     findDialog->close();
 }
 
+/**
+ * @brief MainWindow::findTextChanged - Updates the search query when the text is changed
+ * @param text
+ */
 void MainWindow::findTextChanged(QString text) {
     qDebug() << "Find text:" << text;
     currentSearchQuery = text;
@@ -1107,6 +1146,7 @@ void MainWindow::findButtonClicked() {
     connect(findTextLineEdit, SIGNAL(textChanged(QString)), this, SLOT(findTextChanged(QString)));
     connect(replaceAllButton, SIGNAL(clicked()), this, SLOT(findReplaceButtonClicked()));
     connect(closeButton, SIGNAL(clicked()), this, SLOT(findCloseButtonClicked()));
+    connect(findDialog, SIGNAL(finished(int)), this, SLOT(findDialogFinished(int)));
 }
 
 /**

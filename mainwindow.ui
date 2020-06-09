@@ -628,10 +628,10 @@
      <string>Tools</string>
     </property>
     <addaction name="actionFind"/>
+    <addaction name="actionAutosave"/>
+    <addaction name="actionClean_Empty_Boxes"/>
     <addaction name="actionPrint_Content_to_Log"/>
     <addaction name="actionTest_Add_Box"/>
-    <addaction name="actionClean_Empty_Boxes"/>
-    <addaction name="actionAutosave"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">

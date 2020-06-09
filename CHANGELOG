@@ -1,6 +1,10 @@
 Spiral Changelog:
 
-Version Beta 1.1 (Work in progress - Expected release date: 5/29/2020):
+Version Beta 1.2:
+*  Added find and replace (CTRL+F)
+*  Fixed a bug that caused selections in multiple TextBoxes to be allowed concurrently
+
+Version Beta 1.1:
 *  Autosaving is now multithreaded for improved performance
 *  Autosave can now be disabled in the Tools menu
 *  Fixed a bug that caused HTML from one textbox to be added to any textbox it is dragged into

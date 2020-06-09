@@ -85,6 +85,7 @@ protected slots:
     void findNextButtonClicked();
     void findReplaceButtonClicked();
     void findCloseButtonClicked();
+    void findDialogFinished(int);
     void findTextChanged(QString text);
 
 private:
