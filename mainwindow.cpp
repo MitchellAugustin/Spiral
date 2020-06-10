@@ -976,7 +976,7 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
             for(QVector<Section*>::Iterator s_it = (*n_it)->loadSectionsList()->begin(); s_it != (*n_it)->loadSectionsList()->end(); ++s_it) {
                 for (QVector<Page*>::Iterator p_it = (*s_it)->loadPagesList()->begin(); p_it != (*s_it)->loadPagesList()->end(); ++p_it) {
                     for (QVector<TextBox*>::Iterator t_it = (*p_it)->textBoxList.begin(); t_it != (*p_it)->textBoxList.end(); ++t_it) {
-                        if ((*t_it)->richTextEdit->toPlainText().contains(currentSearchQuery)) {
+                        if ((*t_it)->richTextEdit->toPlainText().contains(currentSearchQuery, Qt::CaseInsensitive)) {
                             int currentFrom = 0;
                             QTextCursor currentCursor;
                             if (queryMatchCase) {
