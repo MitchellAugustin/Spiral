@@ -91,6 +91,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionCheck_for_Updates, SIGNAL(triggered()), this, SLOT(checkUpdatesButtonClicked()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(exitButtonClicked()));
     connect(ui->actionAutosave, SIGNAL(toggled(bool)), this, SLOT(setAutosaveEnabled(bool)));
+    connect(ui->actionFind, SIGNAL(triggered()), this, SLOT(findButtonClicked()));
 
     connect(ui->openSession, SIGNAL(clicked()), this, SLOT(loadSession()));
 }
@@ -142,6 +143,20 @@ void MainWindow::autosave() {
  * @param newWidget
  */
 void MainWindow::focusChanged(QWidget *oldWidget, QWidget *newWidget) {
+    //If focus is lost, reset the find and replace query
+    queryUpdated = false;
+    //Deselect text if the widget losing focus is a QTextEdit
+    QWidget *parentNewToolbar = newWidget;
+    QToolBar *newToolbar = dynamic_cast<QToolBar*>(parentNewToolbar);
+    while (parentNewToolbar && !newToolbar) {
+        parentNewToolbar = parentNewToolbar->parentWidget();
+        newToolbar = dynamic_cast<QToolBar*>(parentNewToolbar);
+    }
+    QTextEdit *oldTextEdit = dynamic_cast<QTextEdit*>(oldWidget);
+    if (!newToolbar && oldTextEdit) {
+        oldTextEdit->moveCursor(QTextCursor::Start);
+    }
+
     //Autosave notebooks any time the user leaves the Spiral window
     if (newWidget == nullptr) {
         autosave();
@@ -937,6 +952,296 @@ void MainWindow::emptyBoxCleanupExternal() {
             }
         }
     }
+}
+
+/**
+ * @brief MainWindow::findIterate - Iterates to the next or previous found search result depending on the direction parameter.
+ * @param direction -1: Previous, 1: Next
+ * @param replacementText: If nullptr, this function just iterates to next found instance of searchQuery. If not null, it replaces that word with the replacement.
+ * @return true if the last word in the result list was replaced, false otherwise.
+ */
+bool MainWindow::findIterate(int direction, QString replacementText) {
+    //Alert the user that the search has looped back to the beginning
+    if (direction == 1 && searchResultsIterator == searchResults->end()) {
+        QApplication::beep();
+    }
+    else if (direction == -1 && searchResultsIterator == searchResults->begin()) {
+        QApplication::beep();
+    }
+
+    //Updates the search result list if the query was changed
+    if (!queryUpdated) {
+        searchResults->clear();
+        for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
+            for(QVector<Section*>::Iterator s_it = (*n_it)->loadSectionsList()->begin(); s_it != (*n_it)->loadSectionsList()->end(); ++s_it) {
+                for (QVector<Page*>::Iterator p_it = (*s_it)->loadPagesList()->begin(); p_it != (*s_it)->loadPagesList()->end(); ++p_it) {
+                    for (QVector<TextBox*>::Iterator t_it = (*p_it)->textBoxList.begin(); t_it != (*p_it)->textBoxList.end(); ++t_it) {
+                        if ((*t_it)->richTextEdit->toPlainText().contains(currentSearchQuery, Qt::CaseInsensitive)) {
+                            int currentFrom = 0;
+                            QTextCursor currentCursor;
+                            if (queryMatchCase) {
+                                 currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom, QTextDocument::FindCaseSensitively);
+                            }
+                            else {
+                                 currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom);
+                            }
+                            /* Since positions are changed whenever an instance of the word is removed, arrange
+                             * the search results within each text box in reverse order to prevent instances from being missed.
+                             */
+                            QStack<SearchResult*> tmpResultStack;
+                            while (!currentCursor.isNull()) {
+                                SearchResult *thisResult = new SearchResult();
+                                thisResult->notebook = (*n_it);
+                                thisResult->section = (*s_it);
+                                thisResult->page = (*p_it);
+                                thisResult->textBox = (*t_it);
+                                thisResult->cursorStartIndex = currentFrom;
+                                tmpResultStack.push(thisResult);
+                                if (queryMatchCase) {
+                                     currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom, QTextDocument::FindCaseSensitively);
+                                }
+                                else {
+                                     currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom);
+                                }
+                                currentFrom = currentCursor.position();
+                            }
+
+                            foreach(SearchResult* res, tmpResultStack) {
+                                searchResults->append(res);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        qDebug() << "Results:" << searchResults->count();
+        queryUpdated = true;
+        if (direction == -1) {
+            searchResultsIterator = searchResults->end();
+        }
+        else {
+            searchResultsIterator = searchResults->begin();
+        }
+    }
+    if (searchResults->count() == 0) {
+        QApplication::beep();
+        return true;
+    }
+
+
+    //Deselects the last search result's cursor if necessary
+    if (lastSearchResultsIterator && lastSearchResultsIterator != searchResults->end() && (*lastSearchResultsIterator)->valid()) {
+        (*lastSearchResultsIterator)->textBox->richTextEdit->f_textedit->moveCursor(QTextCursor::Start);
+    }
+
+
+    //Navigate to next found item and show
+    if (searchResultsIterator != searchResults->end() && (*searchResultsIterator)->valid()) {
+        if (currentlyOpenNotebook != (*searchResultsIterator)->notebook) {
+            openNotebook((*searchResultsIterator)->notebook);
+        }
+        if (currentlyOpenSection != (*searchResultsIterator)->section) {
+            openSection((*searchResultsIterator)->section);
+        }
+        if (currentlyOpenPage != (*searchResultsIterator)->page && currentlyOpenSection->loadPagesList()->contains((*searchResultsIterator)->page)) {
+            tabWidget->setCurrentIndex(currentlyOpenSection->loadPagesList()->indexOf((*searchResultsIterator)->page));
+        }
+        if (currentlyOpenPage->textBoxList.contains((*searchResultsIterator)->textBox)) {
+            QScrollArea *scrollArea = dynamic_cast<QScrollArea*>(currentlyOpenPage->editorPane);
+            scrollArea->verticalScrollBar()->setValue((*searchResultsIterator)->textBox->location.y());
+            scrollArea->horizontalScrollBar()->setValue((*searchResultsIterator)->textBox->location.x());
+            (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setFocus();
+            QTextCursor cursorFindResult;
+            if (queryMatchCase) {
+                cursorFindResult = (*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery, (*searchResultsIterator)->cursorStartIndex, QTextDocument::FindCaseSensitively);
+            }
+            else {
+                cursorFindResult = (*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery, (*searchResultsIterator)->cursorStartIndex);
+            }
+            if (!cursorFindResult.isNull()) {
+                (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setTextCursor((*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery, (*searchResultsIterator)->cursorStartIndex));
+            }
+
+            if (replacementText != nullptr) {
+                (*searchResultsIterator)->textBox->richTextEdit->f_textedit->textCursor().removeSelectedText();
+                (*searchResultsIterator)->textBox->richTextEdit->f_textedit->textCursor().insertText(replacementText);
+                //If this was the last item to replace, terminate the 'replace all' function.
+                if ((searchResultsIterator + 1) == searchResults->end()) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    //Increment the iterator or loop back to beginning if it is at the end
+    lastSearchResultsIterator = searchResultsIterator;
+    if (direction == -1) {
+        if (searchResultsIterator == searchResults->begin()) {
+            searchResultsIterator = searchResults->end();
+            searchResultsIterator--;
+        }
+        else {
+            searchResultsIterator--;
+        }
+    }
+    else {
+        if ((searchResultsIterator + 1) == searchResults->end()) {
+            if (replacementText != nullptr) {
+                return true;
+            }
+            searchResultsIterator = searchResults->begin();
+        }
+        else {
+            searchResultsIterator++;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * @brief MainWindow::findPreviousButtonClicked - Iterates to previous found search result
+ */
+void MainWindow::findPreviousButtonClicked() {
+    findIterate(-1, nullptr);
+}
+
+/**
+ * @brief MainWindow::findNextButtonClicked - Iterates to next found search result
+ */
+void MainWindow::findNextButtonClicked() {
+    findIterate(1, nullptr);
+}
+
+/**
+ * NOTE: This is disabled in the master branch of Spiral. See Issue #9 for details.
+ * @brief MainWindow::findReplaceButtonClicked - Replaces all instances of the text in the "Text to find" QLineEdit with that in the "Replacement Text" QLineEdit
+ */
+void MainWindow::findReplaceButtonClicked() {
+    //Navigate to first search result to populate the list, then reset iterator to beginning.
+    findIterate(1, nullptr);
+    searchResultsIterator = searchResults->begin();
+    if (currentReplacementText == nullptr) {
+        currentReplacementText = " ";
+    }
+    bool lastReplaced = false;
+    while (!lastReplaced) {
+        lastReplaced = findIterate(1, currentReplacementText);
+    }
+    queryUpdated = true;
+}
+
+/**
+ * @brief MainWindow::findDialogFinished - Called when the find/replace dialog is closed
+ * @param result
+ */
+void MainWindow::findDialogFinished(int result) {
+    findCloseButtonClicked();
+}
+
+/**
+ * @brief MainWindow::findCloseButtonClicked - Handles find/replace dialog disposal
+ */
+void MainWindow::findCloseButtonClicked() {
+    searchResults->clear();
+    findDialog->close();
+}
+
+/**
+ * @brief MainWindow::findTextChanged - Updates the search query when the text is changed
+ * @param text
+ */
+void MainWindow::findTextChanged(QString text) {
+    qDebug() << "Find text:" << text;
+    currentSearchQuery = text;
+    queryUpdated = false;
+}
+
+/**
+ * @brief MainWindow::findMatchCaseChanged - Called whenever the find dialog's match case checkbox is modified
+ * @param value
+ */
+void MainWindow::findMatchCaseChanged(bool value) {
+    qDebug() << "Case sensitive:" << value;
+    queryMatchCase = value;
+    queryUpdated = true;
+}
+
+/**
+ * @brief MainWindow::replaceTextChanged - Updates the replacement text
+ * @param text
+ */
+void MainWindow::replaceTextChanged(QString text) {
+    qDebug() << "Replace text:" << text;
+    currentReplacementText = text;
+}
+
+/**
+ * @brief MainWindow::findButtonClicked - Opens find and replace dialog
+ */
+void MainWindow::findButtonClicked() {
+    qDebug() << "Find button clicked";
+    findDialog = new QDialog(this);
+    QVBoxLayout *findLayout = new QVBoxLayout(findDialog);
+    QHBoxLayout *findBoxLayout = new QHBoxLayout(findDialog);
+    QHBoxLayout *replaceBoxLayout = new QHBoxLayout(findDialog);
+    QHBoxLayout *buttonLayout = new QHBoxLayout(findDialog);
+    QHBoxLayout *caseLayout = new QHBoxLayout(findDialog);
+    QPushButton *previousButton = new QPushButton();
+    previousButton->setText("Find Previous");
+    previousButton->setProperty("autoDefault", false);
+    previousButton->setProperty("default", false);
+    QPushButton *nextButton = new QPushButton();
+    nextButton->setText("Find Next");
+    nextButton->setProperty("autoDefault", false);
+    nextButton->setProperty("default", false);
+    QPushButton *replaceAllButton = new QPushButton();
+    replaceAllButton->setProperty("autoDefault", false);
+    replaceAllButton->setProperty("default", false);
+    replaceAllButton->setText("Replace All");
+    QPushButton *closeButton = new QPushButton();
+    closeButton->setProperty("autoDefault", false);
+    closeButton->setProperty("default", false);
+    closeButton->setText("Close");
+    buttonLayout->addWidget(previousButton);
+    buttonLayout->addWidget(nextButton);
+    buttonLayout->addWidget(closeButton);
+    QLabel *findLabel = new QLabel();
+    QLabel *replaceLabel = new QLabel();
+    findLabel->setText("Text to Find:");
+    replaceLabel->setText("Replacement Text:");
+    findTextLineEdit = new QLineEdit(findDialog);
+    replaceTextLineEdit = new QLineEdit(findDialog);
+    findBoxLayout->addWidget(findLabel);
+    findBoxLayout->addWidget(findTextLineEdit);
+    replaceBoxLayout->addWidget(replaceLabel);
+    replaceBoxLayout->addWidget(replaceTextLineEdit);
+    replaceTextLineEdit->close();
+    findLayout->addLayout(findBoxLayout);
+    QLabel *caseLabel = new QLabel();
+    caseLabel->setText("Match Case: ");
+    QCheckBox *caseCheckBox = new QCheckBox();
+    caseLayout->addWidget(caseLabel);
+    caseLayout->addWidget(caseCheckBox);
+    findBoxLayout->addLayout(caseLayout);
+    findLayout->addLayout(buttonLayout);
+    findDialog->setLayout(findLayout);
+    findDialog->setAttribute(Qt::WA_DeleteOnClose);
+    findDialog->setWindowTitle("Find");
+    findDialog->setModal(false);
+    findDialog->show();
+    findDialog->raise();
+    findDialog->activateWindow();
+
+    connect(previousButton, SIGNAL(clicked()), this, SLOT(findPreviousButtonClicked()));
+    connect(nextButton, SIGNAL(clicked()), this, SLOT(findNextButtonClicked()));
+    connect(findTextLineEdit, SIGNAL(returnPressed()), this, SLOT(findNextButtonClicked()));
+    connect(findTextLineEdit, SIGNAL(textChanged(QString)), this, SLOT(findTextChanged(QString)));
+    connect(replaceTextLineEdit, SIGNAL(textChanged(QString)), this, SLOT(replaceTextChanged(QString)));
+    connect(replaceAllButton, SIGNAL(clicked()), this, SLOT(findReplaceButtonClicked()));
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(findCloseButtonClicked()));
+    connect(findDialog, SIGNAL(finished(int)), this, SLOT(findDialogFinished(int)));
+    connect(caseCheckBox, SIGNAL(toggled(bool)), this, SLOT(findMatchCaseChanged(bool)));
 }
 
 /**
