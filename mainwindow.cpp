@@ -978,7 +978,13 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
                     for (QVector<TextBox*>::Iterator t_it = (*p_it)->textBoxList.begin(); t_it != (*p_it)->textBoxList.end(); ++t_it) {
                         if ((*t_it)->richTextEdit->toPlainText().contains(currentSearchQuery)) {
                             int currentFrom = 0;
-                            QTextCursor currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom);
+                            QTextCursor currentCursor;
+                            if (queryMatchCase) {
+                                 currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom, QTextDocument::FindCaseSensitively);
+                            }
+                            else {
+                                 currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom);
+                            }
                             /* Since positions are changed whenever an instance of the word is removed, arrange
                              * the search results within each text box in reverse order to prevent instances from being missed.
                              */
@@ -991,7 +997,12 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
                                 thisResult->textBox = (*t_it);
                                 thisResult->cursorStartIndex = currentFrom;
                                 tmpResultStack.push(thisResult);
-                                currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom);
+                                if (queryMatchCase) {
+                                     currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom, QTextDocument::FindCaseSensitively);
+                                }
+                                else {
+                                     currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom);
+                                }
                                 currentFrom = currentCursor.position();
                             }
 
@@ -1040,7 +1051,14 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
             scrollArea->verticalScrollBar()->setValue((*searchResultsIterator)->textBox->location.y());
             scrollArea->horizontalScrollBar()->setValue((*searchResultsIterator)->textBox->location.x());
             (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setFocus();
-            if (!(*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery, (*searchResultsIterator)->cursorStartIndex).isNull()) {
+            QTextCursor cursorFindResult;
+            if (queryMatchCase) {
+                cursorFindResult = (*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery, (*searchResultsIterator)->cursorStartIndex, QTextDocument::FindCaseSensitively);
+            }
+            else {
+                cursorFindResult = (*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery, (*searchResultsIterator)->cursorStartIndex);
+            }
+            if (!cursorFindResult.isNull()) {
                 (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setTextCursor((*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery, (*searchResultsIterator)->cursorStartIndex));
             }
 
@@ -1139,6 +1157,16 @@ void MainWindow::findTextChanged(QString text) {
 }
 
 /**
+ * @brief MainWindow::findMatchCaseChanged - Called whenever the find dialog's match case checkbox is modified
+ * @param value
+ */
+void MainWindow::findMatchCaseChanged(bool value) {
+    qDebug() << "Case sensitive:" << value;
+    queryMatchCase = value;
+    queryUpdated = true;
+}
+
+/**
  * @brief MainWindow::replaceTextChanged - Updates the replacement text
  * @param text
  */
@@ -1157,6 +1185,7 @@ void MainWindow::findButtonClicked() {
     QHBoxLayout *findBoxLayout = new QHBoxLayout(findDialog);
     QHBoxLayout *replaceBoxLayout = new QHBoxLayout(findDialog);
     QHBoxLayout *buttonLayout = new QHBoxLayout(findDialog);
+    QHBoxLayout *caseLayout = new QHBoxLayout(findDialog);
     QPushButton *previousButton = new QPushButton();
     previousButton->setText("Find Previous");
     previousButton->setProperty("autoDefault", false);
@@ -1188,6 +1217,12 @@ void MainWindow::findButtonClicked() {
     replaceBoxLayout->addWidget(replaceTextLineEdit);
     replaceTextLineEdit->close();
     findLayout->addLayout(findBoxLayout);
+    QLabel *caseLabel = new QLabel();
+    caseLabel->setText("Match Case: ");
+    QCheckBox *caseCheckBox = new QCheckBox();
+    caseLayout->addWidget(caseLabel);
+    caseLayout->addWidget(caseCheckBox);
+    findBoxLayout->addLayout(caseLayout);
     findLayout->addLayout(buttonLayout);
     findDialog->setLayout(findLayout);
     findDialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -1205,6 +1240,7 @@ void MainWindow::findButtonClicked() {
     connect(replaceAllButton, SIGNAL(clicked()), this, SLOT(findReplaceButtonClicked()));
     connect(closeButton, SIGNAL(clicked()), this, SLOT(findCloseButtonClicked()));
     connect(findDialog, SIGNAL(finished(int)), this, SLOT(findDialogFinished(int)));
+    connect(caseCheckBox, SIGNAL(toggled(bool)), this, SLOT(findMatchCaseChanged(bool)));
 }
 
 /**

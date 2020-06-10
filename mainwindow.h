@@ -87,6 +87,7 @@ protected slots:
     void findCloseButtonClicked();
     void findDialogFinished(int);
     void findTextChanged(QString text);
+    void findMatchCaseChanged(bool value);
     void replaceTextChanged(QString text);
 
 private:
@@ -105,6 +106,7 @@ private:
     QString currentSearchQuery = nullptr;
     QString currentReplacementText = nullptr;
     bool queryUpdated = false;
+    bool queryMatchCase = false;
     QVector<SearchResult*> *searchResults = new QVector<SearchResult*>();
     QVector<SearchResult*>::Iterator searchResultsIterator = nullptr;
     QVector<SearchResult*>::Iterator lastSearchResultsIterator = nullptr;
