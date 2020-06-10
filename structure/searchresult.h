@@ -20,6 +20,7 @@ public:
     Section *section = nullptr;
     Page *page = nullptr;
     TextBox *textBox = nullptr;
+    int cursorStartIndex = 0;
 };
 
 #endif // SEARCHRESULT_H

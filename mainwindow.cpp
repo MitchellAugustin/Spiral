@@ -977,12 +977,19 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
                 for (QVector<Page*>::Iterator p_it = (*s_it)->loadPagesList()->begin(); p_it != (*s_it)->loadPagesList()->end(); ++p_it) {
                     for (QVector<TextBox*>::Iterator t_it = (*p_it)->textBoxList.begin(); t_it != (*p_it)->textBoxList.end(); ++t_it) {
                         if ((*t_it)->richTextEdit->toPlainText().contains(currentSearchQuery)) {
-                            SearchResult *thisResult = new SearchResult();
-                            thisResult->notebook = (*n_it);
-                            thisResult->section = (*s_it);
-                            thisResult->page = (*p_it);
-                            thisResult->textBox = (*t_it);
-                            searchResults->append(thisResult);
+                            int currentFrom = 0;
+                            QTextCursor currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom);
+                            while (!currentCursor.isNull()) {
+                                SearchResult *thisResult = new SearchResult();
+                                thisResult->notebook = (*n_it);
+                                thisResult->section = (*s_it);
+                                thisResult->page = (*p_it);
+                                thisResult->textBox = (*t_it);
+                                thisResult->cursorStartIndex = currentFrom;
+                                searchResults->append(thisResult);
+                                currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom);
+                                currentFrom = currentCursor.position();
+                            }
                         }
                     }
                 }
@@ -1025,7 +1032,7 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
             scrollArea->verticalScrollBar()->setValue((*searchResultsIterator)->textBox->location.y());
             scrollArea->horizontalScrollBar()->setValue((*searchResultsIterator)->textBox->location.x());
             (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setFocus();
-            (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setTextCursor((*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery));
+            (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setTextCursor((*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery, (*searchResultsIterator)->cursorStartIndex));
 
             if (replacementText != nullptr) {
                 (*searchResultsIterator)->textBox->richTextEdit->f_textedit->textCursor().removeSelectedText();
