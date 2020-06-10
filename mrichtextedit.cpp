@@ -279,6 +279,7 @@ void MRichTextEdit::textBold() {
 
 
 void MRichTextEdit::focusInEvent(QFocusEvent *) {
+    f_textedit->moveCursor(QTextCursor::Start);
     f_textedit->setFocus(Qt::TabFocusReason);
 }
 

@@ -979,6 +979,10 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
                         if ((*t_it)->richTextEdit->toPlainText().contains(currentSearchQuery)) {
                             int currentFrom = 0;
                             QTextCursor currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom);
+                            /* Since positions are changed whenever an instance of the word is removed, arrange
+                             * the search results within each text box in reverse order to prevent instances from being missed.
+                             */
+                            QStack<SearchResult*> tmpResultStack;
                             while (!currentCursor.isNull()) {
                                 SearchResult *thisResult = new SearchResult();
                                 thisResult->notebook = (*n_it);
@@ -986,9 +990,13 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
                                 thisResult->page = (*p_it);
                                 thisResult->textBox = (*t_it);
                                 thisResult->cursorStartIndex = currentFrom;
-                                searchResults->append(thisResult);
+                                tmpResultStack.push(thisResult);
                                 currentCursor = (*t_it)->richTextEdit->f_textedit->document()->find(currentSearchQuery, currentFrom);
                                 currentFrom = currentCursor.position();
+                            }
+
+                            foreach(SearchResult* res, tmpResultStack) {
+                                searchResults->append(res);
                             }
                         }
                     }
@@ -1032,7 +1040,9 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
             scrollArea->verticalScrollBar()->setValue((*searchResultsIterator)->textBox->location.y());
             scrollArea->horizontalScrollBar()->setValue((*searchResultsIterator)->textBox->location.x());
             (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setFocus();
-            (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setTextCursor((*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery, (*searchResultsIterator)->cursorStartIndex));
+            if (!(*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery, (*searchResultsIterator)->cursorStartIndex).isNull()) {
+                (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setTextCursor((*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery, (*searchResultsIterator)->cursorStartIndex));
+            }
 
             if (replacementText != nullptr) {
                 (*searchResultsIterator)->textBox->richTextEdit->f_textedit->textCursor().removeSelectedText();
@@ -1057,7 +1067,10 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
         }
     }
     else {
-        if (searchResultsIterator == searchResults->end()) {
+        if ((searchResultsIterator + 1) == searchResults->end()) {
+            if (replacementText != nullptr) {
+                return true;
+            }
             searchResultsIterator = searchResults->begin();
         }
         else {
@@ -1096,6 +1109,7 @@ void MainWindow::findReplaceButtonClicked() {
     while (!lastReplaced) {
         lastReplaced = findIterate(1, currentReplacementText);
     }
+    queryUpdated = true;
 }
 
 /**
@@ -1161,7 +1175,6 @@ void MainWindow::findButtonClicked() {
     closeButton->setText("Close");
     buttonLayout->addWidget(previousButton);
     buttonLayout->addWidget(nextButton);
-    buttonLayout->addWidget(replaceAllButton);
     buttonLayout->addWidget(closeButton);
     QLabel *findLabel = new QLabel();
     QLabel *replaceLabel = new QLabel();
@@ -1173,12 +1186,12 @@ void MainWindow::findButtonClicked() {
     findBoxLayout->addWidget(findTextLineEdit);
     replaceBoxLayout->addWidget(replaceLabel);
     replaceBoxLayout->addWidget(replaceTextLineEdit);
+    replaceTextLineEdit->close();
     findLayout->addLayout(findBoxLayout);
-    findLayout->addLayout(replaceBoxLayout);
     findLayout->addLayout(buttonLayout);
     findDialog->setLayout(findLayout);
     findDialog->setAttribute(Qt::WA_DeleteOnClose);
-    findDialog->setWindowTitle("Find and Replace");
+    findDialog->setWindowTitle("Find");
     findDialog->setModal(false);
     findDialog->show();
     findDialog->raise();
