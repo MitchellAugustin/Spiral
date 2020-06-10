@@ -1,7 +1,7 @@
 Spiral Changelog:
 
 Version Beta 1.2:
-*  Added find and replace (CTRL+F)
+*  Added find dialog (CTRL+F)
 *  Fixed a bug that caused selections in multiple TextBoxes to be allowed concurrently
 
 Version Beta 1.1:

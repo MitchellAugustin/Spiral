@@ -1114,6 +1114,7 @@ void MainWindow::findNextButtonClicked() {
 }
 
 /**
+ * NOTE: This is disabled in the master branch of Spiral. See Issue #9 for details.
  * @brief MainWindow::findReplaceButtonClicked - Replaces all instances of the text in the "Text to find" QLineEdit with that in the "Replacement Text" QLineEdit
  */
 void MainWindow::findReplaceButtonClicked() {
