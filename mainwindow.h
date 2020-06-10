@@ -87,6 +87,7 @@ protected slots:
     void findCloseButtonClicked();
     void findDialogFinished(int);
     void findTextChanged(QString text);
+    void replaceTextChanged(QString text);
 
 private:
     QVector<Notebook*> *openNotebooks = new QVector<Notebook*>();
@@ -102,9 +103,11 @@ private:
     QLineEdit *findTextLineEdit = nullptr;
     QLineEdit *replaceTextLineEdit = nullptr;
     QString currentSearchQuery = nullptr;
+    QString currentReplacementText = nullptr;
     bool queryUpdated = false;
     QVector<SearchResult*> *searchResults = new QVector<SearchResult*>();
     QVector<SearchResult*>::Iterator searchResultsIterator = nullptr;
-    void findIterate(int direction);
+    QVector<SearchResult*>::Iterator lastSearchResultsIterator = nullptr;
+    bool findIterate(int direction, QString replacementText);
 };
 #endif // MAINWINDOW_H

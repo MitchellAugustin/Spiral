@@ -957,8 +957,10 @@ void MainWindow::emptyBoxCleanupExternal() {
 /**
  * @brief MainWindow::findIterate - Iterates to the next or previous found search result depending on the direction parameter.
  * @param direction -1: Previous, 1: Next
+ * @param replacementText: If nullptr, this function just iterates to next found instance of searchQuery. If not null, it replaces that word with the replacement.
+ * @return true if the last word in the result list was replaced, false otherwise.
  */
-void MainWindow::findIterate(int direction) {
+bool MainWindow::findIterate(int direction, QString replacementText) {
     //Alert the user that the search has looped back to the beginning
     if (direction == 1 && searchResultsIterator == searchResults->end()) {
         QApplication::beep();
@@ -966,6 +968,8 @@ void MainWindow::findIterate(int direction) {
     else if (direction == -1 && searchResultsIterator == searchResults->begin()) {
         QApplication::beep();
     }
+
+    //Updates the search result list if the query was changed
     if (!queryUpdated) {
         searchResults->clear();
         for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
@@ -995,31 +999,15 @@ void MainWindow::findIterate(int direction) {
     }
     if (searchResults->count() == 0) {
         QApplication::beep();
-        return;
+        return true;
     }
 
-    if (searchResultsIterator != searchResults->end() && (*searchResultsIterator)->valid()) {
-        (*searchResultsIterator)->textBox->richTextEdit->f_textedit->moveCursor(QTextCursor::Start);
+
+    //Deselects the last search result's cursor if necessary
+    if (lastSearchResultsIterator && lastSearchResultsIterator != searchResults->end() && (*lastSearchResultsIterator)->valid()) {
+        (*lastSearchResultsIterator)->textBox->richTextEdit->f_textedit->moveCursor(QTextCursor::Start);
     }
 
-    //Increment the iterator or loop back to beginning if it is at the end
-    if (direction == -1) {
-        if (searchResultsIterator == searchResults->begin()) {
-            searchResultsIterator = searchResults->end();
-            searchResultsIterator--;
-        }
-        else {
-            searchResultsIterator--;
-        }
-    }
-    else {
-        if (searchResultsIterator == searchResults->end()) {
-            searchResultsIterator = searchResults->begin();
-        }
-        else {
-            searchResultsIterator++;
-        }
-    }
 
     //Navigate to next found item and show
     if (searchResultsIterator != searchResults->end() && (*searchResultsIterator)->valid()) {
@@ -1038,30 +1026,69 @@ void MainWindow::findIterate(int direction) {
             scrollArea->horizontalScrollBar()->setValue((*searchResultsIterator)->textBox->location.x());
             (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setFocus();
             (*searchResultsIterator)->textBox->richTextEdit->f_textedit->setTextCursor((*searchResultsIterator)->textBox->richTextEdit->f_textedit->document()->find(currentSearchQuery));
+
+            if (replacementText != nullptr) {
+                (*searchResultsIterator)->textBox->richTextEdit->f_textedit->textCursor().removeSelectedText();
+                (*searchResultsIterator)->textBox->richTextEdit->f_textedit->textCursor().insertText(replacementText);
+                //If this was the last item to replace, terminate the 'replace all' function.
+                if ((searchResultsIterator + 1) == searchResults->end()) {
+                    return true;
+                }
+            }
         }
     }
+
+    //Increment the iterator or loop back to beginning if it is at the end
+    lastSearchResultsIterator = searchResultsIterator;
+    if (direction == -1) {
+        if (searchResultsIterator == searchResults->begin()) {
+            searchResultsIterator = searchResults->end();
+            searchResultsIterator--;
+        }
+        else {
+            searchResultsIterator--;
+        }
+    }
+    else {
+        if (searchResultsIterator == searchResults->end()) {
+            searchResultsIterator = searchResults->begin();
+        }
+        else {
+            searchResultsIterator++;
+        }
+    }
+
+    return false;
 }
 
 /**
  * @brief MainWindow::findPreviousButtonClicked - Iterates to previous found search result
  */
 void MainWindow::findPreviousButtonClicked() {
-    findIterate(-1);
-
+    findIterate(-1, nullptr);
 }
 
 /**
  * @brief MainWindow::findNextButtonClicked - Iterates to next found search result
  */
 void MainWindow::findNextButtonClicked() {
-    findIterate(1);
+    findIterate(1, nullptr);
 }
 
 /**
  * @brief MainWindow::findReplaceButtonClicked - Replaces all instances of the text in the "Text to find" QLineEdit with that in the "Replacement Text" QLineEdit
  */
 void MainWindow::findReplaceButtonClicked() {
-
+    //Navigate to first search result to populate the list, then reset iterator to beginning.
+    findIterate(1, nullptr);
+    searchResultsIterator = searchResults->begin();
+    if (currentReplacementText == nullptr) {
+        currentReplacementText = " ";
+    }
+    bool lastReplaced = false;
+    while (!lastReplaced) {
+        lastReplaced = findIterate(1, currentReplacementText);
+    }
 }
 
 /**
@@ -1088,6 +1115,15 @@ void MainWindow::findTextChanged(QString text) {
     qDebug() << "Find text:" << text;
     currentSearchQuery = text;
     queryUpdated = false;
+}
+
+/**
+ * @brief MainWindow::replaceTextChanged - Updates the replacement text
+ * @param text
+ */
+void MainWindow::replaceTextChanged(QString text) {
+    qDebug() << "Replace text:" << text;
+    currentReplacementText = text;
 }
 
 /**
@@ -1118,6 +1154,7 @@ void MainWindow::findButtonClicked() {
     closeButton->setText("Close");
     buttonLayout->addWidget(previousButton);
     buttonLayout->addWidget(nextButton);
+    buttonLayout->addWidget(replaceAllButton);
     buttonLayout->addWidget(closeButton);
     QLabel *findLabel = new QLabel();
     QLabel *replaceLabel = new QLabel();
@@ -1144,6 +1181,7 @@ void MainWindow::findButtonClicked() {
     connect(nextButton, SIGNAL(clicked()), this, SLOT(findNextButtonClicked()));
     connect(findTextLineEdit, SIGNAL(returnPressed()), this, SLOT(findNextButtonClicked()));
     connect(findTextLineEdit, SIGNAL(textChanged(QString)), this, SLOT(findTextChanged(QString)));
+    connect(replaceTextLineEdit, SIGNAL(textChanged(QString)), this, SLOT(replaceTextChanged(QString)));
     connect(replaceAllButton, SIGNAL(clicked()), this, SLOT(findReplaceButtonClicked()));
     connect(closeButton, SIGNAL(clicked()), this, SLOT(findCloseButtonClicked()));
     connect(findDialog, SIGNAL(finished(int)), this, SLOT(findDialogFinished(int)));
