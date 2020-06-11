@@ -1016,6 +1016,7 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
         }
         qDebug() << "Results:" << searchResults->count();
         queryUpdated = true;
+        lastSearchResultsIterator = nullptr;
         if (direction == -1) {
             searchResultsIterator = searchResults->end();
         }
