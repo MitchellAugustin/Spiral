@@ -1,0 +1,21 @@
+Building Spiral's Release Binaries:
+
+Linux (Must be done via the Ubuntu VM):
+1. Install the following packages on a VM running the oldest supported ubuntu version: qtcreator, qt5-default, qtdeclarative5-dev.
+2. Build and compile a release version of the Spiral source code on this system
+3. Run ./[linuxdeployqt appimage] ./spiral-binary
+
+This will consolidate all qt dependencies to the working directory of where the command was run, and that directory and its contents are all that are needed to run Spiral. Tested successfully on Computo, my Ubuntu VM, and Data. Even with the consolidated version, qt5-default and qtdeclarative5-dev need to be installed on the client system. Once these are satisfied, everything works as expected (including icons on Linux systems with icon packs in their DEs.)
+
+File structure of distributable tarball should contain:
+These folders: doc, lib, translations
+These files: Demo.snb (Demo notebook), Spiral (executable link), install.sh (Install script for generating desktop entry), logo.png, session.json (opens demo notebook by default on initial launch), and spiral-binary (Actual Spiral main binary).
+
+Windows:
+1. Use QT_DIR/msvc2017_64/windeployqt.exe Spiral.exe within the [spiral release] directory.
+2. Ensure all required QT dlls are within the root folder (see list below)
+3. The generated folder is now self-contained and Spiral can be launched by running Spiral.exe.
+
+File structure of distributable zip should contain:
+These folders: iconengines, imageformats, platforms, styles, translations
+These files: D3Dcompiler_47.dll, Demo.snb, Qt5Core.dll, Qt5Gui.dll, Qt5Svg.dll, Qt5Widgets.dll, Spiral.exe, libEGL.dll, libGLESV2.dll, libgcc_s_seh-1.dll, libstdc++-6.dll, libwinpthread-1.dll, logo.png, opengl32sw.dll, and session.json.
