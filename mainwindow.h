@@ -25,6 +25,30 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+//UI Constants
+static const QString FORMATTING_TOOLBAR_NAME = "Formatting Toolbar";
+static const QString BROWSER_TOOLBAR_NAME = "Notebook/Section Browser";
+static const int TOOLBAR_HEIGHT_BUFFER = 15;
+
+//File format JSON keys
+static const QString AUTOSAVE_KEY = "autosave";
+static const QString NOTEBOOK_NAME_KEY = "notebook_name";
+static const QString NOTEBOOK_UUID_KEY = "notebook_uuid";
+static const QString SECTIONS_ARR_KEY = "sections";
+static const QString SECTION_NAME_KEY = "section_name";
+static const QString SECTION_UUID_KEY = "section_uuid";
+static const QString PAGES_ARR_KEY = "pages";
+static const QString PAGE_NAME_KEY = "page_name";
+static const QString PAGE_UUID_KEY = "page_uuid";
+static const QString TEXTBOXES_KEY = "textboxes";
+static const QString BOX_UUID_KEY = "box_uuid";
+static const QString BOX_LOCATION_KEY = "box_location";
+static const QString BOX_WIDTH_KEY = "box_width";
+static const QString BOX_HTML_KEY = "box_html";
+
+
+
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT

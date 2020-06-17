@@ -23,9 +23,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->sectionsListView->setMouseTracking(true);
 
     ui->toolBar->addWidget(ui->f_toolbar);
-    ui->toolBar->setMinimumHeight(ui->f_toolbar->height() + 15);
-    ui->toolBar->setObjectName("Formatting Toolbar");
-    ui->toolBar->setAccessibleName("Formatting Toolbar");
+    ui->toolBar->setMinimumHeight(ui->f_toolbar->height() + TOOLBAR_HEIGHT_BUFFER);
+    ui->toolBar->setObjectName(FORMATTING_TOOLBAR_NAME);
+    ui->toolBar->setAccessibleName(FORMATTING_TOOLBAR_NAME);
     ui->toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
     ui->hiddenToolBar->setVisible(false);
     ui->hiddenToolBar->setDisabled(true);
@@ -36,14 +36,14 @@ MainWindow::MainWindow(QWidget *parent)
 //    ui->toolBar->setVisible(false);
 
     //Setup browsing tools
-    ui->browserToolBar->setObjectName("Notebook/Section Browser");
-    ui->browserToolBar->setAccessibleName("Notebook/Section Browser");
+    ui->browserToolBar->setObjectName(BROWSER_TOOLBAR_NAME);
+    ui->browserToolBar->setAccessibleName(BROWSER_TOOLBAR_NAME);
     ui->browserToolBar->addWidget(ui->notebooksListView);
     ui->browserToolBar->addWidget(ui->sectionsListView);
     ui->browserToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
 
     //Set window title and instantiate tab widget
-    MainWindow::setWindowTitle("Spiral");
+    MainWindow::setWindowTitle(DEFAULT_WINDOW_TITLE);
     tabWidget = new QTabWidget(this);
     tabWidget->setTabsClosable(true);
 
@@ -123,7 +123,7 @@ MainWindow::~MainWindow()
  */
 void MainWindow::autosave() {
     if (!autosaveEnabled && currentlyOpenPage) {
-        MainWindow::setWindowTitle(currentlyOpenPage->getName() + "* - Spiral");
+        MainWindow::setWindowTitle(currentlyOpenPage->getName() + "* - " + DEFAULT_WINDOW_TITLE);
         savedFlag = false;
         return;
     }
@@ -211,7 +211,7 @@ void MainWindow::setAutosaveEnabled(bool autosaveEnabled) {
     ui->actionAutosave->setChecked(autosaveEnabled);
     updateSessionFile();
     if (currentlyOpenPage) {
-        MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - Spiral");
+        MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - " + DEFAULT_WINDOW_TITLE);
     }
     savedFlag = true;
 }
@@ -233,7 +233,7 @@ void MainWindow::loadSession() {
             inputStream.flush();
             QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
             QJsonObject rootObj = doc.object();
-            bool autosave = rootObj.value("autosave").toBool();
+            bool autosave = rootObj.value(AUTOSAVE_KEY).toBool();
             setAutosaveEnabled(autosave);
 
             QJsonArray arr = rootObj.value("open_notebooks").toArray();
@@ -269,7 +269,7 @@ QWidget *generateEditorPane(QWidget *parent, QTabWidget *tabWidget, Page *parent
  * @brief MainWindow::newNotebookButtonClicked - Called when the "New Notebook" button is clicked
  */
 void MainWindow::newNotebookButtonClicked() {
-    QString fileURL = QFileDialog::getSaveFileName(this, tr("Save File"), "/home/", tr("Spiral Notebooks (*.snb)"));
+    QString fileURL = QFileDialog::getSaveFileName(this, tr("Save File"), "/home/", FILE_DIALOG_FORMAT_STRING);
     if (fileURL != nullptr && !fileURL.isEmpty()) {
         qDebug() << "New notebook URL:";
         newNotebookAtFile(fileURL);
@@ -280,7 +280,7 @@ void MainWindow::newNotebookButtonClicked() {
  * @brief MainWindow::openNotebookButtonPressed - Called when the "Open Notebook" button is clicked
  */
 void MainWindow::openNotebookButtonClicked() {
-    QString fileURL = QFileDialog::getOpenFileName(this, tr("Open File"), "/home/", tr("Spiral Notebooks (*.snb)"));
+    QString fileURL = QFileDialog::getOpenFileName(this, tr("Open File"), "/home/", FILE_DIALOG_FORMAT_STRING);
     if (fileURL != nullptr && !fileURL.isEmpty()) {
         openNotebookFromFile(fileURL);
     }
@@ -338,7 +338,7 @@ void MainWindow::saveAllButtonClicked() {
     for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
         saveNotebookToDisk(*n_it);
     }
-    MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - Spiral");
+    MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - " + DEFAULT_WINDOW_TITLE);
     savedFlag = true;
 }
 
@@ -355,8 +355,8 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
         else {
             qDebug() << "Writing to path:" << notebook->path;
             QJsonObject obj;
-            obj.insert("notebook_name", notebook->getName());
-            obj.insert("notebook_uuid", notebook->getUUID());
+            obj.insert(NOTEBOOK_NAME_KEY, notebook->getName());
+            obj.insert(NOTEBOOK_UUID_KEY, notebook->getUUID());
 
             QJsonArray sections;
 
@@ -366,14 +366,14 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
                 Section *curSection = *it;
                 qDebug() << "Section: " << curSection->getName() << "(UUID: " << curSection->getUUID() << ")";
                 QJsonObject thisSectionJson;
-                thisSectionJson.insert("section_name", curSection->getName());
-                thisSectionJson.insert("section_uuid", curSection->getUUID());
+                thisSectionJson.insert(SECTION_NAME_KEY, curSection->getName());
+                thisSectionJson.insert(SECTION_UUID_KEY, curSection->getUUID());
                 QJsonArray pages;
                 for(QVector<Page*>::Iterator p_it = curSection->loadPagesList()->begin(); p_it != curSection->loadPagesList()->end(); ++p_it) {
                     Page *curPage = *p_it;
                     QJsonObject thisPageJson;
-                    thisPageJson.insert("page_name", curPage->getName());
-                    thisPageJson.insert("page_uuid", curPage->getUUID());
+                    thisPageJson.insert(PAGE_NAME_KEY, curPage->getName());
+                    thisPageJson.insert(PAGE_UUID_KEY, curPage->getUUID());
                     qDebug() << "Page: " << curPage->getName() << "(UUID: " << curPage->getUUID() << ")";
                     QVector<TextBox*> children = curPage->textBoxList;
                     int iter = 0;
@@ -396,20 +396,20 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
                             QJsonObject thisTextboxJson;
                             qDebug() << "HTML:";
                             qDebug() << obj->richTextEdit->toHtml();
-                            thisTextboxJson.insert("box_uuid", obj->uuid);
-                            thisTextboxJson.insert("box_location", QString::number(obj->location.x()) + "," + QString::number(obj->location.y()));
-                            thisTextboxJson.insert("box_width", obj->width());
-                            thisTextboxJson.insert("box_html", obj->richTextEdit->toHtml());
+                            thisTextboxJson.insert(BOX_UUID_KEY, obj->uuid);
+                            thisTextboxJson.insert(BOX_LOCATION_KEY, QString::number(obj->location.x()) + "," + QString::number(obj->location.y()));
+                            thisTextboxJson.insert(BOX_WIDTH_KEY, obj->width());
+                            thisTextboxJson.insert(BOX_HTML_KEY, obj->richTextEdit->toHtml());
                             textboxes.append(thisTextboxJson);
                         }
                     }
-                    thisPageJson.insert("textboxes", textboxes);
+                    thisPageJson.insert(TEXTBOXES_KEY, textboxes);
                     pages.append(thisPageJson);
                 }
-                thisSectionJson.insert("pages", pages);
+                thisSectionJson.insert(PAGES_ARR_KEY, pages);
                 sections.append(thisSectionJson);
             }
-            obj.insert("sections", sections);
+            obj.insert(SECTIONS_ARR_KEY, sections);
             QJsonDocument doc(obj);
             outputStream << doc.toJson() << endl;
         }
@@ -442,28 +442,28 @@ void MainWindow::openNotebookFromFile(QString filePath) {
             QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
             QJsonObject rootObj = doc.object();
             //Read notebook properties
-            Notebook *notebook = new Notebook(rootObj.value("notebook_uuid").toString());
-            notebook->setName(rootObj.value("notebook_name").toString());
+            Notebook *notebook = new Notebook(rootObj.value(NOTEBOOK_UUID_KEY).toString());
+            notebook->setName(rootObj.value(NOTEBOOK_NAME_KEY).toString());
             notebook->path = filePath;
 
             //Read sections
-            QJsonArray sections = rootObj.value("sections").toArray();
+            QJsonArray sections = rootObj.value(SECTIONS_ARR_KEY).toArray();
             for(QJsonValueRef sectionRef : sections) {
                 QJsonObject sectionJson = sectionRef.toObject();
                 //Read section properties
-                Section *section = new Section(sectionJson.value("section_uuid").toString());
-                section->setName(sectionJson.value("section_name").toString());
+                Section *section = new Section(sectionJson.value(SECTION_UUID_KEY).toString());
+                section->setName(sectionJson.value(SECTION_NAME_KEY).toString());
 
                 //Read pages
-                QJsonArray pages = sectionJson.value("pages").toArray();
+                QJsonArray pages = sectionJson.value(PAGES_ARR_KEY).toArray();
                 for(QJsonValueRef pagesRef : pages) {
                     QJsonObject pageJson = pagesRef.toObject();
                     //Read page properties
-                    Page *page = new Page(pageJson.value("page_uuid").toString());
-                    page->setName(pageJson.value("page_name").toString());
+                    Page *page = new Page(pageJson.value(PAGE_UUID_KEY).toString());
+                    page->setName(pageJson.value(PAGE_NAME_KEY).toString());
 
                     //Read textboxes
-                    QJsonArray textboxes = pageJson.value("textboxes").toArray();
+                    QJsonArray textboxes = pageJson.value(TEXTBOXES_KEY).toArray();
                     for (QJsonValueRef textboxesRef : textboxes) {
                         QJsonObject textboxJson = textboxesRef.toObject();
                         //Read textbox properties
@@ -485,16 +485,16 @@ void MainWindow::openNotebookFromFile(QString filePath) {
                             DragLayout *childDrag = (DragLayout*) page->dragLayout;
                             if (childDrag) {
                                 qDebug() << "Adding box to page:" << page->getName();
-                                QString locationString = textboxJson.value("box_location").toString();
+                                QString locationString = textboxJson.value(BOX_LOCATION_KEY).toString();
                                 int boxX = locationString.split(",")[0].toInt();
                                 int boxY = locationString.split(",")[1].toInt();
-                                int boxWidth = textboxJson.value("box_width").toInt();
+                                int boxWidth = textboxJson.value(BOX_WIDTH_KEY).toInt();
                                 TextBox *thisBox = childDrag->newTextBoxAtLocation(QPoint(boxX, boxY), boxWidth);
-                                thisBox->uuid = textboxJson.value("box_uuid").toString();
-                                thisBox->richTextEdit->setHtml(textboxJson.value("box_html").toString());
+                                thisBox->uuid = textboxJson.value(BOX_UUID_KEY).toString();
+                                thisBox->richTextEdit->setHtml(textboxJson.value(BOX_HTML_KEY).toString());
 //                                ui->toolBar->addWidget(thisBox->richTextEdit->f_toolbar);
                                 thisBox->richTextEdit->f_toolbar->setVisible(false);
-                                qDebug() << "Box has content:" << textboxJson.value("box_html").toString();
+                                qDebug() << "Box has content:" << textboxJson.value(BOX_HTML_KEY).toString();
                             }
                         }
                     }
@@ -542,7 +542,7 @@ void MainWindow::updateSessionFile() {
                 openNotebooksArray.append((*n_it)->path);
             }
             obj.insert("open_notebooks", openNotebooksArray);
-            obj.insert("autosave", autosaveEnabled);
+            obj.insert(AUTOSAVE_KEY, autosaveEnabled);
             qDebug() << "Autosave? " << autosaveEnabled;
             QTextStream outputStream(&file);
             outputStream << QJsonDocument(obj).toJson();
@@ -568,7 +568,7 @@ void MainWindow::openNotebook(Notebook *notebook) {
     }
     //Add Notebook to UI
     currentlyOpenNotebook = notebook;
-    MainWindow::setWindowTitle(currentlyOpenPage->getName() +  (savedFlag ? "" : "*") + " - Spiral");
+    MainWindow::setWindowTitle(currentlyOpenPage->getName() +  (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
 }
 
 /**
@@ -588,7 +588,7 @@ void MainWindow::openSection(Section *section) {
         //Add the page to the UI with its DragLayout
         tabWidget->addTab(curPage->editorPane, curPage->getName());
         currentlyOpenPage = section->loadPagesList()->first();
-        MainWindow::setWindowTitle(currentlyOpenPage->getName() +  (savedFlag ? "" : "*") + " - Spiral");
+        MainWindow::setWindowTitle(currentlyOpenPage->getName() +  (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
     }
     currentlyOpenSection = section;
 }
@@ -847,7 +847,7 @@ void MainWindow::pageSelected(int index) {
         if (validIndex) {
             currentlyOpenPage = currentlyOpenSection->loadPagesList()->at(index);
             emptyBoxCleanup();
-            MainWindow::setWindowTitle(currentlyOpenPage->getName() + (savedFlag ? "" : "*") + " - Spiral");
+            MainWindow::setWindowTitle(currentlyOpenPage->getName() + (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
         }
     }
 }
@@ -972,6 +972,7 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
     //Updates the search result list if the query was changed
     if (!queryUpdated) {
         searchResults->clear();
+        //Search every textbox in every open notebook for any cursors matching the query and add to the search result list.
         for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
             for(QVector<Section*>::Iterator s_it = (*n_it)->loadSectionsList()->begin(); s_it != (*n_it)->loadSectionsList()->end(); ++s_it) {
                 for (QVector<Page*>::Iterator p_it = (*s_it)->loadPagesList()->begin(); p_it != (*s_it)->loadPagesList()->end(); ++p_it) {
