@@ -6,8 +6,15 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     a.setApplicationName("Spiral");
-    QIcon icon("logo.png");
-    a.setWindowIcon(icon);
+    QFile fileCheck("logo.png");
+    if (fileCheck.exists()) {
+        QIcon icon("logo.png");
+        a.setWindowIcon(icon);
+    }
+    else {
+        QIcon icon(":/icons/spiral/logo.png");
+        a.setWindowIcon(icon);
+    }
 
     #ifdef Q_OS_WIN
     //Credit: https://stackoverflow.com/questions/15035767/is-the-qt-5-dark-fusion-theme-available-for-windows

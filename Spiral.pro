@@ -52,4 +52,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES +=
 
 RESOURCES += \
+    icon.qrc \
     tango.qrc

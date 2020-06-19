@@ -31,7 +31,6 @@ static const QString BROWSER_TOOLBAR_NAME = "Notebook/Section Browser";
 static const int TOOLBAR_HEIGHT_BUFFER = 15;
 
 //File format JSON keys
-static const QString AUTOSAVE_KEY = "autosave";
 static const QString NOTEBOOK_NAME_KEY = "notebook_name";
 static const QString NOTEBOOK_UUID_KEY = "notebook_uuid";
 static const QString SECTIONS_ARR_KEY = "sections";
@@ -46,6 +45,9 @@ static const QString BOX_LOCATION_KEY = "box_location";
 static const QString BOX_WIDTH_KEY = "box_width";
 static const QString BOX_HTML_KEY = "box_html";
 
+//Session file JSON keys
+static const QString AUTOSAVE_KEY = "autosave";
+static const QString OPEN_NOTEBOOKS_KEY = "open_notebooks";
 
 
 
@@ -64,7 +66,6 @@ public:
     void loadNotebook(Notebook *notebook);
     void openNotebook(Notebook *notebook);
     void openSection(Section *section);
-    void newNotebook(QString notebookName);
     void newSection(Notebook *notebook, QString sectionName);
     void newPage(Section *section, QString pageName);
     void checkNameChanges();

@@ -236,7 +236,7 @@ void MainWindow::loadSession() {
             bool autosave = rootObj.value(AUTOSAVE_KEY).toBool();
             setAutosaveEnabled(autosave);
 
-            QJsonArray arr = rootObj.value("open_notebooks").toArray();
+            QJsonArray arr = rootObj.value(OPEN_NOTEBOOKS_KEY).toArray();
 
             for(QJsonValueRef notebookRef : arr) {
                 QString notebookPathJson = notebookRef.toString();
@@ -541,7 +541,7 @@ void MainWindow::updateSessionFile() {
             for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
                 openNotebooksArray.append((*n_it)->path);
             }
-            obj.insert("open_notebooks", openNotebooksArray);
+            obj.insert(OPEN_NOTEBOOKS_KEY, openNotebooksArray);
             obj.insert(AUTOSAVE_KEY, autosaveEnabled);
             qDebug() << "Autosave? " << autosaveEnabled;
             QTextStream outputStream(&file);
@@ -647,6 +647,7 @@ void MainWindow::closeNotebookButtonClicked() {
             (*f_it).waitForFinished();
         }
 
+        //Close the notebook, deallocate its memory, and remove it from the view.
         Notebook *toClose = currentlyOpenNotebook;
         int index = openNotebooks->indexOf(currentlyOpenNotebook);
         notebookBrowserStringListModel->removeRow(index);
@@ -701,7 +702,7 @@ void MainWindow::newSectionButtonClicked() {
 
 /**
  * @brief MainWindow::tabCloseRequested - Removes the page from the notebook
- * @param index
+ * @param index - The index of the tab being closed
  */
 void MainWindow::tabCloseRequested(int index) {
     if (currentlyOpenSection == nullptr || currentlyOpenPage == nullptr) {
@@ -719,17 +720,9 @@ void MainWindow::tabCloseRequested(int index) {
 }
 
 /**
- * @brief MainWindow::newNotebook - Creates a new Notebook
- * @param notebookName
- */
-void MainWindow::newNotebook(QString notebookName) {
-    qDebug() << "New notebook:" << notebookName;
-}
-
-/**
  * @brief MainWindow::newSection - Creates a new section within the parameterized Notebook
- * @param notebook
- * @param sectionName
+ * @param notebook - The notebook in which the new section will be added
+ * @param sectionName - The name of the section to be added
  */
 void MainWindow::newSection(Notebook *notebook, QString sectionName) {
     if (notebook == nullptr) {
@@ -746,8 +739,8 @@ void MainWindow::newSection(Notebook *notebook, QString sectionName) {
 
 /**
  * @brief MainWindow::newPage - Adds a new page within the parameterized Section
- * @param section
- * @param pageName
+ * @param section - The section in which the page will be added
+ * @param pageName - The name of the page to be added
  */
 void MainWindow::newPage(Section *section, QString pageName) {
     if (section == nullptr) {
@@ -770,7 +763,7 @@ void MainWindow::newPage(Section *section, QString pageName) {
 
 /**
  * @brief MainWindow::sectionSelected - Open the selected section in the UI
- * @param index
+ * @param index - The index of the selected section.
  */
 void MainWindow::sectionSelected(QModelIndex index) {
     openSection(currentlyOpenNotebook->loadSectionsList()->at(index.row()));
@@ -778,15 +771,15 @@ void MainWindow::sectionSelected(QModelIndex index) {
 
 /**
  * @brief MainWindow::notebookSelected - Open the selected notebook in the UI
- * @param index
+ * @param index - The index of the selected notebook.
  */
 void MainWindow::notebookSelected(QModelIndex index) {
     openNotebook(openNotebooks->at(index.row()));
 }
 
 /**
- * @brief MainWindow::pageDoubleClicked - Called when a page tab is double-clicked
- * @param index
+ * @brief MainWindow::pageDoubleClicked - Called when a page tab is double-clicked. Opens the page rename dialog.
+ * @param index - Index of the page being modified.
  */
 void MainWindow::pageDoubleClicked(int index) {
     qDebug() << "Page double clicked:" << index;
@@ -803,6 +796,7 @@ void MainWindow::pageDoubleClicked(int index) {
 /**
  * @brief MainWindow::checkNameChanges - Updates any unchanged names in the list views within their structure class counterparts
  * Note: This must be called on any list transitions and whenever the file is saved in order to prevent naming conflicts.
+ * This method is no longer in use because it resulted in name overwriting.
  */
 void MainWindow::checkNameChanges() {
     return;
@@ -815,8 +809,9 @@ void MainWindow::checkNameChanges() {
 }
 
 /**
- * @brief MainWindow::notebookNameChanged - Called when the name of a notebook is changed
- * @param newName
+ * @brief MainWindow::notebookNameChanged - Called when the name of a notebook is changed. This generally occurs when the user's cursor
+ * hovers into the list view.
+ * @param index - The index of the modified notebook
  */
 void MainWindow::notebookNameChanged(QModelIndex index) {
     if (index.row() < openNotebooks->count() && openNotebooks->at(index.row())->getName().compare(index.data().toString()) != 0) {
@@ -826,8 +821,9 @@ void MainWindow::notebookNameChanged(QModelIndex index) {
 }
 
 /**
- * @brief MainWindow::sectionNameChanged - Called when the name of a section is changed
- * @param newName
+ * @brief MainWindow::sectionNameChanged - Called when the name of a section is changed. This generally occurs when the user's cursor
+ * hovers into the list view.
+ * @param index - The index of the modified section
  */
 void MainWindow::sectionNameChanged(QModelIndex index) {
     if (index.row() < currentlyOpenNotebook->loadSectionsList()->count() && currentlyOpenNotebook->loadSectionsList()->at(index.row())->getName().compare(index.data().toString()) != 0) {
@@ -838,10 +834,9 @@ void MainWindow::sectionNameChanged(QModelIndex index) {
 
 /**
  * @brief MainWindow::pageSelected - Called when a page in the TabView is selected
- * @param index
+ * @param index - The index of the selected page (tab)
  */
 void MainWindow::pageSelected(int index) {
-//    qDebug() << "Page selected: " << index;
     if (currentlyOpenNotebook && currentlyOpenSection) {
         bool validIndex = (index >= 0) && (index < currentlyOpenSection->loadPagesList()->size());
         if (validIndex) {
@@ -853,7 +848,7 @@ void MainWindow::pageSelected(int index) {
 }
 
 /**
- * @brief MainWindow::testAddBoxProgrammatically - Adds a text box to the current page at 50, 50
+ * @brief MainWindow::testAddBoxProgrammatically - Adds a text box to the current page at 50, 50 for testing purposes
  */
 void MainWindow::testAddBoxProgrammatically() {
     checkNameChanges();
@@ -1303,7 +1298,7 @@ void MainWindow::checkUpdatesButtonClicked() {
  */
 void MainWindow::aboutSpiralButtonClicked() {
     QMessageBox aboutSpiralBox(this);
-    aboutSpiralBox.setIconPixmap(QPixmap("logo.png").scaled(110, 100));
+    aboutSpiralBox.setIconPixmap(QPixmap(":/icons/spiral/logo.png").scaled(110, 100));
     aboutSpiralBox.setWindowTitle("About Spiral");
     aboutSpiralBox.setText("Spiral - https://mitchellaugustin.com/spiral/\n\nVersion: " + SPIRAL_VERSION + "\n\nAuthor: Mitchell Augustin\n\n" +
         "Licensed under the GNU General Public License v3\nhttps://www.gnu.org/licenses/gpl-3.0.en.html\n\nSpiral was built on the QT framework (https://www.qt.io/) and utilizes elements from " +
