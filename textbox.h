@@ -26,6 +26,7 @@ public:
         if(expandLabel) {
             expandLabel->parentTextBoxDeleted();
         }
+        richTextEdit->f_toolbar->setEnabled(false);
     }
 
     QString uuid;

@@ -100,6 +100,7 @@ MainWindow::MainWindow(QWidget *parent)
  */
 MainWindow::~MainWindow()
 {
+    //Ask the user if they want to save their work if autosave is disabled
     if (!autosaveEnabled) {
         QMessageBox::StandardButton res = QMessageBox::question(this, "Unsaved Work", "Would you like to save your unsaved work?",
                                                         QMessageBox::Yes|QMessageBox::No);
