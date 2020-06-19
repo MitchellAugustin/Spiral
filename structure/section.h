@@ -19,6 +19,12 @@ public:
         pagesList->append(page);
         //Add page to UI
     }
+    void removePage(Page *page) {
+        pagesList->removeOne(page);
+    }
+    void removePage(int index) {
+        pagesList->removeAt(index);
+    }
     QVector<Page*> *loadPagesList() {
         return pagesList;
     }

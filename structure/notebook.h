@@ -15,6 +15,12 @@ public:
         sectionsList->append(section);
         //Add section to UI
     }
+    void removeSection(Section *section) {
+        sectionsList->removeOne(section);
+    }
+    void removeSection(int index) {
+        sectionsList->removeAt(index);
+    }
     QVector<Section*> *loadSectionsList() {
         return sectionsList;
     }

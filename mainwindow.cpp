@@ -33,7 +33,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->hiddenToolBar->setMovable(false);
     ui->hiddenToolBar->setAllowedAreas(Qt::NoToolBarArea);
     ui->hiddenToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
-//    ui->toolBar->setVisible(false);
 
     //Setup browsing tools
     ui->browserToolBar->setObjectName(BROWSER_TOOLBAR_NAME);
@@ -95,7 +94,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->openSession, SIGNAL(clicked()), this, SLOT(loadSession()));
 }
-
 
 /**
  * @brief MainWindow::~MainWindow - Autosaves all open notebooks and destroys the window
@@ -217,7 +215,31 @@ void MainWindow::setAutosaveEnabled(bool autosaveEnabled) {
 }
 
 /**
- * @brief MainWindow::loadSession - Loads the notebooks located in session.json
+ * @brief MainWindow::updateSessionFile - Updates session.json with the list of currently open notebooks and current autosave preference
+ */
+void MainWindow::updateSessionFile() {
+    if (sessionFilePath != nullptr) {
+        QFile file(sessionFilePath);
+        if (!file.open(QIODevice::WriteOnly)) {
+            QMessageBox::information(0, "Unable to access session file", file.errorString());
+        }
+        else {
+            QJsonObject obj;
+            QJsonArray openNotebooksArray;
+            for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
+                openNotebooksArray.append((*n_it)->path);
+            }
+            obj.insert(OPEN_NOTEBOOKS_KEY, openNotebooksArray);
+            obj.insert(AUTOSAVE_KEY, autosaveEnabled);
+            qDebug() << "Autosave? " << autosaveEnabled;
+            QTextStream outputStream(&file);
+            outputStream << QJsonDocument(obj).toJson();
+        }
+    }
+}
+
+/**
+ * @brief MainWindow::loadSession - Loads the notebooks located in session.json and applies saved autosave preference
  */
 void MainWindow::loadSession() {
     ui->openSession->hide();
@@ -527,30 +549,6 @@ void MainWindow::loadNotebook(Notebook *notebook) {
 }
 
 /**
- * @brief MainWindow::updateSessionFile - Updates session.json with the list of currently open notebooks
- */
-void MainWindow::updateSessionFile() {
-    if (sessionFilePath != nullptr) {
-        QFile file(sessionFilePath);
-        if (!file.open(QIODevice::WriteOnly)) {
-            QMessageBox::information(0, "Unable to access session file", file.errorString());
-        }
-        else {
-            QJsonObject obj;
-            QJsonArray openNotebooksArray;
-            for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
-                openNotebooksArray.append((*n_it)->path);
-            }
-            obj.insert(OPEN_NOTEBOOKS_KEY, openNotebooksArray);
-            obj.insert(AUTOSAVE_KEY, autosaveEnabled);
-            qDebug() << "Autosave? " << autosaveEnabled;
-            QTextStream outputStream(&file);
-            outputStream << QJsonDocument(obj).toJson();
-        }
-    }
-}
-
-/**
  * @brief MainWindow::openNotebook - Opens a notebook and displays its sections in the UI
  * @param notebook
  */
@@ -618,7 +616,7 @@ void MainWindow::deleteSectionButtonClicked() {
         if (currentlyOpenNotebook->loadSectionsList()->count() > 1) {
             Section *toDelete = currentlyOpenSection;
             int index = currentlyOpenNotebook->loadSectionsList()->indexOf(toDelete);
-            currentlyOpenNotebook->loadSectionsList()->removeAt(index);
+            currentlyOpenNotebook->removeSection(index);
             sectionBrowserStringListModel->removeRow(index);
             openSection(currentlyOpenNotebook->loadSectionsList()->first());
             delete toDelete;
@@ -715,7 +713,7 @@ void MainWindow::tabCloseRequested(int index) {
         qDebug() << "Tab closed:" << index;
         tabWidget->removeTab(index);
         delete currentlyOpenSection->loadPagesList()->at(index)->editorPane;
-        currentlyOpenSection->loadPagesList()->removeAt(index);
+        currentlyOpenSection->removePage(index);
     }
 }
 
