@@ -11,6 +11,9 @@ public:
         sectionsList = new QVector<Section*>();
         qDebug() << "Notebook instantiated with UUID " << uuid;
     }
+    ~Notebook() {
+        delete sectionsList;
+    }
     void addSection(Section *section) {
         sectionsList->append(section);
         //Add section to UI

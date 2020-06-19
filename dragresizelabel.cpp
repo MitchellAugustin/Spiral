@@ -26,6 +26,8 @@ void DragResizeLabel::dropEvent(QDropEvent *event)
 void DragResizeLabel::mousePressEvent(QMouseEvent *event)
 {
     TextBox *textBox = parentTextBox;
-    textBox->resize(textBox->width() + (expand ? 20 : -20), textBox->height());
-    qDebug() << "TextBox" << (expand ? "expanded" : "contracted");
+    if (textBox) {
+        textBox->resize(textBox->width() + (expand ? 20 : -20), textBox->height());
+        qDebug() << "TextBox" << (expand ? "expanded" : "contracted");
+    }
 }

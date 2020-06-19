@@ -15,6 +15,9 @@ public:
         pagesList = new QVector<Page*>();
         qDebug() << "Section instantiated with UUID " << uuid;
     }
+    ~Section() {
+        delete pagesList;
+    }
     void addPage(Page *page) {
         pagesList->append(page);
         //Add page to UI

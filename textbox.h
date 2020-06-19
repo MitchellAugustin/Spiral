@@ -19,7 +19,14 @@ class TextBox : public QFrame
     Q_OBJECT
 public:
     TextBox(QWidget *parent = nullptr, QString uuid = QUuid::createUuid().toString().split("{")[1].split("-")[0]);
-    ~TextBox() {}
+    ~TextBox() {
+        if(contractLabel) {
+            contractLabel->parentTextBoxDeleted();
+        }
+        if(expandLabel) {
+            expandLabel->parentTextBoxDeleted();
+        }
+    }
 
     QString uuid;
     MRichTextEdit* richTextEdit = new MRichTextEdit(this);

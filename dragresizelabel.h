@@ -11,6 +11,10 @@ class DragResizeLabel : public QLabel
     Q_OBJECT
 public:
     explicit DragResizeLabel(TextBox *parent = nullptr, bool expand = true);
+    void parentTextBoxDeleted() {
+        parentTextBox = nullptr;
+        close();
+    }
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;

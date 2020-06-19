@@ -12,6 +12,10 @@ public:
     Page(QString uuid = QUuid::createUuid().toString().split("{")[1].split("-")[0]) : SpiralComponent(uuid) {
         qDebug() << "Page instantiated with UUID " << uuid;
     }
+    ~Page() {
+        delete editorPane;
+        delete dragLayout;
+    }
     const QString class_name = "Page";
 
     QWidget *editorPane = nullptr;

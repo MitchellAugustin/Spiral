@@ -8,6 +8,7 @@ class TextBox;
 
 class SearchResult {
 public:
+    //Note: If a destructor is ever added here, DO NOT delete document elements from it.
     SearchResult() {
 
     }
