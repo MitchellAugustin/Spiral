@@ -12,6 +12,11 @@ class SpiralComponent
 public:
     SpiralComponent(QString uuid = QUuid::createUuid().toString().split("{")[1].split("-")[0]) {
         this->uuid = uuid;
+        //If an empty UUID is read, generate a new one and assign it to the SpiralComponent.
+        if (uuid.isEmpty()) {
+            QString uuid = QUuid::createUuid().toString().split("{")[1].split("-")[0];
+            setUUID(uuid);
+        }
     }
     const QString class_name = "SpiralComponent";
     /** For the time being, I am going to provide a UUID variable,
