@@ -1,5 +1,12 @@
 Spiral Changelog:
 
+Version Release 1.0:
+*  Starting in this version, whenever a Spiral notebook is opened, a copy of that notebook is saved on open in the same directory as [notebook name].bak in case a crash causes any data loss
+*  Added error handling for malformed .snb files and other common user errors
+*  Added automatic file metadata correction for erroneous UUIDs
+*  Added crash detection and recovery instructions
+*  Spiral is now maximized by default
+
 Version Beta 1.2:
 *  Added find dialog (CTRL+F)
 *  Fixed a bug that caused selections in multiple TextBoxes to be allowed concurrently

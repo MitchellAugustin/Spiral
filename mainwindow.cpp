@@ -101,6 +101,8 @@ MainWindow::MainWindow(QWidget *parent)
  */
 MainWindow::~MainWindow()
 {
+    gracefulExitFlag = true;
+    updateSessionFile();
     //Ask the user if they want to save their work if autosave is disabled
     if (!autosaveEnabled) {
         QMessageBox::StandardButton res = QMessageBox::question(this, "Unsaved Work", "Would you like to save your unsaved work?",
@@ -231,6 +233,7 @@ void MainWindow::updateSessionFile() {
             for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
                 openNotebooksArray.append((*n_it)->path);
             }
+            obj.insert(GRACEFUL_EXIT_KEY, gracefulExitFlag);
             obj.insert(OPEN_NOTEBOOKS_KEY, openNotebooksArray);
             obj.insert(AUTOSAVE_KEY, autosaveEnabled);
             qDebug() << "Autosave? " << autosaveEnabled;
@@ -257,6 +260,19 @@ void MainWindow::loadSession() {
             inputStream.flush();
             QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
             QJsonObject rootObj = doc.object();
+            bool gracefulExit = rootObj.value(GRACEFUL_EXIT_KEY).toBool();
+            if (!rootObj.value(GRACEFUL_EXIT_KEY).isUndefined() && !gracefulExit) {
+                QMessageBox::information(this, "Crash detected", "It appears that Spiral may have crashed. If your notebooks do not appear as you left them,"
+                                                                 " you can restore Spiral's automatically backed up versions of them by navigating to"
+                                                                 " the locations of any affected notebooks on the disk and replacing their .snb files"
+                                                                 " with their corresponding .snb.bak files. (Each notebook's .snb.bak file is saved"
+                                                                 " when its corresponding notebook is initially opened, so some edits may have been lost"
+                                                                 " if Spiral crashed before it was able to successfully autosave.)"
+                                                                 " If your notebooks are in their correct states, you can safely ignore this message.");
+            }
+            //Set the graceful exit flag to false on session load since Spiral is now running and in a session.
+            //It will be set to 'true' in the destructor.
+            gracefulExitFlag = false;
             bool autosave = rootObj.value(AUTOSAVE_KEY).toBool();
             setAutosaveEnabled(autosave);
 

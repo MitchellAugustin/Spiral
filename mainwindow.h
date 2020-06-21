@@ -46,6 +46,7 @@ static const QString BOX_WIDTH_KEY = "box_width";
 static const QString BOX_HTML_KEY = "box_html";
 
 //Session file JSON keys
+static const QString GRACEFUL_EXIT_KEY = "graceful_exit";
 static const QString AUTOSAVE_KEY = "autosave";
 static const QString OPEN_NOTEBOOKS_KEY = "open_notebooks";
 
@@ -123,6 +124,7 @@ private:
     QTabWidget *tabWidget;
     QString sessionFilePath = QDir::currentPath() + "/session.json";
     void updateSessionFile();
+    bool gracefulExitFlag = false;
     bool autosaveEnabled = true;
     bool savedFlag = true;
     QVector<QFuture<void>> *saveThreads = new QVector<QFuture<void>>();
