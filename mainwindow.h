@@ -137,5 +137,6 @@ private:
     QVector<SearchResult*>::Iterator searchResultsIterator = nullptr;
     QVector<SearchResult*>::Iterator lastSearchResultsIterator = nullptr;
     bool findIterate(int direction, QString replacementText);
+    void malformedNotebookError(QString filePath);
 };
 #endif // MAINWINDOW_H

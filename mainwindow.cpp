@@ -441,6 +441,15 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
 }
 
 /**
+ * @brief MainWindow::malformedNotebookError - Displays whenever the user attempts to open a malformed .snb file
+ * @param filePath
+ */
+void MainWindow::malformedNotebookError(QString filePath) {
+    QApplication::restoreOverrideCursor();
+    QMessageBox::information(this, "Cannot open notebook", "Unable to open notebook '" + filePath + "': " + "Malformed .snb file");
+}
+
+/**
  * @brief MainWindow::openNotebookFromFile - Parses the notebook file at the given path and loads it into the viewport.
  * @param filePath
  */
@@ -465,7 +474,15 @@ void MainWindow::openNotebookFromFile(QString filePath) {
             QTextStream inputStream(&file);
             QString jsonString = inputStream.readAll();
             QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
+            if (doc.isNull()) {
+                malformedNotebookError(filePath);
+                return;
+            }
             QJsonObject rootObj = doc.object();
+            if (rootObj.isEmpty() || rootObj.value(NOTEBOOK_UUID_KEY).isNull() || rootObj.value(SECTIONS_ARR_KEY).isNull()) {
+                malformedNotebookError(filePath);
+                return;
+            }
             //Read notebook properties
             Notebook *notebook = new Notebook(rootObj.value(NOTEBOOK_UUID_KEY).toString());
             notebook->setName(rootObj.value(NOTEBOOK_NAME_KEY).toString());
@@ -479,6 +496,10 @@ void MainWindow::openNotebookFromFile(QString filePath) {
                 Section *section = new Section(sectionJson.value(SECTION_UUID_KEY).toString());
                 section->setName(sectionJson.value(SECTION_NAME_KEY).toString());
 
+                if (rootObj.value(PAGES_ARR_KEY).isNull()) {
+                    malformedNotebookError(filePath);
+                    return;
+                }
                 //Read pages
                 QJsonArray pages = sectionJson.value(PAGES_ARR_KEY).toArray();
                 for(QJsonValueRef pagesRef : pages) {
@@ -488,6 +509,10 @@ void MainWindow::openNotebookFromFile(QString filePath) {
                     page->setName(pageJson.value(PAGE_NAME_KEY).toString());
 
                     //Read textboxes
+                    if (rootObj.value(TEXTBOXES_KEY).isNull()) {
+                        malformedNotebookError(filePath);
+                        return;
+                    }
                     QJsonArray textboxes = pageJson.value(TEXTBOXES_KEY).toArray();
                     for (QJsonValueRef textboxesRef : textboxes) {
                         QJsonObject textboxJson = textboxesRef.toObject();
@@ -567,7 +592,12 @@ void MainWindow::openNotebook(Notebook *notebook) {
 
     qDebug() << "Notebook opened" << notebook->getName();
     //Open the Notebook's first section
-    openSection(*(notebook->loadSectionsList()->begin()));
+    if (!notebook->loadSectionsList()->isEmpty()) {
+        openSection(*(notebook->loadSectionsList()->begin()));
+    }
+    else {
+        tabWidget->clear();
+    }
     //For each section in the notebook being opened, add its name to the Section Browser
     for(QVector<Section*>::Iterator it = notebook->loadSectionsList()->begin(); it != notebook->loadSectionsList()->end(); ++it) {
         Section *curSection = *it;
@@ -798,6 +828,7 @@ void MainWindow::pageDoubleClicked(int index) {
         currentlyOpenSection->loadPagesList()->at(index)->setName(text);
         tabWidget->setTabText(index, text);
     }
+    MainWindow::setWindowTitle(currentlyOpenPage->getName() + (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
 }
 
 /**
