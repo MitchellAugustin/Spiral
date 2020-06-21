@@ -7,7 +7,7 @@
 #include "mrichtextedit.h"
 
 //Global constants
-static const QString SPIRAL_VERSION = "Beta 1.2";
+static const QString SPIRAL_VERSION = "Release 1.0";
 static const QString DEFAULT_WINDOW_TITLE = "Spiral";
 static const QString SPIRAL_CONTENT_MIME_TYPE = "application/x-spiralcontent";
 static const QString RESIZE_MIME_TYPE = "application/x-spiralresize";

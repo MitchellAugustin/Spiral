@@ -87,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionAbout_Spiral, SIGNAL(triggered()), this, SLOT(aboutSpiralButtonClicked()));
     connect(ui->actionUser_Manual, SIGNAL(triggered()), this, SLOT(userManualButtonClicked()));
     connect(ui->actionContact_Us_Contribute, SIGNAL(triggered()), this, SLOT(contributeButtonClicked()));
+    connect(ui->actionDonate, SIGNAL(triggered()), this, SLOT(donateButtonClicked()));
     connect(ui->actionCheck_for_Updates, SIGNAL(triggered()), this, SLOT(checkUpdatesButtonClicked()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(exitButtonClicked()));
     connect(ui->actionAutosave, SIGNAL(toggled(bool)), this, SLOT(setAutosaveEnabled(bool)));
@@ -222,7 +223,7 @@ void MainWindow::updateSessionFile() {
     if (sessionFilePath != nullptr) {
         QFile file(sessionFilePath);
         if (!file.open(QIODevice::WriteOnly)) {
-            QMessageBox::information(0, "Unable to access session file", file.errorString());
+            QMessageBox::information(this, "Unable to access session file", file.errorString());
         }
         else {
             QJsonObject obj;
@@ -457,7 +458,7 @@ void MainWindow::openNotebookFromFile(QString filePath) {
     if (filePath != nullptr) {
         QFile file(filePath);
         if (!file.open(QIODevice::ReadOnly)) {
-            QMessageBox::information(0, "Unable to open notebook:", file.errorString());
+            QMessageBox::information(this, "Unable to open notebook:", file.errorString());
         }
         else {
             QTextStream inputStream(&file);
@@ -956,7 +957,7 @@ void MainWindow::emptyBoxCleanupExternal() {
  */
 bool MainWindow::findIterate(int direction, QString replacementText) {
     //Alert the user that the search has looped back to the beginning
-    if (direction == 1 && searchResultsIterator == searchResults->end()) {
+    if (direction == 1 && searchResultsIterator == (searchResults->end() - 1)) {
         QApplication::beep();
     }
     else if (direction == -1 && searchResultsIterator == searchResults->begin()) {
@@ -1282,6 +1283,13 @@ void MainWindow::userManualButtonClicked() {
  */
 void MainWindow::contributeButtonClicked() {
     QDesktopServices::openUrl(QUrl("https://mitchellaugustin.com/spiral/contribute.html"));
+}
+
+/**
+ * @brief MainWindow::donateButtonClicked - Opens the donation page in the user's browser
+ */
+void MainWindow::donateButtonClicked() {
+    QDesktopServices::openUrl(QUrl("https://mitchellaugustin.com/spiral/contribute.html#donate"));
 }
 
 /**

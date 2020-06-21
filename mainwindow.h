@@ -102,6 +102,7 @@ protected slots:
     void aboutSpiralButtonClicked();
     void userManualButtonClicked();
     void contributeButtonClicked();
+    void donateButtonClicked();
     void checkUpdatesButtonClicked();
     void exitButtonClicked();
     void setAutosaveEnabled(bool autosaveEnabled);

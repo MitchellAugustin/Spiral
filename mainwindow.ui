@@ -638,13 +638,20 @@
      <string>Help</string>
     </property>
     <addaction name="actionUser_Manual"/>
-    <addaction name="actionContact_Us_Contribute"/>
     <addaction name="actionCheck_for_Updates"/>
     <addaction name="actionAbout_Spiral"/>
+   </widget>
+   <widget class="QMenu" name="menuContribute">
+    <property name="title">
+     <string>Contribute</string>
+    </property>
+    <addaction name="actionDonate"/>
+    <addaction name="actionContact_Us_Contribute"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
+   <addaction name="menuContribute"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -821,6 +828,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionDonate">
+   <property name="text">
+    <string>Donate</string>
    </property>
   </action>
  </widget>

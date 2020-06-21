@@ -50,6 +50,6 @@ int main(int argc, char *argv[])
     qApp->setPalette(darkPalette);
     #endif
     MainWindow w;
-    w.show();
+    w.showMaximized();
     return a.exec();
 }
