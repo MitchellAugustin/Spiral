@@ -445,6 +445,7 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
  * @param filePath
  */
 void MainWindow::openNotebookFromFile(QString filePath) {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     if (ui->openSession->isVisible()) {
         loadSession();
     }
@@ -538,6 +539,7 @@ void MainWindow::openNotebookFromFile(QString filePath) {
             openNotebook(notebook);
         }
     }
+    QApplication::restoreOverrideCursor();
 }
 
 /**
@@ -545,6 +547,11 @@ void MainWindow::openNotebookFromFile(QString filePath) {
  * @param notebook
  */
 void MainWindow::loadNotebook(Notebook *notebook) {
+    //Save .snb.bak file on initial load
+    QString realPath = notebook->path;
+    notebook->path = notebook->path + ".bak";
+    saveNotebookToDisk(notebook);
+    notebook->path = realPath;
     openNotebooks->append(notebook);
     notebookBrowserStringListModel->append(notebook->getName());
     updateSessionFile();
