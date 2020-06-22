@@ -69,7 +69,6 @@ public:
     void openSection(Section *section);
     void newSection(Notebook *notebook, QString sectionName);
     void newPage(Section *section, QString pageName);
-    void checkNameChanges();
     static void saveNotebookToDisk(Notebook *notebook);
     Ui::MainWindow *ui;
     void emptyBoxCleanupExternal();
@@ -80,8 +79,8 @@ public slots:
 protected slots:
     void notebookSelected(QModelIndex index);
     void sectionSelected(QModelIndex index);
-    void notebookNameChanged(QModelIndex index);
-    void sectionNameChanged(QModelIndex index);
+    void notebookNameChanged(QModelIndex topLeft, QModelIndex bottomRight);
+    void sectionNameChanged(QModelIndex topLeft, QModelIndex bottomRight);
     void pageDoubleClicked(int index);
     void pageSelected(int index);
     void newPageButtonClicked();

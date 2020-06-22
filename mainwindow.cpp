@@ -60,12 +60,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->notebooksListView, SIGNAL(activated(QModelIndex)), this, SLOT(notebookSelected(QModelIndex)));
     connect(ui->sectionsListView, SIGNAL(activated(QModelIndex)), this, SLOT(sectionSelected(QModelIndex)));
 
-    connect(ui->notebooksListView, SIGNAL(clicked(QModelIndex)), this, SLOT(notebookNameChanged(QModelIndex)));
-    connect(ui->sectionsListView, SIGNAL(clicked(QModelIndex)), this, SLOT(sectionNameChanged(QModelIndex)));
-    connect(ui->notebooksListView, SIGNAL(activated(QModelIndex)), this, SLOT(notebookNameChanged(QModelIndex)));
-    connect(ui->sectionsListView, SIGNAL(activated(QModelIndex)), this, SLOT(sectionNameChanged(QModelIndex)));
-    connect(ui->notebooksListView, SIGNAL(entered(QModelIndex)), this, SLOT(notebookNameChanged(QModelIndex)));
-    connect(ui->sectionsListView, SIGNAL(entered(QModelIndex)), this, SLOT(sectionNameChanged(QModelIndex)));
+    connect(notebookBrowserStringListModel, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(notebookNameChanged(QModelIndex, QModelIndex)));
+    connect(sectionBrowserStringListModel, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(sectionNameChanged(QModelIndex, QModelIndex)));
     connect(tabWidget, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(pageDoubleClicked(int)));
     connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
 
@@ -544,7 +540,6 @@ void MainWindow::openNotebookFromFile(QString filePath) {
                             tabWidget->setCurrentIndex(tabWidget->count() - 1);
                         }
 
-                        checkNameChanges();
                         qDebug() << "Draglayout added";
                         if (page && page->editorPane) {
                             qDebug() << "Draglayout valid";
@@ -603,7 +598,6 @@ void MainWindow::loadNotebook(Notebook *notebook) {
  * @param notebook
  */
 void MainWindow::openNotebook(Notebook *notebook) {
-    checkNameChanges();
     sectionBrowserStringListModel->removeRows(0, sectionBrowserStringListModel->rowCount());
 
     qDebug() << "Notebook opened" << notebook->getName();
@@ -848,26 +842,11 @@ void MainWindow::pageDoubleClicked(int index) {
 }
 
 /**
- * @brief MainWindow::checkNameChanges - Updates any unchanged names in the list views within their structure class counterparts
- * Note: This must be called on any list transitions and whenever the file is saved in order to prevent naming conflicts.
- * This method is no longer in use because it resulted in name overwriting.
- */
-void MainWindow::checkNameChanges() {
-    return;
-    for (int i = 0; i < sectionBrowserStringListModel->rowCount(); ++i) {
-        sectionNameChanged(sectionBrowserStringListModel->index(i, 0));
-    }
-    for (int i = 0; i < notebookBrowserStringListModel->rowCount(); ++i) {
-        notebookNameChanged(notebookBrowserStringListModel->index(i, 0));
-    }
-}
-
-/**
- * @brief MainWindow::notebookNameChanged - Called when the name of a notebook is changed. This generally occurs when the user's cursor
- * hovers into the list view.
+ * @brief MainWindow::notebookNameChanged - Called when the name of a notebook is changed.
  * @param index - The index of the modified notebook
  */
-void MainWindow::notebookNameChanged(QModelIndex index) {
+void MainWindow::notebookNameChanged(QModelIndex topLeft, QModelIndex bottomRight) {
+    QModelIndex index = topLeft;
     if (index.row() < openNotebooks->count() && openNotebooks->at(index.row())->getName().compare(index.data().toString()) != 0) {
         qDebug() << "Notebook name changed: " << openNotebooks->at(index.row())->getName() << "->" << index.data().toString();
         openNotebooks->at(index.row())->setName(index.data().toString());
@@ -875,11 +854,11 @@ void MainWindow::notebookNameChanged(QModelIndex index) {
 }
 
 /**
- * @brief MainWindow::sectionNameChanged - Called when the name of a section is changed. This generally occurs when the user's cursor
- * hovers into the list view.
+ * @brief MainWindow::sectionNameChanged - Called when the name of a section is changed.
  * @param index - The index of the modified section
  */
-void MainWindow::sectionNameChanged(QModelIndex index) {
+void MainWindow::sectionNameChanged(QModelIndex topLeft, QModelIndex bottomRight) {
+    QModelIndex index = topLeft;
     if (index.row() < currentlyOpenNotebook->loadSectionsList()->count() && currentlyOpenNotebook->loadSectionsList()->at(index.row())->getName().compare(index.data().toString()) != 0) {
         qDebug() << "Section name changed: " << currentlyOpenNotebook->loadSectionsList()->at(index.row())->getName() << "->" << index.data().toString();
         currentlyOpenNotebook->loadSectionsList()->at(index.row())->setName(index.data().toString());
@@ -905,7 +884,6 @@ void MainWindow::pageSelected(int index) {
  * @brief MainWindow::testAddBoxProgrammatically - Adds a text box to the current page at 50, 50 for testing purposes
  */
 void MainWindow::testAddBoxProgrammatically() {
-    checkNameChanges();
     if (currentlyOpenPage && currentlyOpenPage->editorPane) {
         DragLayout *childDrag = (DragLayout*) currentlyOpenPage->dragLayout;
         if (childDrag) {
@@ -922,7 +900,6 @@ void MainWindow::printContentToLog() {
     if (currentlyOpenNotebook == nullptr) {
         return;
     }
-    checkNameChanges();
     //Print all notebook content to the log
     qDebug() << "Content in Notebook: " << currentlyOpenNotebook->getName() << "(UUID: " << currentlyOpenNotebook->getUUID() << ")";
     for(QVector<Section*>::Iterator it = currentlyOpenNotebook->loadSectionsList()->begin(); it != currentlyOpenNotebook->loadSectionsList()->end(); ++it) {
@@ -972,7 +949,6 @@ void MainWindow::emptyBoxCleanupExternal() {
     if (currentlyOpenNotebook == nullptr) {
         return;
     }
-    checkNameChanges();
     //Print all notebook content to the log
     for(QVector<Section*>::Iterator it = currentlyOpenNotebook->loadSectionsList()->begin(); it != currentlyOpenNotebook->loadSectionsList()->end(); ++it) {
         Section *curSection = *it;
