@@ -823,6 +823,7 @@ void MainWindow::newPage(Section *section, QString pageName) {
     tabWidget->setCurrentIndex(tabWidget->count() - 1);
     currentlyOpenPage = curPage;
     currentlyOpenSection->addPage(curPage);
+    MainWindow::setWindowTitle(currentlyOpenPage->getName() + (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
 }
 
 /**
