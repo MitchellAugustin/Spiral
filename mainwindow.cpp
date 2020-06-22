@@ -661,7 +661,7 @@ void MainWindow::openSection(Section *section) {
  * @brief MainWindow::deletePageButtonClicked - Called when the "Delete Page" button is clicked
  */
 void MainWindow::deletePageButtonClicked() {
-    if (tabWidget == nullptr) {
+    if (tabWidget == nullptr || currentlyOpenPage == nullptr) {
         QMessageBox::information(this, "Cannot Delete Page", "No pages are open.");
         return;
     }
@@ -769,7 +769,7 @@ void MainWindow::newSectionButtonClicked() {
  * @param index - The index of the tab being closed
  */
 void MainWindow::tabCloseRequested(int index) {
-    if (currentlyOpenSection == nullptr || currentlyOpenPage == nullptr) {
+    if (currentlyOpenSection == nullptr || currentlyOpenPage == nullptr || index < 0) {
         QMessageBox::information(this, "Cannot Delete Page", "You are not currently in a page.");
         return;
     }
