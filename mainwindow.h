@@ -124,6 +124,7 @@ private:
     QString sessionFilePath = QDir::currentPath() + "/session.json";
     void updateSessionFile();
     bool gracefulExitFlag = false;
+    bool crashDetected = false;
     bool autosaveEnabled = true;
     bool savedFlag = true;
     QVector<QFuture<void>> *saveThreads = new QVector<QFuture<void>>();
@@ -139,5 +140,6 @@ private:
     QVector<SearchResult*>::Iterator lastSearchResultsIterator = nullptr;
     bool findIterate(int direction, QString replacementText);
     void malformedNotebookError(QString filePath);
+    bool doNotUpdateNamesFlag = false;
 };
 #endif // MAINWINDOW_H

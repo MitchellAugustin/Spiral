@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->sectionsListView->setMouseTracking(true);
 
     ui->toolBar->addWidget(ui->f_toolbar);
+    ui->f_toolbar->setEnabled(false);
     ui->toolBar->setMinimumHeight(ui->f_toolbar->height() + TOOLBAR_HEIGHT_BUFFER);
     ui->toolBar->setObjectName(FORMATTING_TOOLBAR_NAME);
     ui->toolBar->setAccessibleName(FORMATTING_TOOLBAR_NAME);
@@ -258,6 +259,7 @@ void MainWindow::loadSession() {
             QJsonObject rootObj = doc.object();
             bool gracefulExit = rootObj.value(GRACEFUL_EXIT_KEY).toBool();
             if (!rootObj.value(GRACEFUL_EXIT_KEY).isUndefined() && !gracefulExit) {
+                crashDetected = true;
                 QMessageBox::information(this, "Crash detected", "It appears that Spiral may have crashed. If your notebooks do not appear as you left them,"
                                                                  " you can restore Spiral's automatically backed up versions of them by navigating to"
                                                                  " the locations of any affected notebooks on the disk and replacing their .snb files"
@@ -374,7 +376,12 @@ void MainWindow::saveAllButtonClicked() {
     for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
         saveNotebookToDisk(*n_it);
     }
-    MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - " + DEFAULT_WINDOW_TITLE);
+    if (currentlyOpenPage) {
+        MainWindow::setWindowTitle(currentlyOpenPage->getName() + " - " + DEFAULT_WINDOW_TITLE);
+    }
+    else {
+        MainWindow::setWindowTitle(DEFAULT_WINDOW_TITLE);
+    }
     savedFlag = true;
 }
 
@@ -583,11 +590,13 @@ void MainWindow::openNotebookFromFile(QString filePath) {
  * @param notebook
  */
 void MainWindow::loadNotebook(Notebook *notebook) {
-    //Save .snb.bak file on initial load
-    QString realPath = notebook->path;
-    notebook->path = notebook->path + ".bak";
-    saveNotebookToDisk(notebook);
-    notebook->path = realPath;
+    //Save .snb.bak file on initial load as long as Spiral exited normally.
+    if (!crashDetected) {
+        QString realPath = notebook->path;
+        notebook->path = notebook->path + ".bak";
+        saveNotebookToDisk(notebook);
+        notebook->path = realPath;
+    }
     openNotebooks->append(notebook);
     notebookBrowserStringListModel->append(notebook->getName());
     updateSessionFile();
@@ -598,6 +607,7 @@ void MainWindow::loadNotebook(Notebook *notebook) {
  * @param notebook
  */
 void MainWindow::openNotebook(Notebook *notebook) {
+    doNotUpdateNamesFlag = true;
     sectionBrowserStringListModel->removeRows(0, sectionBrowserStringListModel->rowCount());
 
     qDebug() << "Notebook opened" << notebook->getName();
@@ -616,6 +626,7 @@ void MainWindow::openNotebook(Notebook *notebook) {
     //Add Notebook to UI
     currentlyOpenNotebook = notebook;
     MainWindow::setWindowTitle(currentlyOpenPage->getName() +  (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
+    doNotUpdateNamesFlag = false;
 }
 
 /**
@@ -635,7 +646,13 @@ void MainWindow::openSection(Section *section) {
         //Add the page to the UI with its DragLayout
         tabWidget->addTab(curPage->editorPane, curPage->getName());
         currentlyOpenPage = section->loadPagesList()->first();
-        MainWindow::setWindowTitle(currentlyOpenPage->getName() +  (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
+        //A section *shouldn't* have 0 pages, but since it is technically possible, I'll check for it.
+        if (currentlyOpenPage) {
+            MainWindow::setWindowTitle(currentlyOpenPage->getName() +  (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
+        }
+        else {
+            MainWindow::setWindowTitle(DEFAULT_WINDOW_TITLE);
+        }
     }
     currentlyOpenSection = section;
 }
@@ -846,6 +863,9 @@ void MainWindow::pageDoubleClicked(int index) {
  * @param index - The index of the modified notebook
  */
 void MainWindow::notebookNameChanged(QModelIndex topLeft, QModelIndex bottomRight) {
+    if (doNotUpdateNamesFlag) {
+        return;
+    }
     QModelIndex index = topLeft;
     if (index.row() < openNotebooks->count() && openNotebooks->at(index.row())->getName().compare(index.data().toString()) != 0) {
         qDebug() << "Notebook name changed: " << openNotebooks->at(index.row())->getName() << "->" << index.data().toString();
@@ -858,6 +878,9 @@ void MainWindow::notebookNameChanged(QModelIndex topLeft, QModelIndex bottomRigh
  * @param index - The index of the modified section
  */
 void MainWindow::sectionNameChanged(QModelIndex topLeft, QModelIndex bottomRight) {
+    if (doNotUpdateNamesFlag) {
+        return;
+    }
     QModelIndex index = topLeft;
     if (index.row() < currentlyOpenNotebook->loadSectionsList()->count() && currentlyOpenNotebook->loadSectionsList()->at(index.row())->getName().compare(index.data().toString()) != 0) {
         qDebug() << "Section name changed: " << currentlyOpenNotebook->loadSectionsList()->at(index.row())->getName() << "->" << index.data().toString();
