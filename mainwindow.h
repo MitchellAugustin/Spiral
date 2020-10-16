@@ -87,7 +87,9 @@ protected slots:
     void newSectionButtonClicked();
     void newNotebookButtonClicked();
     void tabCloseRequested(int index);
-    void tabMoved(int from, int to);
+    void notebookMoved(QModelIndex, int, int, QModelIndex, int);
+    void sectionMoved(QModelIndex, int, int, QModelIndex, int);
+    void pageMoved(int from, int to);
     void deletePageButtonClicked();
     void deleteSectionButtonClicked();
     void closeNotebookButtonClicked();

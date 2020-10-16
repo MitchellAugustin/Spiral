@@ -53,6 +53,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->verticalLayout->addWidget(tabWidget);
     ui->notebooksListView->setModel(notebookBrowserStringListModel);
     ui->sectionsListView->setModel(sectionBrowserStringListModel);
+    ui->notebooksListView->setDragEnabled(true);
+    ui->sectionsListView->setDragEnabled(true);
+    ui->notebooksListView->setDragDropMode(QListView::DragDropMode::InternalMove);
+    ui->sectionsListView->setDragDropMode(QListView::DragDropMode::InternalMove);
+    ui->notebooksListView->setMovement(QListView::Movement::Snap);
+    ui->sectionsListView->setMovement(QListView::Movement::Snap);
 
     connect(QApplication::instance(), SIGNAL(focusChanged(QWidget *, QWidget*)), this, SLOT(focusChanged(QWidget *, QWidget *)));
 
@@ -61,12 +67,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->sectionsListView, SIGNAL(clicked(QModelIndex)), this, SLOT(sectionSelected(QModelIndex)));
     connect(ui->notebooksListView, SIGNAL(activated(QModelIndex)), this, SLOT(notebookSelected(QModelIndex)));
     connect(ui->sectionsListView, SIGNAL(activated(QModelIndex)), this, SLOT(sectionSelected(QModelIndex)));
+    connect(ui->notebooksListView->model(), SIGNAL(rowsMoved(QModelIndex, int, int, QModelIndex, int)), this, SLOT(notebookMoved(QModelIndex, int, int, QModelIndex, int)));
+    connect(ui->sectionsListView->model(), SIGNAL(rowsMoved(QModelIndex, int, int, QModelIndex, int)), this, SLOT(sectionMoved(QModelIndex, int, int, QModelIndex, int)));
 
     connect(notebookBrowserStringListModel, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(notebookNameChanged(QModelIndex, QModelIndex)));
     connect(sectionBrowserStringListModel, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(sectionNameChanged(QModelIndex, QModelIndex)));
     connect(tabWidget, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(pageDoubleClicked(int)));
     connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
-    connect(tabWidget->tabBar(), SIGNAL(tabMoved(int, int)), this, SLOT(tabMoved(int, int)));
+    connect(tabWidget->tabBar(), SIGNAL(tabMoved(int, int)), this, SLOT(pageMoved(int, int)));
 
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(pageSelected(int)));
     connect(ui->actionPrint_Content_to_Log, SIGNAL(triggered()), this, SLOT(printContentToLog()));
@@ -786,11 +794,11 @@ void MainWindow::tabCloseRequested(int index) {
 }
 
 /**
- * @brief MainWindow::tabMoved - Moves the page to its new place on reorganization in the Section structure
+ * @brief MainWindow::pageMoved - Moves the page to its new place on reorganization in the Section structure
  * @param from
  * @param to
  */
-void MainWindow::tabMoved(int from, int to) {
+void MainWindow::pageMoved(int from, int to) {
     if (currentlyOpenSection != nullptr) {
         bool validIndices = (from >= 0) && (to >= 0) && (from < currentlyOpenSection->loadPagesList()->size()) && (to < currentlyOpenSection->loadPagesList()->size());
         if (validIndices) {
@@ -857,6 +865,27 @@ void MainWindow::sectionSelected(QModelIndex index) {
  */
 void MainWindow::notebookSelected(QModelIndex index) {
     openNotebook(openNotebooks->at(index.row()));
+}
+
+
+//TODO Work in progress - finish these methods (based on the following signal)
+//https://doc.qt.io/qt-5/qabstractitemmodel.html#rowsMoved
+/**
+ * @brief MainWindow::notebookMoved - Moves the notebook in the view
+ * @param indexList
+ */
+void MainWindow::notebookMoved(QModelIndex parent, int start, int end, QModelIndex destination, int row) {
+    qDebug() << "notebook indices moved: " << end << " to " << row;
+}
+
+/**
+ * @brief MainWindow::sectionMoved - Moves the section within its notebook
+ * @param indexList
+ */
+void MainWindow::sectionMoved(QModelIndex parent, int start, int end, QModelIndex destination, int row) {
+    for (int i = start; i <= end; ++i) {
+        qDebug() << "section indices moved: " << i << " to " << row - i;
+    }
 }
 
 /**
