@@ -46,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
     MainWindow::setWindowTitle(DEFAULT_WINDOW_TITLE);
     tabWidget = new QTabWidget(this);
     tabWidget->setTabsClosable(true);
+    tabWidget->setMovable(true);
 
 
     //Add the UI Elements to their proper locations
@@ -65,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(sectionBrowserStringListModel, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(sectionNameChanged(QModelIndex, QModelIndex)));
     connect(tabWidget, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(pageDoubleClicked(int)));
     connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
+    connect(tabWidget->tabBar(), SIGNAL(tabMoved(int, int)), this, SLOT(tabMoved(int, int)));
 
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(pageSelected(int)));
     connect(ui->actionPrint_Content_to_Log, SIGNAL(triggered()), this, SLOT(printContentToLog()));
@@ -396,7 +398,7 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
             QMessageBox::information(0, "Unable to save notebook:", file.errorString());
         }
         else {
-            qDebug() << "Writing to path:" << notebook->path;
+//            qDebug() << "Writing to path:" << notebook->path;
             QJsonObject obj;
             obj.insert(NOTEBOOK_NAME_KEY, notebook->getName());
             obj.insert(NOTEBOOK_UUID_KEY, notebook->getUUID());
@@ -407,7 +409,7 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
 
             for(QVector<Section*>::Iterator it = notebook->loadSectionsList()->begin(); it != notebook->loadSectionsList()->end(); ++it) {
                 Section *curSection = *it;
-                qDebug() << "Section: " << curSection->getName() << "(UUID: " << curSection->getUUID() << ")";
+//                qDebug() << "Section: " << curSection->getName() << "(UUID: " << curSection->getUUID() << ")";
                 QJsonObject thisSectionJson;
                 thisSectionJson.insert(SECTION_NAME_KEY, curSection->getName());
                 thisSectionJson.insert(SECTION_UUID_KEY, curSection->getUUID());
@@ -417,28 +419,28 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
                     QJsonObject thisPageJson;
                     thisPageJson.insert(PAGE_NAME_KEY, curPage->getName());
                     thisPageJson.insert(PAGE_UUID_KEY, curPage->getUUID());
-                    qDebug() << "Page: " << curPage->getName() << "(UUID: " << curPage->getUUID() << ")";
+//                    qDebug() << "Page: " << curPage->getName() << "(UUID: " << curPage->getUUID() << ")";
                     QVector<TextBox*> children = curPage->textBoxList;
                     int iter = 0;
                     QJsonArray textboxes;
                     foreach(TextBox *obj, children) {
-                        qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid <<
-                                    ") (" << obj->size().width() << "x" << obj->size().height() <<
-                                    ") (#" << iter << ")";
+//                        qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid <<
+//                                    ") (" << obj->size().width() << "x" << obj->size().height() <<
+//                                    ") (#" << iter << ")";
                         iter++;
                         if (obj == nullptr || obj->richTextEdit == nullptr) {
-                            qDebug() << "Removed TextBox was at this index";
+//                            qDebug() << "Removed TextBox was at this index";
                             continue;
                         }
                         if (obj->richTextEdit->toPlainText().isEmpty()) {
-                            qDebug() << "Empty box found, deleting...";
+//                            qDebug() << "Empty box found, deleting...";
                             curPage->textBoxList.removeOne(obj);
                             obj->close();
                         }
                         else {
                             QJsonObject thisTextboxJson;
-                            qDebug() << "HTML:";
-                            qDebug() << obj->richTextEdit->toHtml();
+//                            qDebug() << "HTML:";
+//                            qDebug() << obj->richTextEdit->toHtml();
                             thisTextboxJson.insert(BOX_UUID_KEY, obj->uuid);
                             thisTextboxJson.insert(BOX_LOCATION_KEY, QString::number(obj->location.x()) + "," + QString::number(obj->location.y()));
                             thisTextboxJson.insert(BOX_WIDTH_KEY, obj->width());
@@ -780,6 +782,21 @@ void MainWindow::tabCloseRequested(int index) {
         tabWidget->removeTab(index);
         delete currentlyOpenSection->loadPagesList()->at(index)->editorPane;
         currentlyOpenSection->removePage(index);
+    }
+}
+
+/**
+ * @brief MainWindow::tabMoved - Moves the page to its new place on reorganization in the Section structure
+ * @param from
+ * @param to
+ */
+void MainWindow::tabMoved(int from, int to) {
+    if (currentlyOpenSection != nullptr) {
+        bool validIndices = (from >= 0) && (to >= 0) && (from < currentlyOpenSection->loadPagesList()->size()) && (to < currentlyOpenSection->loadPagesList()->size());
+        if (validIndices) {
+            qDebug() << "Moved page " << from << " to " << to;
+            currentlyOpenSection->loadPagesList()->move(from, to);
+        }
     }
 }
 

@@ -87,6 +87,7 @@ protected slots:
     void newSectionButtonClicked();
     void newNotebookButtonClicked();
     void tabCloseRequested(int index);
+    void tabMoved(int from, int to);
     void deletePageButtonClicked();
     void deleteSectionButtonClicked();
     void closeNotebookButtonClicked();
