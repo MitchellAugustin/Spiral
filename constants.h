@@ -8,6 +8,7 @@
 
 //Global constants
 static const QString SPIRAL_VERSION = "Release 1.1";
+static const QString BUILD_DATE = "October 17, 2020";
 static const QString DEFAULT_WINDOW_TITLE = "Spiral";
 static const QString SPIRAL_CONTENT_MIME_TYPE = "application/x-spiralcontent";
 static const QString RESIZE_MIME_TYPE = "application/x-spiralresize";
