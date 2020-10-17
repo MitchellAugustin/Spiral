@@ -401,6 +401,7 @@ void MainWindow::saveAllButtonClicked() {
  */
 void MainWindow::saveNotebookToDisk(Notebook *notebook) {
     if (notebook->path != nullptr) {
+        qDebug() << "Saving notebook to disk: " << notebook->path;
         QFile file(notebook->path);
         if (!file.open(QIODevice::WriteOnly)) {
             QMessageBox::information(0, "Unable to save notebook:", file.errorString());
@@ -466,6 +467,7 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
             QJsonDocument doc(obj);
             outputStream << doc.toJson() << endl;
         }
+        qDebug() << "Notebook saved successfully: " << notebook->path;
     }
 }
 
@@ -483,6 +485,7 @@ void MainWindow::malformedNotebookError(QString filePath) {
  * @param filePath
  */
 void MainWindow::openNotebookFromFile(QString filePath) {
+    qDebug() << "Opening notebook: " << filePath;
     QApplication::setOverrideCursor(Qt::WaitCursor);
     if (ui->openSession->isVisible()) {
         loadSession();
@@ -557,12 +560,12 @@ void MainWindow::openNotebookFromFile(QString filePath) {
                             tabWidget->setCurrentIndex(tabWidget->count() - 1);
                         }
 
-                        qDebug() << "Draglayout added";
+//                        qDebug() << "Draglayout added";
                         if (page && page->editorPane) {
-                            qDebug() << "Draglayout valid";
+//                            qDebug() << "Draglayout valid";
                             DragLayout *childDrag = (DragLayout*) page->dragLayout;
                             if (childDrag) {
-                                qDebug() << "Adding box to page:" << page->getName();
+//                                qDebug() << "Adding box to page:" << page->getName();
                                 QString locationString = textboxJson.value(BOX_LOCATION_KEY).toString();
                                 int boxX = locationString.split(",")[0].toInt();
                                 int boxY = locationString.split(",")[1].toInt();
@@ -572,7 +575,7 @@ void MainWindow::openNotebookFromFile(QString filePath) {
                                 thisBox->richTextEdit->setHtml(textboxJson.value(BOX_HTML_KEY).toString());
 //                                ui->toolBar->addWidget(thisBox->richTextEdit->f_toolbar);
                                 thisBox->richTextEdit->f_toolbar->setVisible(false);
-                                qDebug() << "Box has content:" << textboxJson.value(BOX_HTML_KEY).toString();
+//                                qDebug() << "Box has content:" << textboxJson.value(BOX_HTML_KEY).toString();
                             }
                         }
                     }
@@ -593,6 +596,7 @@ void MainWindow::openNotebookFromFile(QString filePath) {
         }
     }
     QApplication::restoreOverrideCursor();
+    qDebug() << "Notebook opened successfully: " << filePath;
 }
 
 /**
@@ -867,15 +871,23 @@ void MainWindow::notebookSelected(QModelIndex index) {
     openNotebook(openNotebooks->at(index.row()));
 }
 
-
-//TODO Work in progress - finish these methods (based on the following signal)
-//https://doc.qt.io/qt-5/qabstractitemmodel.html#rowsMoved
 /**
  * @brief MainWindow::notebookMoved - Moves the notebook in the view
  * @param indexList
  */
 void MainWindow::notebookMoved(QModelIndex parent, int start, int end, QModelIndex destination, int row) {
-    qDebug() << "notebook indices moved: " << end << " to " << row;
+    //If the item is being moved down, subtract 1 from row
+    if (start < row) {
+        row -= 1;
+    }
+    if (openNotebooks != nullptr) {
+        bool validIndices = (start >= 0) && (row >= 0) && (start < openNotebooks->size()) && (row < openNotebooks->size());
+        if (validIndices) {
+            qDebug() << "Moved Notebook " << start << " to " << row;
+            openNotebooks->move(start, row);
+            openNotebook(openNotebooks->at(row));
+        }
+    }
 }
 
 /**
@@ -883,8 +895,17 @@ void MainWindow::notebookMoved(QModelIndex parent, int start, int end, QModelInd
  * @param indexList
  */
 void MainWindow::sectionMoved(QModelIndex parent, int start, int end, QModelIndex destination, int row) {
-    for (int i = start; i <= end; ++i) {
-        qDebug() << "section indices moved: " << i << " to " << row - i;
+    //If the item is being moved down, subtract 1 from row
+    if (start < row) {
+        row -= 1;
+    }
+    if (currentlyOpenNotebook != nullptr) {
+        bool validIndices = (start >= 0) && (row >= 0) && (start < currentlyOpenNotebook->loadSectionsList()->size()) && (row < currentlyOpenNotebook->loadSectionsList()->size());
+        if (validIndices) {
+            qDebug() << "Moved Section " << start << " to " << row;
+            currentlyOpenNotebook->loadSectionsList()->move(start, row);
+            openSection(currentlyOpenNotebook->loadSectionsList()->at(row));
+        }
     }
 }
 
@@ -893,7 +914,6 @@ void MainWindow::sectionMoved(QModelIndex parent, int start, int end, QModelInde
  * @param index - Index of the page being modified.
  */
 void MainWindow::pageDoubleClicked(int index) {
-    qDebug() << "Page double clicked:" << index;
     bool res;
     QString text = QInputDialog::getText(0, "New Page Name", "Name: ", QLineEdit::Normal, "", &res);
     bool validIndex = (index >= 0) && (index < currentlyOpenSection->loadPagesList()->size());
