@@ -5,6 +5,11 @@ Linux (Must be done via the Ubuntu VM):
 2. Build and compile a release version of the Spiral source code on this system
 3. Run ./[linuxdeployqt appimage] ./spiral-binary
 
+Note: As of 10/17/2020, the above instructions are inaccurate. New instructions:
+1. Build and compile a release version of the Spiral source code on Ubuntu v. 18.04
+2. Replace the spiral-binary in an older deployed Spiral version with the newly generated binary. This binary will run on any system >= Ubuntu 16.04 with >= QT 5.9.
+
+
 This will consolidate all qt dependencies to the working directory of where the command was run, and that directory and its contents are all that are needed to run Spiral. Tested successfully on Computo, my Ubuntu VM, and Data. Even with the consolidated version, qt5-default and qtdeclarative5-dev need to be installed on the client system. Once these are satisfied, everything works as expected (including icons on Linux systems with icon packs in their DEs.)
 
 File structure of distributable tarball should contain:
