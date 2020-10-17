@@ -1,5 +1,11 @@
 Spiral Changelog:
 
+Version Release 1.1:
+*  Added ability to rearrange notebooks, sections, and pages by dragging
+*  Added quick highlight feature, which applies the last highlight color used in the current TextBox to the text under the cursor when you press CTRL+H
+*  Fixed a bug that caused pages with a page size greater than the default to be slightly cut off until re-dragging the furthest TextBoxes
+*  Bug Fixes
+
 Version Release 1.0:
 *  Starting in this version, whenever a Spiral notebook is opened, a copy of that notebook is saved on open in the same directory as [notebook name].bak in case a crash causes any data loss
 *  Added error handling for malformed .snb files and other common user errors

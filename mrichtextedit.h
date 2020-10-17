@@ -59,6 +59,7 @@ class MRichTextEdit : public QWidget, public Ui::MRichTextEdit {
     void textStyle(int index);
     void textFgColor();
     void textBgColor();
+    void quickHighlight();
     void listBullet(bool checked);
     void listOrdered(bool checked);
     void slotCurrentCharFormatChanged(const QTextCharFormat &format);
@@ -93,6 +94,7 @@ class MRichTextEdit : public QWidget, public Ui::MRichTextEdit {
                           ParagraphMonospace };
 
     QPointer<QTextList> m_lastBlockList;
+    QColor m_lastHighlightColor;
 };
 
 #endif

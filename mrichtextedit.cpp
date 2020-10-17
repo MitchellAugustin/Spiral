@@ -212,6 +212,11 @@ MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
 
     connect(f_bgcolor, SIGNAL(clicked()), this, SLOT(textBgColor()));
 
+    QAction *quickHighlightAction = new QAction(tr("Quick Highlight"), this);
+    quickHighlightAction->setShortcut(QKeySequence("CTRL+H"));
+    f_textedit->addAction(quickHighlightAction);
+    connect(quickHighlightAction, SIGNAL(triggered()), this, SLOT(quickHighlight()));
+
     // images
     connect(f_image, SIGNAL(clicked()), this, SLOT(insertImage()));
 }
@@ -403,18 +408,35 @@ void MRichTextEdit::textFgColor() {
     fgColorChanged(col);
 }
 
+void MRichTextEdit::quickHighlight() {
+    QTextCursor cursor = f_textedit->textCursor();
+    if (!cursor.hasSelection()) {
+        cursor.select(QTextCursor::WordUnderCursor);
+    }
+    QTextCharFormat fmt = cursor.charFormat();
+    if (m_lastHighlightColor.isValid()) {
+        fmt.setBackground(m_lastHighlightColor);
+    } else {
+        fmt.clearBackground();
+    }
+    cursor.setCharFormat(fmt);
+    f_textedit->setCurrentCharFormat(fmt);
+    bgColorChanged(m_lastHighlightColor);
+}
+
 void MRichTextEdit::textBgColor() {
     QColor col = QColorDialog::getColor(f_textedit->textBackgroundColor(), this);
     QTextCursor cursor = f_textedit->textCursor();
     if (!cursor.hasSelection()) {
         cursor.select(QTextCursor::WordUnderCursor);
-        }
+    }
     QTextCharFormat fmt = cursor.charFormat();
     if (col.isValid()) {
+        m_lastHighlightColor = col;
         fmt.setBackground(col);
-      } else {
+    } else {
         fmt.clearBackground();
-        }
+    }
     cursor.setCharFormat(fmt);
     f_textedit->setCurrentCharFormat(fmt);
     bgColorChanged(col);

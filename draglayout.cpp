@@ -174,13 +174,13 @@ TextBox *DragLayout::newTextBoxAtLocation(QPoint point, int width) {
     tBox->setAttribute(Qt::WA_DeleteOnClose);
     tBox->resize(width, getHeight(tBox));
     //Dynamically resize the DragLayout area
-    if(point.x() + DEFAULT_TEXTBOX_WIDTH > this->width()) {
-        this->resize(this->width() + point.x() + DEFAULT_TEXTBOX_WIDTH, this->height());
+    if(point.x() + tBox->width() + DEFAULT_TEXTBOX_WIDTH > this->width()) {
+        this->resize(this->width() + point.x() + tBox->width() + DEFAULT_TEXTBOX_WIDTH, this->height());
     }
     //Note: This uses DEFAULT_WIDTH for the movement calculation so the box can be moved, but the page must be resized again
     //on drop so the actual TextBox size can be used in the calculation.
-    if(point.y() + DEFAULT_TEXTBOX_WIDTH > this->height()) {
-        this->resize(this->width(), this->height() + point.y() + DEFAULT_TEXTBOX_WIDTH);
+    if(point.y() + tBox->height() + DEFAULT_TEXTBOX_WIDTH > this->height()) {
+        this->resize(this->width(), this->height() + point.y() + tBox->height() + DEFAULT_TEXTBOX_WIDTH);
     }
     return tBox;
 }
