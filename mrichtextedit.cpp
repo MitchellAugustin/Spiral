@@ -214,6 +214,7 @@ MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
 
     QAction *quickHighlightAction = new QAction(tr("Quick Highlight"), this);
     quickHighlightAction->setShortcut(QKeySequence("CTRL+H"));
+    quickHighlightAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
     f_textedit->addAction(quickHighlightAction);
     connect(quickHighlightAction, SIGNAL(triggered()), this, SLOT(quickHighlight()));
 
