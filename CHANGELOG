@@ -1,7 +1,7 @@
 Spiral Changelog:
 
 Version Release 1.1:
-*  Added ability to rearrange notebooks, sections, and pages by dragging
+*  Added ability to rearrange pages by dragging
 *  Added quick highlight feature, which applies the last highlight color used in the current TextBox to the text under the cursor when you press CTRL+H
 *  Fixed a bug that caused pages with a page size greater than the default to be slightly cut off until re-dragging the furthest TextBoxes
 *  Bug Fixes

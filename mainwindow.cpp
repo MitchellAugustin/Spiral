@@ -53,12 +53,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->verticalLayout->addWidget(tabWidget);
     ui->notebooksListView->setModel(notebookBrowserStringListModel);
     ui->sectionsListView->setModel(sectionBrowserStringListModel);
-    ui->notebooksListView->setDragEnabled(true);
-    ui->sectionsListView->setDragEnabled(true);
-    ui->notebooksListView->setDragDropMode(QListView::DragDropMode::InternalMove);
-    ui->sectionsListView->setDragDropMode(QListView::DragDropMode::InternalMove);
-    ui->notebooksListView->setMovement(QListView::Movement::Snap);
-    ui->sectionsListView->setMovement(QListView::Movement::Snap);
+    //Unfortunately, QT's rowsMoved signal is not consistent across QT versions, so I have to disable this until further notice.
+//    ui->notebooksListView->setDragEnabled(true);
+//    ui->sectionsListView->setDragEnabled(true);
+//    ui->notebooksListView->setDragDropMode(QListView::DragDropMode::InternalMove);
+//    ui->sectionsListView->setDragDropMode(QListView::DragDropMode::InternalMove);
+//    ui->notebooksListView->setMovement(QListView::Movement::Snap);
+//    ui->sectionsListView->setMovement(QListView::Movement::Snap);
 
     connect(QApplication::instance(), SIGNAL(focusChanged(QWidget *, QWidget*)), this, SLOT(focusChanged(QWidget *, QWidget *)));
 
