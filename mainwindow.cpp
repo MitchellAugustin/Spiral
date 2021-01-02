@@ -1088,6 +1088,7 @@ void MainWindow::emptyBoxCleanupExternal() {
  * @return true if the last word in the result list was replaced, false otherwise.
  */
 bool MainWindow::findIterate(int direction, QString replacementText) {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     //Alert the user that the search has looped back to the beginning
     if (direction == 1 && searchResultsIterator == (searchResults->end() - 1)) {
         QApplication::beep();
@@ -1103,8 +1104,29 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
         for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
             for(QVector<Section*>::Iterator s_it = (*n_it)->loadSectionsList()->begin(); s_it != (*n_it)->loadSectionsList()->end(); ++s_it) {
                 for (QVector<Page*>::Iterator p_it = (*s_it)->loadPagesList()->begin(); p_it != (*s_it)->loadPagesList()->end(); ++p_it) {
+                    if (!(*p_it)->opened) {
+                        //If the page has not been opened, we have to iterate through the QJsonArrayList to find text content. If some is found, the page will be loaded.
+                        for (QJsonArray::Iterator t_it = (*p_it)->textboxes.begin(); t_it != (*p_it)->textboxes.end(); ++t_it) {
+                            if ((*t_it).isObject()) {
+                                QJsonObject curObj = (*t_it).toObject();
+                                if (curObj.value(BOX_HTML_KEY).toString().contains(currentSearchQuery, Qt::CaseInsensitive)) {
+                                    qDebug() << "Found in unopened page: " << (*p_it)->getName();
+                                    if (currentlyOpenNotebook != *n_it) {
+                                        openNotebook(*n_it);
+                                    }
+                                    if (currentlyOpenSection != *s_it) {
+                                        openSection(*s_it);
+                                    }
+                                    tabWidget->setCurrentIndex((*s_it)->loadPagesList()->indexOf(*p_it));
+                                }
+                            }
+                        }
+                    }
+
+
                     for (QVector<TextBox*>::Iterator t_it = (*p_it)->textBoxList.begin(); t_it != (*p_it)->textBoxList.end(); ++t_it) {
                         if ((*t_it)->richTextEdit->toPlainText().contains(currentSearchQuery, Qt::CaseInsensitive)) {
+                            qDebug() << "Found in opened page: " << (*p_it)->getName();
                             int currentFrom = 0;
                             QTextCursor currentCursor;
                             if (queryMatchCase) {
@@ -1152,10 +1174,12 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
             searchResultsIterator = searchResults->begin();
         }
     }
+    QApplication::restoreOverrideCursor();
     if (searchResults->count() == 0) {
         QApplication::beep();
         return true;
     }
+
 
 
     //Deselects the last search result's cursor if necessary
@@ -1165,7 +1189,7 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
 
 
     //Navigate to next found item and show
-    if (searchResultsIterator != searchResults->end() && (*searchResultsIterator)->valid()) {
+    if (searchResultsIterator && searchResultsIterator != searchResults->end() && (*searchResultsIterator)->valid()) {
         if (currentlyOpenNotebook != (*searchResultsIterator)->notebook) {
             openNotebook((*searchResultsIterator)->notebook);
         }
@@ -1174,6 +1198,8 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
         }
         if (currentlyOpenPage != (*searchResultsIterator)->page && currentlyOpenSection->loadPagesList()->contains((*searchResultsIterator)->page)) {
             tabWidget->setCurrentIndex(currentlyOpenSection->loadPagesList()->indexOf((*searchResultsIterator)->page));
+            //May be redundant
+            pageSelected(currentlyOpenSection->loadPagesList()->indexOf((*searchResultsIterator)->page));
         }
         if (currentlyOpenPage->textBoxList.contains((*searchResultsIterator)->textBox)) {
             QScrollArea *scrollArea = dynamic_cast<QScrollArea*>(currentlyOpenPage->editorPane);
