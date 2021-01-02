@@ -2,6 +2,7 @@
 #define PAGE_H
 
 #include <QVector>
+#include <QJsonArray>
 
 #include "spiralcomponent.h"
 #include "textbox.h"
@@ -18,6 +19,8 @@ public:
     }
     const QString class_name = "Page";
 
+    bool opened = false;
+    QJsonArray textboxes;
     QWidget *editorPane = nullptr;
     QWidget *dragLayout = nullptr;
     QVector<TextBox*> textBoxList;

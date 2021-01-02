@@ -429,36 +429,41 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
                     QJsonObject thisPageJson;
                     thisPageJson.insert(PAGE_NAME_KEY, curPage->getName());
                     thisPageJson.insert(PAGE_UUID_KEY, curPage->getUUID());
-//                    qDebug() << "Page: " << curPage->getName() << "(UUID: " << curPage->getUUID() << ")";
-                    QVector<TextBox*> children = curPage->textBoxList;
-                    int iter = 0;
-                    QJsonArray textboxes;
-                    foreach(TextBox *obj, children) {
-//                        qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid <<
-//                                    ") (" << obj->size().width() << "x" << obj->size().height() <<
-//                                    ") (#" << iter << ")";
-                        iter++;
-                        if (obj == nullptr || obj->richTextEdit == nullptr) {
-//                            qDebug() << "Removed TextBox was at this index";
-                            continue;
+                    if (curPage->opened) {
+    //                    qDebug() << "Page: " << curPage->getName() << "(UUID: " << curPage->getUUID() << ")";
+                        QVector<TextBox*> children = curPage->textBoxList;
+                        int iter = 0;
+                        QJsonArray textboxes;
+                        foreach(TextBox *obj, children) {
+    //                        qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid <<
+    //                                    ") (" << obj->size().width() << "x" << obj->size().height() <<
+    //                                    ") (#" << iter << ")";
+                            iter++;
+                            if (obj == nullptr || obj->richTextEdit == nullptr) {
+    //                            qDebug() << "Removed TextBox was at this index";
+                                continue;
+                            }
+                            if (obj->richTextEdit->toPlainText().isEmpty()) {
+    //                            qDebug() << "Empty box found, deleting...";
+                                curPage->textBoxList.removeOne(obj);
+                                obj->close();
+                            }
+                            else {
+                                QJsonObject thisTextboxJson;
+    //                            qDebug() << "HTML:";
+    //                            qDebug() << obj->richTextEdit->toHtml();
+                                thisTextboxJson.insert(BOX_UUID_KEY, obj->uuid);
+                                thisTextboxJson.insert(BOX_LOCATION_KEY, QString::number(obj->location.x()) + "," + QString::number(obj->location.y()));
+                                thisTextboxJson.insert(BOX_WIDTH_KEY, obj->width());
+                                thisTextboxJson.insert(BOX_HTML_KEY, obj->richTextEdit->toHtml());
+                                textboxes.append(thisTextboxJson);
+                            }
                         }
-                        if (obj->richTextEdit->toPlainText().isEmpty()) {
-//                            qDebug() << "Empty box found, deleting...";
-                            curPage->textBoxList.removeOne(obj);
-                            obj->close();
-                        }
-                        else {
-                            QJsonObject thisTextboxJson;
-//                            qDebug() << "HTML:";
-//                            qDebug() << obj->richTextEdit->toHtml();
-                            thisTextboxJson.insert(BOX_UUID_KEY, obj->uuid);
-                            thisTextboxJson.insert(BOX_LOCATION_KEY, QString::number(obj->location.x()) + "," + QString::number(obj->location.y()));
-                            thisTextboxJson.insert(BOX_WIDTH_KEY, obj->width());
-                            thisTextboxJson.insert(BOX_HTML_KEY, obj->richTextEdit->toHtml());
-                            textboxes.append(thisTextboxJson);
-                        }
+                        thisPageJson.insert(TEXTBOXES_KEY, textboxes);
                     }
-                    thisPageJson.insert(TEXTBOXES_KEY, textboxes);
+                    else {
+                        thisPageJson.insert(TEXTBOXES_KEY, curPage->textboxes);
+                    }
                     pages.append(thisPageJson);
                 }
                 thisSectionJson.insert(PAGES_ARR_KEY, pages);
@@ -546,41 +551,13 @@ void MainWindow::openNotebookFromFile(QString filePath) {
                         malformedNotebookError(filePath);
                         return;
                     }
-                    QJsonArray textboxes = pageJson.value(TEXTBOXES_KEY).toArray();
-                    for (QJsonValueRef textboxesRef : textboxes) {
-                        QJsonObject textboxJson = textboxesRef.toObject();
-                        //Read textbox properties
-                        //If the page has not yet been generated a DragLayout, generate one
-                        if(page->editorPane == nullptr) {
-                            QWidget *editorPane = generateEditorPane(this, tabWidget, page);
-                            page->editorPane = editorPane;
-                            currentlyOpenNotebook = notebook;
-                            currentlyOpenSection = section;
-                            currentlyOpenPage = page;
-                            tabWidget->addTab(page->editorPane, page->getName());
-                            tabWidget->setCurrentIndex(tabWidget->count() - 1);
-                        }
+                    page->textboxes = pageJson.value(TEXTBOXES_KEY).toArray();
 
-//                        qDebug() << "Draglayout added";
-                        if (page && page->editorPane) {
-//                            qDebug() << "Draglayout valid";
-                            DragLayout *childDrag = (DragLayout*) page->dragLayout;
-                            if (childDrag) {
-//                                qDebug() << "Adding box to page:" << page->getName();
-                                QString locationString = textboxJson.value(BOX_LOCATION_KEY).toString();
-                                int boxX = locationString.split(",")[0].toInt();
-                                int boxY = locationString.split(",")[1].toInt();
-                                int boxWidth = textboxJson.value(BOX_WIDTH_KEY).toInt();
-                                TextBox *thisBox = childDrag->newTextBoxAtLocation(QPoint(boxX, boxY), boxWidth);
-                                thisBox->uuid = textboxJson.value(BOX_UUID_KEY).toString();
-                                thisBox->richTextEdit->setHtml(textboxJson.value(BOX_HTML_KEY).toString());
-//                                ui->toolBar->addWidget(thisBox->richTextEdit->f_toolbar);
-                                thisBox->richTextEdit->f_toolbar->setVisible(false);
-//                                qDebug() << "Box has content:" << textboxJson.value(BOX_HTML_KEY).toString();
-                            }
-                        }
-                    }
-
+                    currentlyOpenNotebook = notebook;
+                    currentlyOpenSection = section;
+                    currentlyOpenPage = page;
+                    tabWidget->addTab(page->editorPane, page->getName());
+                    tabWidget->setCurrentIndex(tabWidget->count() - 1);
                     //Add page to section
                     section->addPage(page);
                 }
@@ -664,6 +641,8 @@ void MainWindow::openSection(Section *section) {
         //A section *shouldn't* have 0 pages, but since it is technically possible, I'll check for it.
         if (currentlyOpenPage) {
             MainWindow::setWindowTitle(currentlyOpenPage->getName() +  (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
+            //We can safely open page 0 here since it will always be the first page in the section
+            pageSelected(section->loadPagesList()->indexOf(currentlyOpenPage));
         }
         else {
             MainWindow::setWindowTitle(DEFAULT_WINDOW_TITLE);
@@ -967,6 +946,38 @@ void MainWindow::pageSelected(int index) {
             currentlyOpenPage = currentlyOpenSection->loadPagesList()->at(index);
             emptyBoxCleanup();
             MainWindow::setWindowTitle(currentlyOpenPage->getName() + (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
+            QJsonArray textboxes = currentlyOpenPage->textboxes;
+            if (!currentlyOpenPage->opened) {
+                for (QJsonValueRef textboxesRef : textboxes) {
+                    QJsonObject textboxJson = textboxesRef.toObject();
+                    //Read textbox properties
+                    //If the page has not yet been generated a DragLayout, generate one
+                    if(currentlyOpenPage->editorPane == nullptr) {
+                        QWidget *editorPane = generateEditorPane(this, tabWidget, currentlyOpenPage);
+                        currentlyOpenPage->editorPane = editorPane;
+                    }
+
+    //                        qDebug() << "Draglayout added";
+                    if (currentlyOpenPage && currentlyOpenPage->editorPane) {
+    //                            qDebug() << "Draglayout valid";
+                        DragLayout *childDrag = (DragLayout*) currentlyOpenPage->dragLayout;
+                        if (childDrag) {
+    //                                qDebug() << "Adding box to page:" << page->getName();
+                            QString locationString = textboxJson.value(BOX_LOCATION_KEY).toString();
+                            int boxX = locationString.split(",")[0].toInt();
+                            int boxY = locationString.split(",")[1].toInt();
+                            int boxWidth = textboxJson.value(BOX_WIDTH_KEY).toInt();
+                            TextBox *thisBox = childDrag->newTextBoxAtLocation(QPoint(boxX, boxY), boxWidth);
+                            thisBox->uuid = textboxJson.value(BOX_UUID_KEY).toString();
+                            thisBox->richTextEdit->setHtml(textboxJson.value(BOX_HTML_KEY).toString());
+    //                                ui->toolBar->addWidget(thisBox->richTextEdit->f_toolbar);
+                            thisBox->richTextEdit->f_toolbar->setVisible(false);
+    //                                qDebug() << "Box has content:" << textboxJson.value(BOX_HTML_KEY).toString();
+                        }
+                    }
+                }
+                currentlyOpenPage->opened = true;
+            }
         }
     }
 }
