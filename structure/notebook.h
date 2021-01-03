@@ -12,7 +12,12 @@ public:
         qDebug() << "Notebook instantiated with UUID " << uuid;
     }
     ~Notebook() {
+        for(QVector<Section*>::Iterator s_it = sectionsList->begin(); s_it != sectionsList->end(); ++s_it) {
+            delete *s_it;
+            *s_it = nullptr;
+        }
         delete sectionsList;
+        sectionsList = nullptr;
     }
     void addSection(Section *section) {
         sectionsList->append(section);

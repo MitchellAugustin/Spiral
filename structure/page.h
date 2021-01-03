@@ -14,8 +14,14 @@ public:
         qDebug() << "Page instantiated with UUID " << uuid;
     }
     ~Page() {
-        delete editorPane;
+        for(QVector<TextBox*>::Iterator t_it = textBoxList.begin(); t_it != textBoxList.end(); ++t_it) {
+            delete *t_it;
+            *t_it = nullptr;
+        }
         delete dragLayout;
+        dragLayout = nullptr;
+        delete editorPane;
+        editorPane = nullptr;
     }
     const QString class_name = "Page";
 

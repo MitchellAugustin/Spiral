@@ -16,7 +16,12 @@ public:
         qDebug() << "Section instantiated with UUID " << uuid;
     }
     ~Section() {
+        for(QVector<Page*>::Iterator p_it = pagesList->begin(); p_it != pagesList->end(); ++p_it) {
+            delete *p_it;
+            *p_it = nullptr;
+        }
         delete pagesList;
+        pagesList = nullptr;
     }
     void addPage(Page *page) {
         pagesList->append(page);

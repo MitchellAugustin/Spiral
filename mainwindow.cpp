@@ -125,7 +125,15 @@ MainWindow::~MainWindow()
     for(QVector<QFuture<void>>::iterator f_it = saveThreads->begin(); f_it != saveThreads->end(); ++f_it) {
         (*f_it).waitForFinished();
     }
+
+    for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
+        delete *n_it;
+        *n_it = nullptr;
+    }
+    delete tabWidget;
+    tabWidget = nullptr;
     delete ui;
+    ui = nullptr;
 }
 
 /**
@@ -942,7 +950,7 @@ void MainWindow::sectionNameChanged(QModelIndex topLeft, QModelIndex bottomRight
 void MainWindow::pageSelected(int index) {
     if (currentlyOpenNotebook && currentlyOpenSection) {
         bool validIndex = (index >= 0) && (index < currentlyOpenSection->loadPagesList()->size());
-        if (validIndex) {
+        if (validIndex && currentlyOpenSection->loadPagesList()->at(index) != nullptr) {
             currentlyOpenPage = currentlyOpenSection->loadPagesList()->at(index);
             emptyBoxCleanup();
             MainWindow::setWindowTitle(currentlyOpenPage->getName() + (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
@@ -1054,27 +1062,29 @@ void MainWindow::emptyBoxCleanupExternal() {
     //Print all notebook content to the log
     for(QVector<Section*>::Iterator it = currentlyOpenNotebook->loadSectionsList()->begin(); it != currentlyOpenNotebook->loadSectionsList()->end(); ++it) {
         Section *curSection = *it;
+        if (curSection == nullptr) {
+            continue;
+        }
         for(QVector<Page*>::Iterator p_it = curSection->loadPagesList()->begin(); p_it != curSection->loadPagesList()->end(); ++p_it) {
             Page *curPage = *p_it;
-
-            QVector<TextBox*> children = curPage->textBoxList;
-            int iter = 0;
-            foreach(TextBox *obj, children) {
-                iter++;
-                if (obj == nullptr || obj->richTextEdit == nullptr) {
-                    qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid << ") (#" << iter << ") is empty, removing";
-                    qDebug() << "Removed TextBox was at this index";
-                    obj->richTextEdit->f_toolbar->setEnabled(false);
-                    continue;
-                }
-                if (obj->richTextEdit->toPlainText().isEmpty()) {
-                    qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid << ") (#" << iter << ") is empty, removing";
-                    qDebug() << "Empty box found, deleting...";
-                    curPage->textBoxList.removeOne(obj);
-                    obj->expandLabel->close();
-                    obj->contractLabel->close();
-                    obj->close();
-                    obj->richTextEdit->f_toolbar->setEnabled(false);
+            if (curPage != nullptr) {
+                QVector<TextBox*> children = curPage->textBoxList;
+                int iter = 0;
+                foreach(TextBox *obj, children) {
+                    iter++;
+                    if (obj == nullptr || obj->richTextEdit == nullptr) {
+                        qDebug() << "Removed TextBox was at this index";
+                        continue;
+                    }
+                    if (obj->richTextEdit->toPlainText().isEmpty()) {
+                        qDebug() << "Box @ " << obj->location << "(UUID: " << obj->uuid << ") (#" << iter << ") is empty, removing";
+                        qDebug() << "Empty box found, deleting...";
+                        curPage->textBoxList.removeOne(obj);
+                        obj->expandLabel->close();
+                        obj->contractLabel->close();
+                        obj->close();
+                        obj->richTextEdit->f_toolbar->setEnabled(false);
+                    }
                 }
             }
         }
@@ -1300,6 +1310,10 @@ void MainWindow::findDialogFinished(int result) {
 void MainWindow::findCloseButtonClicked() {
     searchResults->clear();
     findDialog->close();
+    foreach (QObject *obj, findDialog->layout()->children()) {
+        delete obj;
+    }
+    delete findDialog;
 }
 
 /**
