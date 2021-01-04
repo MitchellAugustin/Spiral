@@ -640,6 +640,7 @@ void MainWindow::openNotebook(Notebook *notebook) {
  */
 void MainWindow::openSection(Section *section) {
     tabWidget->clear();
+    currentlyOpenSection = section;
     //For each page in the section being opened
     for(QVector<Page*>::Iterator p_it = section->loadPagesList()->begin(); p_it != section->loadPagesList()->end(); ++p_it) {
         Page *curPage = *p_it;
@@ -651,13 +652,12 @@ void MainWindow::openSection(Section *section) {
         //Add the page to the UI with its DragLayout
         tabWidget->addTab(curPage->editorPane, curPage->getName());
     }
-    currentlyOpenSection = section;
     currentlyOpenPage = section->loadPagesList()->first();
     //A section *shouldn't* have 0 pages, but since it is technically possible, I'll check for it.
     if (currentlyOpenPage) {
         MainWindow::setWindowTitle(currentlyOpenPage->getName() +  (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
         //We can safely open page 0 here since it will always be the first page in the section
-        pageSelected(section->loadPagesList()->indexOf(currentlyOpenPage));
+        pageSelected(currentlyOpenSection->loadPagesList()->indexOf(currentlyOpenPage));
     }
     else {
         MainWindow::setWindowTitle(DEFAULT_WINDOW_TITLE);
