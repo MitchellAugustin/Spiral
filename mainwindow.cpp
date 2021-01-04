@@ -130,6 +130,11 @@ MainWindow::~MainWindow()
         delete *n_it;
         *n_it = nullptr;
     }
+
+    delete notebookBrowserStringListModel;
+    delete sectionBrowserStringListModel;
+    delete saveThreads;
+
     delete tabWidget;
     tabWidget = nullptr;
     delete ui;
@@ -1109,6 +1114,9 @@ bool MainWindow::findIterate(int direction, QString replacementText) {
 
     //Updates the search result list if the query was changed
     if (!queryUpdated) {
+        for (QVector<SearchResult*>::Iterator s_it = searchResults->begin(); s_it != searchResults->end(); ++s_it) {
+            delete *s_it;
+        }
         searchResults->clear();
         //Search every textbox in every open notebook for any cursors matching the query and add to the search result list.
         for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
@@ -1308,12 +1316,13 @@ void MainWindow::findDialogFinished(int result) {
  * @brief MainWindow::findCloseButtonClicked - Handles find/replace dialog disposal
  */
 void MainWindow::findCloseButtonClicked() {
+    for (QVector<SearchResult*>::Iterator s_it = searchResults->begin(); s_it != searchResults->end(); ++s_it) {
+        delete *s_it;
+    }
     searchResults->clear();
     findDialog->close();
-    foreach (QObject *obj, findDialog->layout()->children()) {
-        delete obj;
-    }
-    delete findDialog;
+    //Since deleting a QObject deletes all of its children as per QObject documentation, we only have to delete findDialog here.
+    //Since we have WA_DeleteOnClose set for this dialog, DO NOT call delete findDialog.
 }
 
 /**
@@ -1353,7 +1362,6 @@ void MainWindow::findButtonClicked() {
     findDialog = new QDialog(this);
     QVBoxLayout *findLayout = new QVBoxLayout(findDialog);
     QHBoxLayout *findBoxLayout = new QHBoxLayout(findDialog);
-    QHBoxLayout *replaceBoxLayout = new QHBoxLayout(findDialog);
     QHBoxLayout *buttonLayout = new QHBoxLayout(findDialog);
     QHBoxLayout *caseLayout = new QHBoxLayout(findDialog);
     QPushButton *previousButton = new QPushButton();
@@ -1364,10 +1372,6 @@ void MainWindow::findButtonClicked() {
     nextButton->setText("Find Next");
     nextButton->setProperty("autoDefault", false);
     nextButton->setProperty("default", false);
-    QPushButton *replaceAllButton = new QPushButton();
-    replaceAllButton->setProperty("autoDefault", false);
-    replaceAllButton->setProperty("default", false);
-    replaceAllButton->setText("Replace All");
     QPushButton *closeButton = new QPushButton();
     closeButton->setProperty("autoDefault", false);
     closeButton->setProperty("default", false);
@@ -1376,15 +1380,11 @@ void MainWindow::findButtonClicked() {
     buttonLayout->addWidget(nextButton);
     buttonLayout->addWidget(closeButton);
     QLabel *findLabel = new QLabel();
-    QLabel *replaceLabel = new QLabel();
     findLabel->setText("Text to Find:");
-    replaceLabel->setText("Replacement Text:");
     findTextLineEdit = new QLineEdit(findDialog);
     replaceTextLineEdit = new QLineEdit(findDialog);
     findBoxLayout->addWidget(findLabel);
     findBoxLayout->addWidget(findTextLineEdit);
-    replaceBoxLayout->addWidget(replaceLabel);
-    replaceBoxLayout->addWidget(replaceTextLineEdit);
     replaceTextLineEdit->close();
     findLayout->addLayout(findBoxLayout);
     QLabel *caseLabel = new QLabel();
@@ -1407,7 +1407,6 @@ void MainWindow::findButtonClicked() {
     connect(findTextLineEdit, SIGNAL(returnPressed()), this, SLOT(findNextButtonClicked()));
     connect(findTextLineEdit, SIGNAL(textChanged(QString)), this, SLOT(findTextChanged(QString)));
     connect(replaceTextLineEdit, SIGNAL(textChanged(QString)), this, SLOT(replaceTextChanged(QString)));
-    connect(replaceAllButton, SIGNAL(clicked()), this, SLOT(findReplaceButtonClicked()));
     connect(closeButton, SIGNAL(clicked()), this, SLOT(findCloseButtonClicked()));
     connect(findDialog, SIGNAL(finished(int)), this, SLOT(findDialogFinished(int)));
     connect(caseCheckBox, SIGNAL(toggled(bool)), this, SLOT(findMatchCaseChanged(bool)));
