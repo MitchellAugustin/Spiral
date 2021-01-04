@@ -986,10 +986,13 @@ void MainWindow::pageSelected(int index) {
     //                                ui->toolBar->addWidget(thisBox->richTextEdit->f_toolbar);
                             thisBox->richTextEdit->f_toolbar->setVisible(false);
     //                                qDebug() << "Box has content:" << textboxJson.value(BOX_HTML_KEY).toString();
+                            if (!currentlyOpenPage->opened && childDrag->isVisible()) {
+                                currentlyOpenPage->opened = true;
+                                qDebug() << "Opened page: " << currentlyOpenPage->getName() << " in " << currentlyOpenSection->getName();
+                            }
                         }
                     }
                 }
-                currentlyOpenPage->opened = true;
             }
         }
     }
