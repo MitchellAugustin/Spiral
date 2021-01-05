@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     browserSplitterHorizontal->addWidget(browserSplitterVertical);
     browserSplitterHorizontal->addWidget(ui->contentWidget);
     ui->centralwidget->layout()->addWidget(browserSplitterHorizontal);
+    browserSplitterVertical->setVisible(false);
 
 //    this->layout()->addWidget(browserSplitterHorizontal);
 
@@ -334,6 +335,7 @@ void MainWindow::loadSession() {
 //    ui->notebooksListView->resize(75, ui->notebooksListView->height());
 //    ui->sectionsListView->resize(75, ui->sectionsListView->height());
     browserSplitterHorizontal->setSizes(sizes);
+    browserSplitterVertical->setVisible(true);
 }
 
 /**
