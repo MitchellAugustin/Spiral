@@ -126,6 +126,12 @@ MainWindow::~MainWindow()
         (*f_it).waitForFinished();
     }
 
+    //Clear any cached search results from find dialog
+    for (QVector<SearchResult*>::Iterator s_it = searchResults->begin(); s_it != searchResults->end(); ++s_it) {
+        delete *s_it;
+    }
+    searchResults->clear();
+
     for(QVector<Notebook*>::Iterator n_it = openNotebooks->begin(); n_it != openNotebooks->end(); ++n_it) {
         delete *n_it;
         *n_it = nullptr;
@@ -167,7 +173,7 @@ void MainWindow::autosave() {
  */
 void MainWindow::focusChanged(QWidget *oldWidget, QWidget *newWidget) {
     //If focus is lost, reset the find and replace query
-    queryUpdated = false;
+//    queryUpdated = false;
     //Deselect text if the widget losing focus is a QTextEdit
     QWidget *parentNewToolbar = newWidget;
     QToolBar *newToolbar = dynamic_cast<QToolBar*>(parentNewToolbar);
@@ -1324,10 +1330,12 @@ void MainWindow::findDialogFinished(int result) {
  * @brief MainWindow::findCloseButtonClicked - Handles find/replace dialog disposal
  */
 void MainWindow::findCloseButtonClicked() {
+    /*
     for (QVector<SearchResult*>::Iterator s_it = searchResults->begin(); s_it != searchResults->end(); ++s_it) {
         delete *s_it;
     }
     searchResults->clear();
+    */
     findDialog->close();
     //Since deleting a QObject deletes all of its children as per QObject documentation, we only have to delete findDialog here.
     //Since we have WA_DeleteOnClose set for this dialog, DO NOT call delete findDialog.
@@ -1409,6 +1417,11 @@ void MainWindow::findButtonClicked() {
     findDialog->show();
     findDialog->raise();
     findDialog->activateWindow();
+
+    if (queryUpdated) {
+        findTextLineEdit->setText(currentSearchQuery);
+        queryUpdated = true;
+    }
 
     connect(previousButton, SIGNAL(clicked()), this, SLOT(findPreviousButtonClicked()));
     connect(nextButton, SIGNAL(clicked()), this, SLOT(findNextButtonClicked()));

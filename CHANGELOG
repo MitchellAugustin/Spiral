@@ -1,5 +1,12 @@
 Spiral Changelog:
 
+Version Release 1.2:
+*  Greatly improved average memory usage by having notebooks load pages when accessed individually instead of pre-loading all pages in the notebook on open
+*  Improved text find behavior that caused it to start over at the first instance of a query if the dialog had been closed and re-opened without changing the query
+*  Fixed a bug that caused some textboxes to occasionally be shorter than they should have been until being clicked
+*  Patched all known memory leaks (some text find leaks had gone unnoticed by me in previous tests - oops)
+*  More bug fixes
+
 Version Release 1.1:
 *  Added ability to rearrange pages by dragging
 *  Added quick highlight feature, which applies the last highlight color used in the current TextBox to the text under the cursor when you press CTRL+H
