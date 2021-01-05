@@ -970,6 +970,15 @@ void MainWindow::pageSelected(int index) {
                         currentlyOpenPage->editorPane = editorPane;
                     }
 
+                    if (!currentlyOpenPage->opened && currentlyOpenPage->dragLayout->isVisible()) {
+                        currentlyOpenPage->opened = true;
+                        qDebug() << "Opened page: " << currentlyOpenPage->getName() << " in " << currentlyOpenSection->getName();
+                    }
+                    else if (!currentlyOpenPage->opened && !currentlyOpenPage->dragLayout->isVisible()) {
+                        qDebug() << "Attempted to mark page that is not currently visible as opened. Layout not generated.";
+                        break;
+                    }
+
     //                        qDebug() << "Draglayout added";
                     if (currentlyOpenPage && currentlyOpenPage->editorPane) {
     //                            qDebug() << "Draglayout valid";
@@ -986,10 +995,6 @@ void MainWindow::pageSelected(int index) {
     //                                ui->toolBar->addWidget(thisBox->richTextEdit->f_toolbar);
                             thisBox->richTextEdit->f_toolbar->setVisible(false);
     //                                qDebug() << "Box has content:" << textboxJson.value(BOX_HTML_KEY).toString();
-                            if (!currentlyOpenPage->opened && childDrag->isVisible()) {
-                                currentlyOpenPage->opened = true;
-                                qDebug() << "Opened page: " << currentlyOpenPage->getName() << " in " << currentlyOpenSection->getName();
-                            }
                         }
                     }
                 }
