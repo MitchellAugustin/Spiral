@@ -124,6 +124,8 @@ private:
     SpiralStringList *notebookBrowserStringListModel = new SpiralStringList();
     SpiralStringList *sectionBrowserStringListModel = new SpiralStringList();
     QTabWidget *tabWidget;
+    QSplitter *browserSplitterVertical;
+    QSplitter *browserSplitterHorizontal;
     QString sessionFilePath = QDir::currentPath() + "/session.json";
     void updateSessionFile();
     bool gracefulExitFlag = false;

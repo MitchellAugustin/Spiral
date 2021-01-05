@@ -36,11 +36,19 @@ MainWindow::MainWindow(QWidget *parent)
     ui->hiddenToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
 
     //Setup browsing tools
-    ui->browserToolBar->setObjectName(BROWSER_TOOLBAR_NAME);
-    ui->browserToolBar->setAccessibleName(BROWSER_TOOLBAR_NAME);
-    ui->browserToolBar->addWidget(ui->notebooksListView);
-    ui->browserToolBar->addWidget(ui->sectionsListView);
-    ui->browserToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+    browserSplitterVertical = new QSplitter(this);
+    browserSplitterVertical->setOrientation(Qt::Vertical);
+    browserSplitterVertical->addWidget(ui->notebooksListView);
+    browserSplitterVertical->addWidget(ui->sectionsListView);
+    browserSplitterHorizontal = new QSplitter(this);
+    browserSplitterHorizontal->addWidget(browserSplitterVertical);
+    browserSplitterHorizontal->addWidget(ui->contentWidget);
+    ui->centralwidget->layout()->addWidget(browserSplitterHorizontal);
+
+//    this->layout()->addWidget(browserSplitterHorizontal);
+
+//    ui->browserToolBar->addWidget(browserSplitterVertical);
+//    ui->browserToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
 
     //Set window title and instantiate tab widget
     MainWindow::setWindowTitle(DEFAULT_WINDOW_TITLE);
@@ -143,6 +151,10 @@ MainWindow::~MainWindow()
 
     delete tabWidget;
     tabWidget = nullptr;
+    delete browserSplitterVertical;
+    browserSplitterVertical = nullptr;
+    delete browserSplitterHorizontal;
+    browserSplitterHorizontal = nullptr;
     delete ui;
     ui = nullptr;
 }
