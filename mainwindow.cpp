@@ -326,6 +326,14 @@ void MainWindow::loadSession() {
             }
         }
     }
+
+
+    QList<int> sizes;
+    sizes.append(75);
+    sizes.append(ui->contentWidget->width());
+//    ui->notebooksListView->resize(75, ui->notebooksListView->height());
+//    ui->sectionsListView->resize(75, ui->sectionsListView->height());
+    browserSplitterHorizontal->setSizes(sizes);
 }
 
 /**
