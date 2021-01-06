@@ -49,6 +49,7 @@ static const QString BOX_HTML_KEY = "box_html";
 static const QString GRACEFUL_EXIT_KEY = "graceful_exit";
 static const QString AUTOSAVE_KEY = "autosave";
 static const QString OPEN_NOTEBOOKS_KEY = "open_notebooks";
+static const QString BROWSER_WIDTH_KEY = "browser_width";
 
 
 
@@ -128,6 +129,7 @@ private:
     QSplitter *browserSplitterHorizontal;
     QString sessionFilePath = QDir::currentPath() + "/session.json";
     void updateSessionFile();
+    bool sessionActive = false;
     bool gracefulExitFlag = false;
     bool crashDetected = false;
     bool autosaveEnabled = true;

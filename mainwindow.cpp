@@ -262,7 +262,9 @@ void MainWindow::setAutosaveEnabled(bool autosaveEnabled) {
  * @brief MainWindow::updateSessionFile - Updates session.json with the list of currently open notebooks and current autosave preference
  */
 void MainWindow::updateSessionFile() {
-    if (sessionFilePath != nullptr) {
+    //Only update the session file if a session was actually started.
+    //(Otherwise, opening Spiral and closing before resuming the session will result in the notebooks being closed on next start.)
+    if (sessionFilePath != nullptr && sessionActive) {
         QFile file(sessionFilePath);
         if (!file.open(QIODevice::WriteOnly)) {
             QMessageBox::information(this, "Unable to access session file", file.errorString());
@@ -276,10 +278,14 @@ void MainWindow::updateSessionFile() {
             obj.insert(GRACEFUL_EXIT_KEY, gracefulExitFlag);
             obj.insert(OPEN_NOTEBOOKS_KEY, openNotebooksArray);
             obj.insert(AUTOSAVE_KEY, autosaveEnabled);
+            obj.insert(BROWSER_WIDTH_KEY, browserSplitterHorizontal->sizes().at(0));
             qDebug() << "Autosave? " << autosaveEnabled;
             QTextStream outputStream(&file);
             outputStream << QJsonDocument(obj).toJson();
         }
+    }
+    else {
+        qDebug() << "Not updating session file." << ((sessionFilePath == nullptr) ? " Path was null." : " No session was active.");
     }
 }
 
@@ -288,6 +294,7 @@ void MainWindow::updateSessionFile() {
  */
 void MainWindow::loadSession() {
     ui->openSession->hide();
+    int browserWidth = 75;
     if (sessionFilePath != nullptr) {
         QFile file(sessionFilePath);
         if (!file.open(QIODevice::ReadOnly)) {
@@ -319,6 +326,9 @@ void MainWindow::loadSession() {
 
             QJsonArray arr = rootObj.value(OPEN_NOTEBOOKS_KEY).toArray();
 
+
+            browserWidth = (rootObj.contains(BROWSER_WIDTH_KEY) && !crashDetected) ? rootObj.value(BROWSER_WIDTH_KEY).toInt() : browserWidth;
+
             for(QJsonValueRef notebookRef : arr) {
                 QString notebookPathJson = notebookRef.toString();
                 if (notebookPathJson != nullptr && !notebookPathJson.isEmpty()) {
@@ -330,12 +340,14 @@ void MainWindow::loadSession() {
 
 
     QList<int> sizes;
-    sizes.append(75);
+    sizes.append(browserWidth);
     sizes.append(ui->contentWidget->width());
 //    ui->notebooksListView->resize(75, ui->notebooksListView->height());
 //    ui->sectionsListView->resize(75, ui->sectionsListView->height());
     browserSplitterHorizontal->setSizes(sizes);
     browserSplitterVertical->setVisible(true);
+
+    sessionActive = true;
 }
 
 /**
