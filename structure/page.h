@@ -20,7 +20,7 @@ public:
         }
         delete dragLayout;
         dragLayout = nullptr;
-        delete editorPane;
+        //Note: Do not delete editorPane here since deleting dragLayout also deletes it.
         editorPane = nullptr;
     }
     const QString class_name = "Page";
