@@ -880,6 +880,7 @@ void MainWindow::newPage(Section *section, QString pageName) {
         QWidget *editorPane = generateEditorPane(this, tabWidget, curPage);
         curPage->editorPane = editorPane;
     }
+    curPage->opened = true;
     //Add the page to the UI with its DragLayout
     tabWidget->addTab(curPage->editorPane, curPage->getName());
     tabWidget->setCurrentIndex(tabWidget->count() - 1);
