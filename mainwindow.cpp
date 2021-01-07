@@ -1002,23 +1002,23 @@ void MainWindow::pageSelected(int index) {
             MainWindow::setWindowTitle(currentlyOpenPage->getName() + (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
             QJsonArray textboxes = currentlyOpenPage->textboxes;
             if (!currentlyOpenPage->opened) {
+                //If the page has not yet been generated a DragLayout, generate one
+                if(currentlyOpenPage->editorPane == nullptr) {
+                    QWidget *editorPane = generateEditorPane(this, tabWidget, currentlyOpenPage);
+                    currentlyOpenPage->editorPane = editorPane;
+                }
+
+                if (!currentlyOpenPage->opened && currentlyOpenPage->dragLayout->isVisible()) {
+                    currentlyOpenPage->opened = true;
+                    qDebug() << "Opened page: " << currentlyOpenPage->getName() << " in " << currentlyOpenSection->getName();
+                }
+                else if (!currentlyOpenPage->opened && !currentlyOpenPage->dragLayout->isVisible()) {
+                    qDebug() << "Attempted to mark page that is not currently visible as opened. Layout not generated.";
+                    return;
+                }
                 for (QJsonValueRef textboxesRef : textboxes) {
                     QJsonObject textboxJson = textboxesRef.toObject();
                     //Read textbox properties
-                    //If the page has not yet been generated a DragLayout, generate one
-                    if(currentlyOpenPage->editorPane == nullptr) {
-                        QWidget *editorPane = generateEditorPane(this, tabWidget, currentlyOpenPage);
-                        currentlyOpenPage->editorPane = editorPane;
-                    }
-
-                    if (!currentlyOpenPage->opened && currentlyOpenPage->dragLayout->isVisible()) {
-                        currentlyOpenPage->opened = true;
-                        qDebug() << "Opened page: " << currentlyOpenPage->getName() << " in " << currentlyOpenSection->getName();
-                    }
-                    else if (!currentlyOpenPage->opened && !currentlyOpenPage->dragLayout->isVisible()) {
-                        qDebug() << "Attempted to mark page that is not currently visible as opened. Layout not generated.";
-                        break;
-                    }
 
     //                        qDebug() << "Draglayout added";
                     if (currentlyOpenPage && currentlyOpenPage->editorPane) {
