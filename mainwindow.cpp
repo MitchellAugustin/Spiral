@@ -825,6 +825,12 @@ void MainWindow::tabCloseRequested(int index) {
     if (res == QMessageBox::Yes) {
         qDebug() << "Tab closed:" << index;
         tabWidget->removeTab(index);
+        if (tabWidget->count() > index) {
+            tabWidget->setCurrentIndex(index);
+        }
+        else if (tabWidget->count() > index - 1 && (index - 1) >= 0) {
+            tabWidget->setCurrentIndex(index - 1);
+        }
         delete currentlyOpenSection->loadPagesList()->at(index)->editorPane;
         currentlyOpenSection->removePage(index);
     }
