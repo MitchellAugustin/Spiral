@@ -1,12 +1,28 @@
+/*
+** Copyright (C) 2019-2021 Mitchell Augustin - https://mitchellaugustin.com/
+**
+** This program is licensed under the GNU General Public License v3
+** https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
 #include "draglayout.h"
 
 #include <QtWidgets>
 
+/**
+ * @brief draglayout.cpp - Handles all user actions within a Page's draggable region (where all TextBox objects are placed)
+ * @author Mitchell Augustin - https://mitchellaugustin.com
+ */
+
+
+/**
+ * @brief spiralContentMimeType - Returns the MIME type of Spiral textboxes
+ * @return
+ */
 static inline QString spiralContentMimeType() { return SPIRAL_CONTENT_MIME_TYPE; }
 
 /**
  * @brief getHeight - Returns the height of the parameterized TextBox and closes it if empty
- * @author Mitchell Augustin - https://mitchellaugustin.com
  * @param tBox
  * @return
  */

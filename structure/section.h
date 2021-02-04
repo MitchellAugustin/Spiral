@@ -1,3 +1,10 @@
+/*
+** Copyright (C) 2019-2021 Mitchell Augustin - https://mitchellaugustin.com/
+**
+** This program is licensed under the GNU General Public License v3
+** https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
 #ifndef SECTION_H
 #define SECTION_H
 
@@ -8,6 +15,10 @@
 #include "spiralcomponent.h"
 #include "page.h"
 
+/**
+ * @brief Section - Structure class for Section objects.
+ * @author Mitchell Augustin - https://mitchellaugustin.com
+ */
 class Section : public SpiralComponent
 {
 public:

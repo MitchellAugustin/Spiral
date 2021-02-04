@@ -1,10 +1,20 @@
+/*
+** Copyright (C) 2019-2021 Mitchell Augustin - https://mitchellaugustin.com/
+**
+** This program is licensed under the GNU General Public License v3
+** https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
 #ifndef NOTEBOOK_H
 #define NOTEBOOK_H
 
 #include "spiralcomponent.h"
 #include "section.h"
 
-
+/**
+ * @brief Notebook - Structure class for Notebook objects.
+ * @author Mitchell Augustin - https://mitchellaugustin.com
+ */
 class Notebook : public SpiralComponent
 {
 public:

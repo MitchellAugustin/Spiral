@@ -1,3 +1,10 @@
+/*
+** Copyright (C) 2019-2021 Mitchell Augustin - https://mitchellaugustin.com/
+**
+** This program is licensed under the GNU General Public License v3
+** https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -52,7 +59,11 @@ static const QString OPEN_NOTEBOOKS_KEY = "open_notebooks";
 static const QString BROWSER_WIDTH_KEY = "browser_width";
 
 
-
+/**
+ * @brief MainWindow::MainWindow - Header for MainWindow that contains the bulk of Spiral's functionality.
+ * @author Mitchell Augustin - https://mitchellaugustin.com
+ * @param parent
+ */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT

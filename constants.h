@@ -1,3 +1,10 @@
+/*
+** Copyright (C) 2019-2021 Mitchell Augustin - https://mitchellaugustin.com/
+**
+** This program is licensed under the GNU General Public License v3
+** https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 #include <QTextDocument>
@@ -5,6 +12,11 @@
 #include <QAbstractTextDocumentLayout>
 #include <QString>
 #include "mrichtextedit.h"
+
+/**
+ * @brief Constants - Header containing frequently used constants.
+ * @author Mitchell Augustin - https://mitchellaugustin.com
+ */
 
 //Global constants
 static const QString SPIRAL_VERSION = "Release 1.2";

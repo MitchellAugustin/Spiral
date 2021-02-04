@@ -1,8 +1,15 @@
+/*
+** Copyright (C) 2019-2021 Mitchell Augustin - https://mitchellaugustin.com/
+**
+** This program is licensed under the GNU General Public License v3
+** https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 /**
- * @brief MainWindow::MainWindow - Constructs the main window
+ * @brief MainWindow::MainWindow - Constructs the main window and handles the bulk of Spiral's functionality.
  * @author Mitchell Augustin - https://mitchellaugustin.com
  * @param parent
  */

@@ -1,7 +1,18 @@
+/*
+** Copyright (C) 2019-2021 Mitchell Augustin - https://mitchellaugustin.com/
+**
+** This program is licensed under the GNU General Public License v3
+** https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
 #include "mainwindow.h"
 
 #include <QApplication>
 
+/**
+ * @brief Main - Entry point of application. Configures environment, as well as the base theme for Windows users.
+ * @author Mitchell Augustin - https://mitchellaugustin.com
+ */
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);

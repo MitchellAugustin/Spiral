@@ -1,3 +1,10 @@
+/*
+** Copyright (C) 2019-2021 Mitchell Augustin - https://mitchellaugustin.com/
+**
+** This program is licensed under the GNU General Public License v3
+** https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
 #ifndef SPIRALCOMPONENT_H
 #define SPIRALCOMPONENT_H
 
@@ -7,6 +14,10 @@
 #include <QStringList>
 #include <QDebug>
 
+/**
+ * @brief SpiralComponent - Base structure class for notebook component objects. Extended by Notebook, Section, and Page.
+ * @author Mitchell Augustin - https://mitchellaugustin.com
+ */
 class SpiralComponent
 {
 public:
