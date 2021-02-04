@@ -1,11 +1,11 @@
 #ifndef _MTEXTEDIT_H_
 #define _MTEXTEDIT_H_
 
-#include <QTextEdit>
+#include <QTextBrowser>
 #include <QMimeData>
 #include <QImage>
 
-class MTextEdit : public QTextEdit {
+class MTextEdit : public QTextBrowser {
     Q_OBJECT
   public:
     MTextEdit(QWidget *parent);
