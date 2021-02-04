@@ -6,6 +6,7 @@ static inline QString spiralContentMimeType() { return SPIRAL_CONTENT_MIME_TYPE;
 
 /**
  * @brief getHeight - Returns the height of the parameterized TextBox and closes it if empty
+ * @author Mitchell Augustin - https://mitchellaugustin.com
  * @param tBox
  * @return
  */
@@ -210,6 +211,7 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
         tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
         event->accept();
         tBox->richTextEdit->f_textedit->setFocus();
+        tBox->richTextEdit->f_textedit->setTextCursor(tBox->richTextEdit->f_textedit->document()->find("Type here", 0, QTextDocument::FindCaseSensitively));
         return;
     }
 

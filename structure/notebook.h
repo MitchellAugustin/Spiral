@@ -4,6 +4,7 @@
 #include "spiralcomponent.h"
 #include "section.h"
 
+
 class Notebook : public SpiralComponent
 {
 public:

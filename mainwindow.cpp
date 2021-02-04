@@ -3,6 +3,7 @@
 
 /**
  * @brief MainWindow::MainWindow - Constructs the main window
+ * @author Mitchell Augustin - https://mitchellaugustin.com
  * @param parent
  */
 MainWindow::MainWindow(QWidget *parent)
