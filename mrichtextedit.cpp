@@ -186,6 +186,10 @@ MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
     connect(f_indent_inc, SIGNAL(clicked()), this, SLOT(increaseIndentation()));
     connect(f_indent_dec, SIGNAL(clicked()), this, SLOT(decreaseIndentation()));
 
+    // font
+
+    connect(fontComboBox, SIGNAL(activated(QString)), this, SLOT(textFont()));
+
     // font size
 
     QFontDatabase db;
@@ -305,6 +309,12 @@ void MRichTextEdit::textItalic() {
 void MRichTextEdit::textStrikeout() {
     QTextCharFormat fmt;
     fmt.setFontStrikeOut(f_strikeout->isChecked());
+    mergeFormatOnWordOrSelection(fmt);
+}
+
+void MRichTextEdit::textFont() {
+    QTextCharFormat fmt;
+    fmt.setFont(fontComboBox->font());
     mergeFormatOnWordOrSelection(fmt);
 }
 
