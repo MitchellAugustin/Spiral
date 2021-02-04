@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>819</width>
+    <width>957</width>
     <height>312</height>
    </rect>
   </property>
@@ -483,6 +483,9 @@
        </widget>
       </item>
       <item>
+       <widget class="QFontComboBox" name="fontComboBox"/>
+      </item>
+      <item>
        <widget class="QComboBox" name="f_fontsize">
         <property name="focusPolicy">
          <enum>Qt::ClickFocus</enum>
@@ -560,6 +563,7 @@
      <zorder>f_menu</zorder>
      <zorder>f_fgcolor</zorder>
      <zorder>horizontalSpacer</zorder>
+     <zorder>fontComboBox</zorder>
     </widget>
    </item>
    <item>
