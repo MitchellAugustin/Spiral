@@ -507,6 +507,9 @@
         <property name="text">
          <string notr="true">...</string>
         </property>
+        <property name="icon">
+         <iconset theme="insert-image"/>
+        </property>
        </widget>
       </item>
       <item>
