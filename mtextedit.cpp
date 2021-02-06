@@ -39,13 +39,13 @@ void MTextEdit::insertFromMimeData(const QMimeData *source) {
             if (formats[i] == "image/tiff") { format = "TIFF"; break; }
             if (formats[i] == "image/xbm")  { format = "XBM";  break; }
             if (formats[i] == "image/xpm")  { format = "XPM";  break; }
-            }
+        }
         if (!format.isEmpty()) {
-//          dropImage(qvariant_cast<QImage>(source->imageData()), format);
+            //          dropImage(qvariant_cast<QImage>(source->imageData()), format);
             dropImage(qvariant_cast<QImage>(source->imageData()), "JPG"); // Sorry, ale cokoli jiného dlouho trvá
             return;
-            }
         }
+    }
     if (!source->formats().contains("application/x-spiralcontent")) {
         QTextEdit::insertFromMimeData(source);
     }
@@ -69,24 +69,24 @@ void MTextEdit::dropImage(const QImage& image, const QString& format) {
         base64l.append(base64[i]);
         if (i%80 == 0) {
             base64l.append("\n");
-            }
         }
+    }
 
     QTextCursor cursor = textCursor();
     QTextImageFormat imageFormat;
     imageFormat.setWidth  ( image.width() );
     imageFormat.setHeight ( image.height() );
     imageFormat.setName   ( QString("data:image/%1;base64,%2")
-                                .arg(QString("%1.%2").arg(rand()).arg(format))
-                                .arg(base64l.data())
-                                );
+                            .arg(QString("%1.%2").arg(rand()).arg(format))
+                            .arg(base64l.data())
+                            );
     cursor.insertImage    ( imageFormat );
 }
 
 void MTextEdit::onTextChanged() {
-//    qDebug() << "Text changed";
+    //    qDebug() << "Text changed";
 }
 
 void MTextEdit::onCursorPositionChanged() {
-//    qDebug() << "Cursor position changed";
+    //    qDebug() << "Cursor position changed";
 }
