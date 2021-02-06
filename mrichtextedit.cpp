@@ -312,6 +312,7 @@ void MRichTextEdit::textStrikeout() {
     mergeFormatOnWordOrSelection(fmt);
 }
 
+//Thanks to https://gitlab.com/DrewTechs for implementing the font selector
 void MRichTextEdit::textFont() {
     QTextCharFormat fmt;
     qreal pointSize = f_fontsize->currentText().toFloat();
