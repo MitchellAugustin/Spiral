@@ -1,7 +1,10 @@
 Spiral Changelog:
 
 Version Release 1.3:
+*  Links in textboxes are now clickable
+*  Added font selector (Thank you, https://gitlab.com/DrewTechs)
 *  "Type here" text is now highlighted by default on box creation
+*  Added icon for "insert image" button
 
 Version Release 1.2:
 *  Greatly improved average memory usage by having notebooks load pages when accessed individually instead of pre-loading all pages in the notebook on open
