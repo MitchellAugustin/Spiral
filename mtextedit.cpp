@@ -7,9 +7,14 @@
 #include <stdlib.h>
 #include <QDebug>
 
-MTextEdit::MTextEdit(QWidget *parent) : QTextEdit(parent) {
+MTextEdit::MTextEdit(QWidget *parent) : QTextBrowser(parent) {
+    QTextBrowser::setReadOnly(false);
+    QTextBrowser::setOpenLinks(true);
+    QTextBrowser::setOpenExternalLinks(true);
+    QTextBrowser::setTextInteractionFlags(Qt::LinksAccessibleByMouse|Qt::TextEditorInteraction);
     connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
+
 }
 
 
