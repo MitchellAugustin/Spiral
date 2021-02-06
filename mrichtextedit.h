@@ -54,6 +54,7 @@ class MRichTextEdit : public QWidget, public Ui::MRichTextEdit {
     void textUnderline();
     void textStrikeout();
     void textItalic();
+    void textFont();
     void textSize(const QString &p);
     void textLink(bool checked);
     void textStyle(int index);

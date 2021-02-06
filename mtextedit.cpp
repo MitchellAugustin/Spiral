@@ -14,6 +14,7 @@ MTextEdit::MTextEdit(QWidget *parent) : QTextBrowser(parent) {
     QTextBrowser::setTextInteractionFlags(Qt::LinksAccessibleByMouse|Qt::TextEditorInteraction);
     connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
+
 }
 
 

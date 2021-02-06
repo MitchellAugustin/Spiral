@@ -72,6 +72,9 @@
        </property>
        <item>
         <widget class="QWidget" name="widget" native="true">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <widget class="QWidget" name="f_toolbar" native="true">
           <property name="geometry">
            <rect>
@@ -604,7 +607,7 @@
      <x>0</x>
      <y>0</y>
      <width>977</width>
-     <height>23</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
