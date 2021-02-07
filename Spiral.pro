@@ -17,32 +17,32 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    draglayout.cpp \
-    dragresizelabel.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    textbox.cpp \
-    mrichtextedit.cpp \
-    mtextedit.cpp
+    src/draglayout.cpp \
+    src/dragresizelabel.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/textbox.cpp \
+    src/mrichtextedit.cpp \
+    src/mtextedit.cpp
 
 HEADERS += \
-    constants.h \
-    draglayout.h \
-    dragresizelabel.h \
-    mainwindow.h \
-    spiralstringlist.h \
-    structure/notebook.h \
-    structure/page.h \
-    structure/searchresult.h \
-    structure/section.h \
-    structure/spiralcomponent.h \
-    textbox.h \
-    mrichtextedit.h \
-    mtextedit.h
+    src/constants.h \
+    src/draglayout.h \
+    src/dragresizelabel.h \
+    src/mainwindow.h \
+    src/spiralstringlist.h \
+    src/structure/notebook.h \
+    src/structure/page.h \
+    src/structure/searchresult.h \
+    src/structure/section.h \
+    src/structure/spiralcomponent.h \
+    src/textbox.h \
+    src/mrichtextedit.h \
+    src/mtextedit.h
 
 FORMS += \
-    mainwindow.ui \
-    mrichtextedit.ui
+    src/mainwindow.ui \
+    src/mrichtextedit.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
