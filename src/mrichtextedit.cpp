@@ -127,7 +127,7 @@ MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
 
     connect(f_textedit, SIGNAL(copyAvailable(bool)), f_cut, SLOT(setEnabled(bool)));
     connect(f_textedit, SIGNAL(copyAvailable(bool)), f_copy, SLOT(setEnabled(bool)));
-    connect(f_textedit, SIGNAL(textChanged()), f_textedit, SLOT(onTextChanged()));
+    connect(f_textedit, SIGNAL(textChanged()), this, SLOT(textChanged()));
 
 #ifndef QT_NO_CLIPBOARD
     connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SLOT(slotClipboardDataChanged()));
@@ -522,14 +522,6 @@ void MRichTextEdit::slotCursorPositionChanged() {
         f_list_bullet->setChecked(false);
         f_list_ordered->setChecked(false);
     }
-
-    TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
-    if(parentTextBox) {
-        resize(parentTextBox->width(), getHeight());
-        parentTextBox->resize(parentTextBox->width(), getHeight() + 15);
-
-        qDebug() << "TextBox " << parentTextBox->uuid << " resized to " << parentTextBox->width() << "x" << this->height() << " from MRichTextEdit::slotCursorPositionChanged()";
-    }
 }
 
 void MRichTextEdit::fontChanged(const QFont &f) {
@@ -670,10 +662,12 @@ void MRichTextEdit::insertImage() {
 void MRichTextEdit::textChanged() {
     qDebug() << "Text changed from MRichTextEdit";
 
+
     TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
     if(parentTextBox) {
         resize(parentTextBox->width(), getHeight());
-        qDebug() << "Resizing parent TextBox";
-        parentTextBox->resize(width(), getHeight() + 15);
+        parentTextBox->resize(parentTextBox->width(), getHeight() + 15);
+
+        qDebug() << "TextBox " << parentTextBox->uuid << " resized to " << parentTextBox->width() << "x" << this->height() << " from MRichTextEdit::slotCursorPositionChanged()";
     }
 }

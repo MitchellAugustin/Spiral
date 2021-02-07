@@ -12,7 +12,7 @@ MTextEdit::MTextEdit(QWidget *parent) : QTextBrowser(parent) {
     QTextBrowser::setOpenLinks(true);
     QTextBrowser::setOpenExternalLinks(true);
     QTextBrowser::setTextInteractionFlags(Qt::LinksAccessibleByMouse|Qt::TextEditorInteraction);
-    connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+    QTextBrowser::setUndoRedoEnabled(true);
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
 
 }
@@ -83,6 +83,7 @@ void MTextEdit::dropImage(const QImage& image, const QString& format) {
     cursor.insertImage    ( imageFormat );
 }
 
+//Implemented in MRichTextEdit
 void MTextEdit::onTextChanged() {
     //    qDebug() << "Text changed";
 }
