@@ -5,6 +5,7 @@ Version Release 1.3:
 *  Added font selector (Thank you, https://gitlab.com/DrewTechs)
 *  "Type here" text is now highlighted by default on box creation
 *  Added icon for "insert image" button
+*  Switched build system to CMake (Thank you, https://gitlab.com/borgmanJeremy)
 
 Version Release 1.2:
 *  Greatly improved average memory usage by having notebooks load pages when accessed individually instead of pre-loading all pages in the notebook on open
