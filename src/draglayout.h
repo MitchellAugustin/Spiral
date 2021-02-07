@@ -9,7 +9,7 @@
 #define DRAGLAYOUT_H
 
 #include <QWidget>
-#include <textbox.h>
+#include "textbox.h"
 #include "structure/page.h"
 #include "constants.h"
 

@@ -12,7 +12,7 @@
 #include <QJsonArray>
 
 #include "spiralcomponent.h"
-#include "textbox.h"
+#include "src/textbox.h"
 
 /**
  * @brief Page - Structure class for Page objects.
