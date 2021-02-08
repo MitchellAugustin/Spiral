@@ -24,6 +24,13 @@ target_sources(spiral
   mtextedit.cpp
 )
 
+# Icon QRC files
+target_sources(spiral
+        PRIVATE
+        ../icon.qrc
+        ../moveicon.qrc
+        ../tango.qrc)
+
 target_include_directories(spiral
 PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/>
