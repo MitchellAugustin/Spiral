@@ -46,8 +46,8 @@ bool QWidget::focusNextPrevChild(bool next) {
     return false;
 }
 
-int MRichTextEdit::getHeight() {
-    if(toPlainText().isEmpty()) {
+int MRichTextEdit::getHeight(QString uuid) {
+    if(toPlainText().isEmpty() && !uuid.isEmpty()) {
         QWidget *parent = parentWidget();
         MainWindow *win = dynamic_cast<MainWindow*>(parent);
         while (!win) {
@@ -59,6 +59,10 @@ int MRichTextEdit::getHeight() {
         }
         //        parentWidget()->close();
         qDebug() << "TextBox deleted from getHeight in mrichtextedit";
+        TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
+        if(parentTextBox) {
+            qDebug() << "The textbox deleted here was: " << uuid;
+        }
         return 0;
     }
     return utilities::getMRichTextEditHeight(this);
@@ -564,8 +568,8 @@ void MRichTextEdit::fontChanged(const QFont &f) {
 
     TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
     if(parentTextBox) {
-        resize(parentTextBox->width(), getHeight());
-        parentTextBox->resize(width(), getHeight() + 15);
+        resize(parentTextBox->width(), getHeight(parentTextBox->uuid));
+        parentTextBox->resize(width(), getHeight(parentTextBox->uuid) + 15);
     }
 }
 
@@ -664,9 +668,9 @@ void MRichTextEdit::textChanged() {
 
     TextBox *parentTextBox = static_cast<TextBox*>(parentWidget());
     if(parentTextBox) {
-        resize(parentTextBox->width(), getHeight());
-        parentTextBox->resize(parentTextBox->width(), getHeight() + 15);
+        resize(parentTextBox->width(), getHeight(parentTextBox->uuid));
+        parentTextBox->resize(parentTextBox->width(), getHeight(parentTextBox->uuid) + 15);
 
-        qDebug() << "TextBox " << parentTextBox->uuid << " resized to " << parentTextBox->width() << "x" << this->height() << " from MRichTextEdit::slotCursorPositionChanged()";
+        qDebug() << "TextBox " << parentTextBox->uuid << " resized to " << parentTextBox->width() << "x" << this->height() << " from MRichTextEdit::textChanged()";
     }
 }

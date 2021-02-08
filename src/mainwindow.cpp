@@ -1049,7 +1049,7 @@ void MainWindow::pageSelected(int index) {
                             thisBox->richTextEdit->setHtml(textboxJson.value(BOX_HTML_KEY).toString());
     //                                ui->toolBar->addWidget(thisBox->richTextEdit->f_toolbar);
                             thisBox->richTextEdit->f_toolbar->setVisible(false);
-    //                                qDebug() << "Box has content:" << textboxJson.value(BOX_HTML_KEY).toString();
+//                            qDebug() << "Added box with content:\n" << textboxJson.value(BOX_HTML_KEY).toString();
                         }
                     }
                 }
