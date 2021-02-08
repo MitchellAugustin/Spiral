@@ -1,3 +1,5 @@
 nohup.out
 build/
 Spiral.pro.user*
+.idea/
+cmake-build-debug/
