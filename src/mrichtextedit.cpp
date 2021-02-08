@@ -48,7 +48,6 @@ bool QWidget::focusNextPrevChild(bool next) {
 
 int MRichTextEdit::getHeight() {
     if(toPlainText().isEmpty()) {
-        document()->clear();
         QWidget *parent = parentWidget();
         MainWindow *win = dynamic_cast<MainWindow*>(parent);
         while (!win) {
