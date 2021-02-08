@@ -15,6 +15,7 @@ add_executable(spiral)
 
 target_sources(spiral 
   PRIVATE
+  constants.cpp
   draglayout.cpp
   dragresizelabel.cpp
   main.cpp

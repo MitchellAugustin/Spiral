@@ -91,16 +91,16 @@ public slots:
 protected slots:
     void notebookSelected(QModelIndex index);
     void sectionSelected(QModelIndex index);
-    void notebookNameChanged(QModelIndex topLeft, QModelIndex bottomRight);
-    void sectionNameChanged(QModelIndex topLeft, QModelIndex bottomRight);
+    void notebookNameChanged(QModelIndex topLeft);
+    void sectionNameChanged(QModelIndex topLeft);
     void pageDoubleClicked(int index);
     void pageSelected(int index);
     void newPageButtonClicked();
     void newSectionButtonClicked();
     void newNotebookButtonClicked();
     void tabCloseRequested(int index);
-    void notebookMoved(QModelIndex, int, int, QModelIndex, int);
-    void sectionMoved(QModelIndex, int, int, QModelIndex, int);
+    void notebookMoved(int, int);
+    void sectionMoved(int, int);
     void pageMoved(int from, int to);
     void deletePageButtonClicked();
     void deleteSectionButtonClicked();
@@ -126,7 +126,7 @@ protected slots:
     void findNextButtonClicked();
     void findReplaceButtonClicked();
     void findCloseButtonClicked();
-    void findDialogFinished(int);
+    void findDialogFinished();
     void findTextChanged(QString text);
     void findMatchCaseChanged(bool value);
     void replaceTextChanged(QString text);

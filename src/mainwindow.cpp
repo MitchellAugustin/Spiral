@@ -532,7 +532,7 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
             }
             obj.insert(SECTIONS_ARR_KEY, sections);
             QJsonDocument doc(obj);
-            outputStream << doc.toJson() << endl;
+            outputStream << doc.toJson() << Qt::endl;
         }
         qDebug() << "Notebook saved successfully: " << notebook->path;
     }
@@ -923,7 +923,7 @@ void MainWindow::notebookSelected(QModelIndex index) {
  * @brief MainWindow::notebookMoved - Moves the notebook in the view
  * @param indexList
  */
-void MainWindow::notebookMoved(QModelIndex parent, int start, int end, QModelIndex destination, int row) {
+void MainWindow::notebookMoved(int start, int row) {
     //If the item is being moved down, subtract 1 from row
     if (start < row) {
         row -= 1;
@@ -942,7 +942,7 @@ void MainWindow::notebookMoved(QModelIndex parent, int start, int end, QModelInd
  * @brief MainWindow::sectionMoved - Moves the section within its notebook
  * @param indexList
  */
-void MainWindow::sectionMoved(QModelIndex parent, int start, int end, QModelIndex destination, int row) {
+void MainWindow::sectionMoved(int start, int row) {
     //If the item is being moved down, subtract 1 from row
     if (start < row) {
         row -= 1;
@@ -977,7 +977,7 @@ void MainWindow::pageDoubleClicked(int index) {
  * @brief MainWindow::notebookNameChanged - Called when the name of a notebook is changed.
  * @param index - The index of the modified notebook
  */
-void MainWindow::notebookNameChanged(QModelIndex topLeft, QModelIndex bottomRight) {
+void MainWindow::notebookNameChanged(QModelIndex topLeft) {
     if (doNotUpdateNamesFlag) {
         return;
     }
@@ -992,7 +992,7 @@ void MainWindow::notebookNameChanged(QModelIndex topLeft, QModelIndex bottomRigh
  * @brief MainWindow::sectionNameChanged - Called when the name of a section is changed.
  * @param index - The index of the modified section
  */
-void MainWindow::sectionNameChanged(QModelIndex topLeft, QModelIndex bottomRight) {
+void MainWindow::sectionNameChanged(QModelIndex topLeft) {
     if (doNotUpdateNamesFlag) {
         return;
     }
@@ -1037,7 +1037,7 @@ void MainWindow::pageSelected(int index) {
     //                        qDebug() << "Draglayout added";
                     if (currentlyOpenPage && currentlyOpenPage->editorPane) {
     //                            qDebug() << "Draglayout valid";
-                        DragLayout *childDrag = (DragLayout*) currentlyOpenPage->dragLayout;
+                        DragLayout *childDrag = static_cast<DragLayout*>(currentlyOpenPage->dragLayout);
                         if (childDrag) {
     //                                qDebug() << "Adding box to page:" << page->getName();
                             QString locationString = textboxJson.value(BOX_LOCATION_KEY).toString();
@@ -1063,7 +1063,7 @@ void MainWindow::pageSelected(int index) {
  */
 void MainWindow::testAddBoxProgrammatically() {
     if (currentlyOpenPage && currentlyOpenPage->editorPane) {
-        DragLayout *childDrag = (DragLayout*) currentlyOpenPage->dragLayout;
+        DragLayout *childDrag = static_cast<DragLayout*> (currentlyOpenPage->dragLayout);
         if (childDrag) {
             childDrag->newTextBoxAtLocation(QPoint(50, 50), DEFAULT_TEXTBOX_WIDTH);
         }
@@ -1371,7 +1371,7 @@ void MainWindow::findReplaceButtonClicked() {
  * @brief MainWindow::findDialogFinished - Called when the find/replace dialog is closed
  * @param result
  */
-void MainWindow::findDialogFinished(int result) {
+void MainWindow::findDialogFinished() {
     findCloseButtonClicked();
 }
 

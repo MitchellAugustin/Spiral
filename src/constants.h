@@ -32,16 +32,6 @@ static const int DEFAULT_TAB_SIZE = 2000;
 
 
 namespace utilities {
-static int getMRichTextEditHeight(MRichTextEdit *richTextEdit) {
-    QTextDocument *doc = richTextEdit->document();
-    QAbstractTextDocumentLayout *layout = doc->documentLayout();
-    int h = richTextEdit->f_toolbar->height() * 2;
-    QTextBlock b = doc->begin();
-    while (b != doc->end()) {
-        h += layout->blockBoundingRect(b).height();
-        b = b.next();
-    }
-    return h;
-}
+int getMRichTextEditHeight(MRichTextEdit *richTextEdit);
 }
 #endif // CONSTANTS_H

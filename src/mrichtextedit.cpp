@@ -42,7 +42,7 @@
 #include <QMenu>
 #include <QDialog>
 
-bool QWidget::focusNextPrevChild(bool next) {
+bool QWidget::focusNextPrevChild([[maybe_unused]] bool next) {
     return false;
 }
 
@@ -71,7 +71,7 @@ int MRichTextEdit::getHeight(QString uuid) {
 MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
     setupUi(this);
     m_lastBlockList = 0;
-    f_textedit->setTabStopWidth(40);
+    f_textedit->setTabStopDistance(40);
 
     connect(f_textedit, SIGNAL(currentCharFormatChanged(QTextCharFormat)),
             this,     SLOT(slotCurrentCharFormatChanged(QTextCharFormat)));
@@ -207,14 +207,14 @@ MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
     // text foreground color
 
     QPixmap pix(16, 16);
-    pix.fill(QApplication::palette().foreground().color());
+    pix.fill(QApplication::palette().windowText().color());
     f_fgcolor->setIcon(pix);
 
     connect(f_fgcolor, SIGNAL(clicked()), this, SLOT(textFgColor()));
 
     // text background color
 
-    pix.fill(QApplication::palette().background().color());
+    pix.fill(QApplication::palette().window().color());
     f_bgcolor->setIcon(pix);
 
     connect(f_bgcolor, SIGNAL(clicked()), this, SLOT(textBgColor()));
@@ -578,7 +578,7 @@ void MRichTextEdit::fgColorChanged(const QColor &c) {
     if (c.isValid()) {
         pix.fill(c);
     } else {
-        pix.fill(QApplication::palette().foreground().color());
+        pix.fill(QApplication::palette().windowText().color());
     }
     f_fgcolor->setIcon(pix);
 }
@@ -588,7 +588,7 @@ void MRichTextEdit::bgColorChanged(const QColor &c) {
     if (c.isValid()) {
         pix.fill(c);
     } else {
-        pix.fill(QApplication::palette().background().color());
+        pix.fill(QApplication::palette().window().color());
     }
     f_bgcolor->setIcon(pix);
 }
