@@ -1,0 +1,12 @@
+image: gcc
+
+before_script:
+  - apt-get update && apt-get -y install cmake qt5-default
+
+spiral:
+  stage: build
+  script:
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make
