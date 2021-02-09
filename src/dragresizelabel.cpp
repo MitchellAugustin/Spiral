@@ -26,17 +26,17 @@ DragResizeLabel::DragResizeLabel(TextBox *parent, bool expand)
     setAcceptDrops(true);
 }
 
-void DragResizeLabel::dragEnterEvent(QDragEnterEvent *event)
+void DragResizeLabel::dragEnterEvent([[maybe_unused]] QDragEnterEvent *event)
 {
     //No implementation needed
 }
 
-void DragResizeLabel::dragMoveEvent(QDragMoveEvent *event)
+void DragResizeLabel::dragMoveEvent([[maybe_unused]]QDragMoveEvent *event)
 {
     //No implementation needed
 }
 
-void DragResizeLabel::dropEvent(QDropEvent *event)
+void DragResizeLabel::dropEvent([[maybe_unused]] QDropEvent *event)
 {
     //No implementation needed
 }
@@ -45,7 +45,7 @@ void DragResizeLabel::dropEvent(QDropEvent *event)
  * @brief DragResizeLabel::mousePressEvent - Handles expansion/contraction of the corresponding TextBox
  * @param event
  */
-void DragResizeLabel::mousePressEvent(QMouseEvent *event)
+void DragResizeLabel::mousePressEvent([[maybe_unused]] QMouseEvent *event)
 {
     TextBox *textBox = parentTextBox;
     if (textBox) {

@@ -28,7 +28,7 @@ static inline QString spiralContentMimeType() { return SPIRAL_CONTENT_MIME_TYPE;
  */
 static int getHeight(TextBox *tBox) {
     if(tBox->richTextEdit->toPlainText().isEmpty()) {
-        DragLayout *parentDrag = (DragLayout*) tBox->parentWidget();
+        DragLayout *parentDrag = static_cast<DragLayout*> (tBox->parentWidget());
         parentDrag->parentPage->textBoxList.removeOne(tBox);
         tBox->close();
         qDebug() << "TextBox " << tBox->uuid << " deleted from getHeight in draglayout";
@@ -209,7 +209,7 @@ TextBox *DragLayout::newTextBoxAtLocation(QPoint point, int width) {
 void DragLayout::mousePressEvent(QMouseEvent *event)
 {
     TextBox *child = dynamic_cast<TextBox*>(childAt(event->pos()));
-    QFrame *childQFrameCheck = dynamic_cast<QFrame*>(childAt(event->pos()));
+    // QFrame *childQFrameCheck = dynamic_cast<QFrame*>(childAt(event->pos()));
     MRichTextEdit *childMRichTextEditCheck = dynamic_cast<MRichTextEdit*>(childAt(event->pos()));
 
     //Ensures that drag operations are not handled unless the user is dragging a TextBox object
@@ -237,7 +237,7 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
 
         QByteArray itemData;
         QDataStream dataStream(&itemData, QIODevice::WriteOnly);
-        dataStream << child->richTextEdit->toHtml() << QPoint(hotSpot) << child->uuid << child->width();
+        dataStream << child->richTextEdit->toHtml() << hotSpot << child->uuid << child->width();
 
         QByteArray htmlItemData;
         QDataStream htmlDataStream(&htmlItemData, QIODevice::WriteOnly);

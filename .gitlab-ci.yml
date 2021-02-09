@@ -1,12 +1,26 @@
 image: gcc
 
 before_script:
-  - apt-get update && apt-get -y install cmake qt5-default
+  - apt-get update && apt-get -y install build-essential cmake qt5-default
 
-spiral:
-  stage: build
+variables:
+  DEBIAN_FRONTEND: noninteractive
+
+build:buster:
+  image: debian:buster
   script:
     - mkdir build
     - cd build
     - cmake ..
     - make
+
+
+build:focal:
+  image: ubuntu:focal
+  script:
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make
+
+
