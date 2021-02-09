@@ -928,7 +928,7 @@ void MainWindow::notebookSelected(QModelIndex index) {
  * @brief MainWindow::notebookMoved - Moves the notebook in the view
  * @param indexList
  */
-void MainWindow::notebookMoved(int start, int row) {
+void MainWindow::notebookMoved([[maybe_unused]] QModelIndex parent, int start, [[maybe_unused]] int end, [[maybe_unused]] QModelIndex destination, int row) {
     //If the item is being moved down, subtract 1 from row
     if (start < row) {
         row -= 1;
@@ -947,7 +947,7 @@ void MainWindow::notebookMoved(int start, int row) {
  * @brief MainWindow::sectionMoved - Moves the section within its notebook
  * @param indexList
  */
-void MainWindow::sectionMoved(int start, int row) {
+void MainWindow::sectionMoved([[maybe_unused]] QModelIndex parent, int start, [[maybe_unused]] int end, [[maybe_unused]] QModelIndex destination, int row) {
     //If the item is being moved down, subtract 1 from row
     if (start < row) {
         row -= 1;
@@ -982,7 +982,7 @@ void MainWindow::pageDoubleClicked(int index) {
  * @brief MainWindow::notebookNameChanged - Called when the name of a notebook is changed.
  * @param index - The index of the modified notebook
  */
-void MainWindow::notebookNameChanged(QModelIndex topLeft) {
+void MainWindow::notebookNameChanged(QModelIndex topLeft, [[maybe_unused]] QModelIndex bottomRight) {
     if (doNotUpdateNamesFlag) {
         return;
     }
@@ -997,7 +997,7 @@ void MainWindow::notebookNameChanged(QModelIndex topLeft) {
  * @brief MainWindow::sectionNameChanged - Called when the name of a section is changed.
  * @param index - The index of the modified section
  */
-void MainWindow::sectionNameChanged(QModelIndex topLeft) {
+void MainWindow::sectionNameChanged(QModelIndex topLeft, [[maybe_unused]] QModelIndex bottomRight) {
     if (doNotUpdateNamesFlag) {
         return;
     }

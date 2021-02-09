@@ -91,16 +91,16 @@ public slots:
 protected slots:
     void notebookSelected(QModelIndex index);
     void sectionSelected(QModelIndex index);
-    void notebookNameChanged(QModelIndex topLeft);
-    void sectionNameChanged(QModelIndex topLeft);
+    void notebookNameChanged(QModelIndex topLeft, QModelIndex bottomRight);
+    void sectionNameChanged(QModelIndex topLeft, QModelIndex bottomRight);
     void pageDoubleClicked(int index);
     void pageSelected(int index);
     void newPageButtonClicked();
     void newSectionButtonClicked();
     void newNotebookButtonClicked();
     void tabCloseRequested(int index);
-    void notebookMoved(int, int);
-    void sectionMoved(int, int);
+    void notebookMoved(QModelIndex parent, int start, int end, QModelIndex destination, int row);
+    void sectionMoved(QModelIndex parent, int start, int end, QModelIndex destination, int row);
     void pageMoved(int from, int to);
     void deletePageButtonClicked();
     void deleteSectionButtonClicked();
