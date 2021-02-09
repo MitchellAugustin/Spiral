@@ -532,7 +532,12 @@ void MainWindow::saveNotebookToDisk(Notebook *notebook) {
             }
             obj.insert(SECTIONS_ARR_KEY, sections);
             QJsonDocument doc(obj);
-            outputStream << doc.toJson() << Qt::endl;
+
+            #if ((QT_VERSION) >= QT_VERSION_CHECK(5,14,0))
+                outputStream << doc.toJson() << Qt::endl;
+            #else
+                outputStream << doc.toJson() << endl;
+            #endif
         }
         qDebug() << "Notebook saved successfully: " << notebook->path;
     }
