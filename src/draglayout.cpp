@@ -208,64 +208,66 @@ TextBox *DragLayout::newTextBoxAtLocation(QPoint point, int width) {
  */
 void DragLayout::mousePressEvent(QMouseEvent *event)
 {
-    TextBox *child = dynamic_cast<TextBox*>(childAt(event->pos()));
-    // QFrame *childQFrameCheck = dynamic_cast<QFrame*>(childAt(event->pos()));
-    MRichTextEdit *childMRichTextEditCheck = dynamic_cast<MRichTextEdit*>(childAt(event->pos()));
+    if (event->button() == Qt::LeftButton) {
+        TextBox *child = dynamic_cast<TextBox*>(childAt(event->pos()));
+        // QFrame *childQFrameCheck = dynamic_cast<QFrame*>(childAt(event->pos()));
+        MRichTextEdit *childMRichTextEditCheck = dynamic_cast<MRichTextEdit*>(childAt(event->pos()));
 
-    //Ensures that drag operations are not handled unless the user is dragging a TextBox object
-    bool childInnerCheck = child && !(childMRichTextEditCheck);
+        //Ensures that drag operations are not handled unless the user is dragging a TextBox object
+        bool childInnerCheck = child && !(childMRichTextEditCheck);
 
-    if (!child && !childInnerCheck) {
-        TextBox *tBox = new TextBox(this);
-        parentPage->textBoxList.append(tBox);
-        qDebug() << "Appended in mousePressEvent";
-        tBox->richTextEdit->setText("Type here");
-        tBox->move(event->pos());
-        tBox->location = event->pos();
-        tBox->show();
-        tBox->setAttribute(Qt::WA_DeleteOnClose);
-        tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
-        event->accept();
-        tBox->richTextEdit->f_textedit->setFocus();
-        tBox->richTextEdit->f_textedit->setTextCursor(tBox->richTextEdit->f_textedit->document()->find("Type here", 0, QTextDocument::FindCaseSensitively));
-        return;
-    }
-
-    //If the user is dragging a TextBox object by its draggable area and NOT touching an inner layout component
-    if (child && childInnerCheck) {
-        QPoint hotSpot = event->pos() - child->pos();
-
-        QByteArray itemData;
-        QDataStream dataStream(&itemData, QIODevice::WriteOnly);
-        dataStream << child->richTextEdit->toHtml() << hotSpot << child->uuid << child->width();
-
-        QByteArray htmlItemData;
-        QDataStream htmlDataStream(&htmlItemData, QIODevice::WriteOnly);
-        htmlDataStream << child->richTextEdit->toHtml();
-
-        QByteArray plainTextItemData;
-        QDataStream plainTextDataStream(&plainTextItemData, QIODevice::WriteOnly);
-        plainTextDataStream << child->richTextEdit->toPlainText();
-
-        QMimeData *mimeData = new QMimeData;
-        mimeData->setData(spiralContentMimeType(), itemData);
-        mimeData->setData("text/html", htmlItemData);
-        mimeData->setData("text/plain", plainTextItemData);
-
-
-        QDrag *drag = new QDrag(this);
-        drag->setMimeData(mimeData);
-        drag->setHotSpot(hotSpot);
-
-        child->hide();
-
-
-        if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction) {
-            qDebug() << "TextBox removed from list in mousePressEvent";
-            parentPage->textBoxList.removeOne(child);
-            child->close();
+        if (!child && !childInnerCheck) {
+            TextBox *tBox = new TextBox(this);
+            parentPage->textBoxList.append(tBox);
+            qDebug() << "Appended in mousePressEvent";
+            tBox->richTextEdit->setText("Type here");
+            tBox->move(event->pos());
+            tBox->location = event->pos();
+            tBox->show();
+            tBox->setAttribute(Qt::WA_DeleteOnClose);
+            tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
+            event->accept();
+            tBox->richTextEdit->f_textedit->setFocus();
+            tBox->richTextEdit->f_textedit->setTextCursor(tBox->richTextEdit->f_textedit->document()->find("Type here", 0, QTextDocument::FindCaseSensitively));
+            return;
         }
-        else
-            child->show();
+
+        //If the user is dragging a TextBox object by its draggable area and NOT touching an inner layout component
+        if (child && childInnerCheck) {
+            QPoint hotSpot = event->pos() - child->pos();
+
+            QByteArray itemData;
+            QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+            dataStream << child->richTextEdit->toHtml() << hotSpot << child->uuid << child->width();
+
+            QByteArray htmlItemData;
+            QDataStream htmlDataStream(&htmlItemData, QIODevice::WriteOnly);
+            htmlDataStream << child->richTextEdit->toHtml();
+
+            QByteArray plainTextItemData;
+            QDataStream plainTextDataStream(&plainTextItemData, QIODevice::WriteOnly);
+            plainTextDataStream << child->richTextEdit->toPlainText();
+
+            QMimeData *mimeData = new QMimeData;
+            mimeData->setData(spiralContentMimeType(), itemData);
+            mimeData->setData("text/html", htmlItemData);
+            mimeData->setData("text/plain", plainTextItemData);
+
+
+            QDrag *drag = new QDrag(this);
+            drag->setMimeData(mimeData);
+            drag->setHotSpot(hotSpot);
+
+            child->hide();
+
+
+            if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction) {
+                qDebug() << "TextBox removed from list in mousePressEvent";
+                parentPage->textBoxList.removeOne(child);
+                child->close();
+            }
+            else
+                child->show();
+        }
     }
 }
