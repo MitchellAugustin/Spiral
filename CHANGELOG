@@ -1,5 +1,8 @@
 Spiral Changelog:
 
+Changes implemented for next release:
+*  Fixed a bug that caused right-click and middle-click to create new textboxes
+
 Version Release 1.3:
 *  Links in textboxes are now clickable
 *  Added font selector (Thank you, https://gitlab.com/DrewTechs)
