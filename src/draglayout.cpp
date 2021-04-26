@@ -180,11 +180,20 @@ void DragLayout::dropEvent(QDropEvent *event)
  * Note: This is mainly a proof-of-concept to show that this can be done upon file load
  * @param point
  */
-TextBox *DragLayout::newTextBoxAtLocation(QPoint point, int width) {
+TextBox *DragLayout::newTextBoxAtLocation(QString uuid, QPoint point, int width, QString content) {
     TextBox *tBox = new TextBox(this);
     parentPage->textBoxList.append(tBox);
     qDebug() << "Appended in newTextBoxAtLocation";
-    tBox->richTextEdit->setText("Added programatically");
+    if (content != nullptr) {
+        tBox->richTextEdit->setHtml(content);
+    }
+    else {
+        tBox->richTextEdit->setText("Added programatically");
+    }
+
+    if (uuid != nullptr) {
+        tBox->uuid = uuid;
+    }
     tBox->move(point);
     tBox->location = point;
     tBox->show();
@@ -196,9 +205,10 @@ TextBox *DragLayout::newTextBoxAtLocation(QPoint point, int width) {
     }
     //Note: This uses DEFAULT_WIDTH for the movement calculation so the box can be moved, but the page must be resized again
     //on drop so the actual TextBox size can be used in the calculation.
-    if(point.y() + tBox->height() + DEFAULT_TEXTBOX_WIDTH > this->height()) {
-        this->resize(this->width(), this->height() + point.y() + tBox->height() + DEFAULT_TEXTBOX_WIDTH);
+    if(getHeight(tBox) > this->height()) {
+        this->resize(this->width(), this->height() + getHeight(tBox));
     }
+    tBox->resize(tBox->width(), tBox->height());
     return tBox;
 }
 

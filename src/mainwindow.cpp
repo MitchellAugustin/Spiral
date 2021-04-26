@@ -1049,11 +1049,11 @@ void MainWindow::pageSelected(int index) {
                             int boxX = locationString.split(",")[0].toInt();
                             int boxY = locationString.split(",")[1].toInt();
                             int boxWidth = textboxJson.value(BOX_WIDTH_KEY).toInt();
-                            TextBox *thisBox = childDrag->newTextBoxAtLocation(QPoint(boxX, boxY), boxWidth);
-                            thisBox->uuid = textboxJson.value(BOX_UUID_KEY).toString();
-                            thisBox->richTextEdit->setHtml(textboxJson.value(BOX_HTML_KEY).toString());
+                            TextBox *thisBox =
+                                    childDrag->newTextBoxAtLocation(textboxJson.value(BOX_UUID_KEY).toString(), QPoint(boxX, boxY), boxWidth, textboxJson.value(BOX_HTML_KEY).toString());
     //                                ui->toolBar->addWidget(thisBox->richTextEdit->f_toolbar);
                             thisBox->richTextEdit->f_toolbar->setVisible(false);
+                            thisBox->richTextEdit->setHtml(textboxJson.value(BOX_HTML_KEY).toString());
 //                            qDebug() << "Added box with content:\n" << textboxJson.value(BOX_HTML_KEY).toString();
                         }
                     }
@@ -1070,7 +1070,7 @@ void MainWindow::testAddBoxProgrammatically() {
     if (currentlyOpenPage && currentlyOpenPage->editorPane) {
         DragLayout *childDrag = static_cast<DragLayout*> (currentlyOpenPage->dragLayout);
         if (childDrag) {
-            childDrag->newTextBoxAtLocation(QPoint(50, 50), DEFAULT_TEXTBOX_WIDTH);
+            childDrag->newTextBoxAtLocation(nullptr, QPoint(50, 50), DEFAULT_TEXTBOX_WIDTH, nullptr);
         }
     }
 }
