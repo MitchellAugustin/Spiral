@@ -13,7 +13,7 @@
  * @param parent - The parent widget of this TextBox
  * @param uuid - This TextBox's UUID
  */
-TextBox::TextBox(QWidget *parent, QString uuid) : QFrame(parent)
+TextBox::TextBox(QWidget *parent, bool *queryUpdated, QString uuid) : QFrame(parent)
 {
     this->uuid = uuid;
     setFrameShape(QFrame::Panel);
@@ -22,6 +22,7 @@ TextBox::TextBox(QWidget *parent, QString uuid) : QFrame(parent)
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 15, 0, 0);
 
+    TextBox::richTextEdit = new MRichTextEdit(this, queryUpdated);
     TextBox::richTextEdit->setText("Default text");
 
     contractLabel->setText("<=");
@@ -35,4 +36,5 @@ TextBox::TextBox(QWidget *parent, QString uuid) : QFrame(parent)
 //    layout->setAlignment(contractLabel, Qt::AlignRight);
 //    layout->setAlignment(expandLabel, Qt::AlignRight);
     layout->addWidget(TextBox::richTextEdit);
+    this->queryUpdated = queryUpdated;
 }

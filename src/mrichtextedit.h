@@ -33,7 +33,7 @@
 class MRichTextEdit : public QWidget, public Ui::MRichTextEdit {
     Q_OBJECT
   public:
-    MRichTextEdit(QWidget *parent = 0);
+    MRichTextEdit(QWidget *parent = 0, bool *queryUpdated = nullptr);
 
     QString toPlainText() const { return f_textedit->toPlainText(); }
     QString toHtml() const;
@@ -96,6 +96,9 @@ class MRichTextEdit : public QWidget, public Ui::MRichTextEdit {
 
     QPointer<QTextList> m_lastBlockList;
     QColor m_lastHighlightColor;
+
+  private:
+    bool *queryUpdated;
 };
 
 #endif

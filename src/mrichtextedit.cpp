@@ -63,12 +63,14 @@ int MRichTextEdit::getHeight(QString uuid) {
         if(parentTextBox) {
             qDebug() << "The textbox deleted here was: " << uuid;
         }
+        (*queryUpdated) = false;
         return 0;
     }
     return utilities::getMRichTextEditHeight(this);
 }
 
-MRichTextEdit::MRichTextEdit(QWidget *parent) : QWidget(parent) {
+MRichTextEdit::MRichTextEdit(QWidget *parent, bool *queryUpdated) : QWidget(parent) {
+    this->queryUpdated = queryUpdated;
     setupUi(this);
     m_lastBlockList = 0;
     f_textedit->setTabStopDistance(40);

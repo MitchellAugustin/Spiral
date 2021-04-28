@@ -9,6 +9,7 @@
 
 #include <QtWidgets>
 
+
 /**
  * @brief draglayout.cpp - Handles all user actions within a Page's draggable region (where all TextBox objects are placed)
  * @author Mitchell Augustin - https://mitchellaugustin.com
@@ -26,12 +27,13 @@ static inline QString spiralContentMimeType() { return SPIRAL_CONTENT_MIME_TYPE;
  * @param tBox
  * @return
  */
-static int getHeight(TextBox *tBox) {
+int DragLayout::getHeight(TextBox *tBox) {
     if(tBox->richTextEdit->toPlainText().isEmpty()) {
         DragLayout *parentDrag = static_cast<DragLayout*> (tBox->parentWidget());
         parentDrag->parentPage->textBoxList.removeOne(tBox);
         tBox->close();
         qDebug() << "TextBox " << tBox->uuid << " deleted from getHeight in draglayout";
+        (*queryUpdated) = false;
         return 0;
     }
     return utilities::getMRichTextEditHeight(tBox->richTextEdit);
@@ -42,10 +44,11 @@ static int getHeight(TextBox *tBox) {
  * @param parent
  * @param parentPage
  */
-DragLayout::DragLayout(QWidget *parent, Page *parentPage) : QWidget(parent)
+DragLayout::DragLayout(QWidget *parent, Page *parentPage, bool *queryUpdated) : QWidget(parent)
 {
     setAcceptDrops(true);
     this->parentPage = parentPage;
+    this->queryUpdated = queryUpdated;
 }
 
 
@@ -55,6 +58,7 @@ DragLayout::DragLayout(QWidget *parent, Page *parentPage) : QWidget(parent)
  */
 void DragLayout::dragEnterEvent(QDragEnterEvent *event)
 {
+    (*queryUpdated) = false;
     //Handles movement of Spiral text boxes
     if (event->mimeData()->hasFormat(spiralContentMimeType())) {
         if (children().contains(event->source())) {
@@ -122,7 +126,7 @@ void DragLayout::dropEvent(QDropEvent *event)
 
         qDebug() << "Width from data stream: " << width;
 
-        TextBox *tBox = new TextBox(this, uuid);
+        TextBox *tBox = new TextBox(this, queryUpdated, uuid);
         parentPage->textBoxList.append(tBox);
         qDebug() << "Appended in dropEvent1";
         tBox->richTextEdit->setText(text);
@@ -150,7 +154,7 @@ void DragLayout::dropEvent(QDropEvent *event)
         }
         qDebug() << "TextBox " << tBox->uuid << " moved to " << event->pos();
     } else if (event->mimeData()->hasText()) {
-        TextBox *tBox = new TextBox(this);
+        TextBox *tBox = new TextBox(this, queryUpdated);
         parentPage->textBoxList.append(tBox);
         qDebug() << "Appended in dropEvent2";
         tBox->richTextEdit->setText(event->mimeData()->text());
@@ -181,7 +185,7 @@ void DragLayout::dropEvent(QDropEvent *event)
  * @param point
  */
 TextBox *DragLayout::newTextBoxAtLocation(QString uuid, QPoint point, int width, QString content) {
-    TextBox *tBox = new TextBox(this);
+    TextBox *tBox = new TextBox(this, queryUpdated);
     parentPage->textBoxList.append(tBox);
     qDebug() << "Appended in newTextBoxAtLocation";
     if (content != nullptr) {
@@ -227,7 +231,7 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
         bool childInnerCheck = child && !(childMRichTextEditCheck);
 
         if (!child && !childInnerCheck) {
-            TextBox *tBox = new TextBox(this);
+            TextBox *tBox = new TextBox(this, queryUpdated);
             parentPage->textBoxList.append(tBox);
             qDebug() << "Appended in mousePressEvent";
             tBox->richTextEdit->setText("Type here");

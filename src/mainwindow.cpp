@@ -362,10 +362,11 @@ void MainWindow::loadSession() {
  * @brief generateEditorPane - Generates a QWidget that will be used as the editor pane for a Tab
  * @param parent
  * @param tabWidget
+ * @param queryUpdated - Pointer to MainWindow's queryUpdated boolean used to trigger re-search when boxes are altered mid-find.
  * @return
  */
-QWidget *generateEditorPane(QWidget *parent, QTabWidget *tabWidget, Page *parentPage) {
-    DragLayout *customDragLayout = new DragLayout(tabWidget, parentPage);
+QWidget *generateEditorPane(QWidget *parent, QTabWidget *tabWidget, Page *parentPage, bool *queryUpdated) {
+    DragLayout *customDragLayout = new DragLayout(tabWidget, parentPage, queryUpdated);
 
     QScrollArea *scrollArea = new QScrollArea(parent);
     customDragLayout->resize(DEFAULT_TAB_SIZE, DEFAULT_TAB_SIZE);
@@ -699,7 +700,7 @@ void MainWindow::openSection(Section *section) {
         Page *curPage = *p_it;
         //If the page has not yet been generated a DragLayout, generate one
         if(curPage->editorPane == nullptr) {
-            QWidget *editorPane = generateEditorPane(this, tabWidget, curPage);
+            QWidget *editorPane = generateEditorPane(this, tabWidget, curPage, &queryUpdated);
             curPage->editorPane = editorPane;
         }
         //Add the page to the UI with its DragLayout
@@ -715,6 +716,7 @@ void MainWindow::openSection(Section *section) {
     else {
         MainWindow::setWindowTitle(DEFAULT_WINDOW_TITLE);
     }
+    queryUpdated = false;
 }
 
 /**
@@ -750,6 +752,7 @@ void MainWindow::deleteSectionButtonClicked() {
         else {
             QMessageBox::information(this, "Cannot Delete", "You cannot delete the only section of a notebook");
         }
+        queryUpdated = false;
     }
 
 }
@@ -789,6 +792,7 @@ void MainWindow::closeNotebookButtonClicked() {
             delete toClose;
             MainWindow::setWindowTitle("Spiral");
         }
+        queryUpdated = false;
     }
     updateSessionFile();
 }
@@ -846,6 +850,7 @@ void MainWindow::tabCloseRequested(int index) {
         }
         delete currentlyOpenSection->loadPagesList()->at(index)->editorPane;
         currentlyOpenSection->removePage(index);
+        queryUpdated = false;
     }
 }
 
@@ -896,7 +901,7 @@ void MainWindow::newPage(Section *section, QString pageName) {
     curPage->setName(pageName);
     //If the page has not yet been generated a DragLayout, generate one
     if(curPage->editorPane == nullptr) {
-        QWidget *editorPane = generateEditorPane(this, tabWidget, curPage);
+        QWidget *editorPane = generateEditorPane(this, tabWidget, curPage, &queryUpdated);
         curPage->editorPane = editorPane;
     }
     curPage->opened = true;
@@ -1023,7 +1028,7 @@ void MainWindow::pageSelected(int index) {
             if (!currentlyOpenPage->opened) {
                 //If the page has not yet been generated a DragLayout, generate one
                 if(currentlyOpenPage->editorPane == nullptr) {
-                    QWidget *editorPane = generateEditorPane(this, tabWidget, currentlyOpenPage);
+                    QWidget *editorPane = generateEditorPane(this, tabWidget, currentlyOpenPage, &queryUpdated);
                     currentlyOpenPage->editorPane = editorPane;
                 }
 

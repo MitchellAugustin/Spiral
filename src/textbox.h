@@ -31,7 +31,7 @@ class TextBox : public QFrame
 {
     Q_OBJECT
 public:
-    TextBox(QWidget *parent = nullptr, QString uuid = QUuid::createUuid().toString().split("{")[1].split("-")[0]);
+    TextBox(QWidget *parent = nullptr, bool *queryUpdated = nullptr, QString uuid = QUuid::createUuid().toString().split("{")[1].split("-")[0]);
     ~TextBox() {
         if(contractLabel) {
             contractLabel->parentTextBoxDeleted();
@@ -43,7 +43,8 @@ public:
     }
 
     QString uuid;
-    MRichTextEdit* richTextEdit = new MRichTextEdit(this);
+    bool *queryUpdated;
+    MRichTextEdit* richTextEdit;
     QPoint location;
     DragResizeLabel *contractLabel = new DragResizeLabel(this, false);
     DragResizeLabel *expandLabel = new DragResizeLabel(this, true);

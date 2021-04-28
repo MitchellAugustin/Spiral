@@ -20,7 +20,7 @@
 class DragLayout : public QWidget
 {
 public:
-    explicit DragLayout(QWidget *parent = nullptr, Page *parentPage = nullptr);
+    explicit DragLayout(QWidget *parent = nullptr, Page *parentPage = nullptr, bool *queryUpdated = nullptr);
     TextBox *newTextBoxAtLocation(QString uuid, QPoint point, int width, QString content);
     Page *parentPage;
 
@@ -29,5 +29,9 @@ protected:
     void dragMoveEvent(QDragMoveEvent *event) override;
     void dropEvent(QDropEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    int getHeight(TextBox *tBox);
+
+private:
+    bool *queryUpdated;
 };
 #endif // DRAGLAYOUT_H
