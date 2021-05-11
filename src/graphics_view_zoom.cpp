@@ -1,3 +1,5 @@
+//Currently using a modified version of the zoom handler taken from https://stackoverflow.com/questions/19113532/qgraphicsview-zooming-in-and-out-under-mouse-position-using-mouse-wheel?rq=1
+
 #include "graphics_view_zoom.h"
 #include <QMouseEvent>
 #include <QApplication>
