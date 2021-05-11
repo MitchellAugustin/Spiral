@@ -370,8 +370,9 @@ QWidget *generateEditorPane(QWidget *parent, QTabWidget *tabWidget, Page *parent
 
     QScrollArea *scrollArea = new QScrollArea(parent);
     customDragLayout->resize(DEFAULT_TAB_SIZE, DEFAULT_TAB_SIZE);
-    scrollArea->setWidget(customDragLayout);
-
+    Graphics_view_zoom *zoom = new Graphics_view_zoom(customDragLayout);
+    scrollArea->setWidget(zoom);
+    zoom->setVisible(true);
     parentPage->dragLayout = customDragLayout;
     return scrollArea;
 }

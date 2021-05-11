@@ -12,12 +12,13 @@
 #include "textbox.h"
 #include "structure/page.h"
 #include "constants.h"
+#include "scalableqwidget.h"
 
 /**
  * @brief DragLayout - This class handles user operations on DragLayouts, which are present in every page.
  * @author Mitchell Augustin - https://mitchellaugustin.com
  */
-class DragLayout : public QWidget
+class DragLayout : public ScalableQWidget
 {
 public:
     explicit DragLayout(QWidget *parent = nullptr, Page *parentPage = nullptr, bool *queryUpdated = nullptr);

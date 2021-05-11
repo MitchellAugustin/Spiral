@@ -44,7 +44,7 @@ int DragLayout::getHeight(TextBox *tBox) {
  * @param parent
  * @param parentPage
  */
-DragLayout::DragLayout(QWidget *parent, Page *parentPage, bool *queryUpdated) : QWidget(parent)
+DragLayout::DragLayout(QWidget *parent, Page *parentPage, bool *queryUpdated) : ScalableQWidget(parent)
 {
     setAcceptDrops(true);
     this->parentPage = parentPage;

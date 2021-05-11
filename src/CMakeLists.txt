@@ -23,6 +23,8 @@ target_sources(spiral
   textbox.cpp
   mrichtextedit.cpp
   mtextedit.cpp
+  scalableqwidget.cpp
+  graphics_view_zoom.cpp
 )
 
 # Icon QRC files
