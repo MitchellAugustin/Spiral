@@ -211,6 +211,11 @@ void MainWindow::focusChanged(QWidget *oldWidget, QWidget *newWidget) {
     if (newWidget == nullptr) {
         autosave();
     }
+    else {
+        if (ui->openSession->isVisible()) {
+            loadSession();
+        }
+    }
     qDebug() << "Focus changed, old:" << oldWidget;
     qDebug() << "Focus changed, new:" << newWidget;
 
@@ -370,9 +375,7 @@ QWidget *generateEditorPane(QWidget *parent, QTabWidget *tabWidget, Page *parent
 
     QScrollArea *scrollArea = new QScrollArea(parent);
     customDragLayout->resize(DEFAULT_TAB_SIZE, DEFAULT_TAB_SIZE);
-    Graphics_view_zoom *zoom = new Graphics_view_zoom(customDragLayout);
-    scrollArea->setWidget(zoom);
-    zoom->setVisible(true);
+    scrollArea->setWidget(customDragLayout);
     parentPage->dragLayout = customDragLayout;
     return scrollArea;
 }

@@ -20,6 +20,7 @@
 #include "constants.h"
 #include "mrichtextedit.h"
 #include "dragresizelabel.h"
+#include "scalableqwidget.h"
 
 /**
  * @brief TextBox - Container class for textboxes
@@ -27,7 +28,7 @@
  * @param parent - The parent widget of this TextBox
  * @param uuid - This TextBox's UUID
  */
-class TextBox : public QFrame
+class TextBox : public ScalableQWidget
 {
     Q_OBJECT
 public:

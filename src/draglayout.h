@@ -20,10 +20,12 @@
  */
 class DragLayout : public ScalableQWidget
 {
+
 public:
     explicit DragLayout(QWidget *parent = nullptr, Page *parentPage = nullptr, bool *queryUpdated = nullptr);
     TextBox *newTextBoxAtLocation(QString uuid, QPoint point, int width, QString content);
     Page *parentPage;
+    const QObjectList &children() const;
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;

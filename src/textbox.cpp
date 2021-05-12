@@ -13,7 +13,7 @@
  * @param parent - The parent widget of this TextBox
  * @param uuid - This TextBox's UUID
  */
-TextBox::TextBox(QWidget *parent, bool *queryUpdated, QString uuid) : QFrame(parent)
+TextBox::TextBox(QWidget *parent, bool *queryUpdated, QString uuid) : ScalableQWidget(parent)
 {
     this->uuid = uuid;
     setFrameShape(QFrame::Panel);

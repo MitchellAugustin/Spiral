@@ -22,6 +22,10 @@
  */
 static inline QString spiralContentMimeType() { return SPIRAL_CONTENT_MIME_TYPE; }
 
+const QObjectList &DragLayout::children() const {
+    return QWidget::children();
+}
+
 /**
  * @brief getHeight - Returns the height of the parameterized TextBox and closes it if empty
  * @param tBox
