@@ -211,6 +211,11 @@ void MainWindow::focusChanged(QWidget *oldWidget, QWidget *newWidget) {
     if (newWidget == nullptr) {
         autosave();
     }
+    else {
+        if (ui->openSession->isVisible()) {
+            loadSession();
+        }
+    }
     qDebug() << "Focus changed, old:" << oldWidget;
     qDebug() << "Focus changed, new:" << newWidget;
 

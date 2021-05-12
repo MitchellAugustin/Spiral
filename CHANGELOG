@@ -4,6 +4,7 @@ Version Release 1.4 (Work in progress):
 *  Fixed a bug that caused right-click and middle-click to create new textboxes
 *  Fixed a bug that caused viewport size to be smaller than it should be when loading some pages with large textboxes
 *  Fixed a bug that caused repositioning/deleting textboxes or removing pages, sections or notebooks mid-find to cause the program to crash when attempting to access the removed elements
+*  Session now opens on start rather than requiring user to click "Resume Session" button
 
 Version Release 1.3:
 *  Links in textboxes are now clickable
