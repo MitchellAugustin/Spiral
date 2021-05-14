@@ -25,3 +25,6 @@ enable_sanitizers(project_options)
 
 
 add_subdirectory(src)
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  set_property(TARGET spiral PROPERTY WIN32_EXECUTABLE true)
+endif()
