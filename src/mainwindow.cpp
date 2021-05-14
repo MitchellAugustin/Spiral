@@ -711,9 +711,9 @@ void MainWindow::openSection(Section *section) {
         //Add the page to the UI with its DragLayout
         tabWidget->addTab(curPage->editorPane, curPage->getName());
     }
-    currentlyOpenPage = section->loadPagesList()->first();
     //A section *shouldn't* have 0 pages, but since it is technically possible, I'll check for it.
-    if (currentlyOpenPage) {
+    if (!section->loadPagesList()->isEmpty()) {
+        currentlyOpenPage = section->loadPagesList()->first();
         MainWindow::setWindowTitle(currentlyOpenPage->getName() +  (savedFlag ? "" : "*") + " - " + DEFAULT_WINDOW_TITLE);
         //We can safely open page 0 here since it will always be the first page in the section
         pageSelected(currentlyOpenSection->loadPagesList()->indexOf(currentlyOpenPage));

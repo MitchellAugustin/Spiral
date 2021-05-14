@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
-set(SPIRAL_VERSION 1.3)
+set(SPIRAL_VERSION 1.4)
 
 project(spiral VERSION ${SPIRAL_VERSION} LANGUAGES CXX)
 
