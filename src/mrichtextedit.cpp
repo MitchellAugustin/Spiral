@@ -84,6 +84,7 @@ MRichTextEdit::MRichTextEdit(QWidget *parent, bool *queryUpdated) : QWidget(pare
     m_fontsize_h2 = 16;
     m_fontsize_h3 = 14;
     m_fontsize_h4 = 12;
+    m_fontsize_standard = 10;
 
     fontChanged(f_textedit->font());
     bgColorChanged(f_textedit->textColor());
@@ -375,6 +376,7 @@ void MRichTextEdit::textStyle(int index) {
     QTextCharFormat fmt;
     cursor.setCharFormat(fmt);
     f_textedit->setCurrentCharFormat(fmt);
+    QTextCharFormat originalFmt = fmt;
 
     if (index == ParagraphHeading1
             || index == ParagraphHeading2
@@ -403,6 +405,11 @@ void MRichTextEdit::textStyle(int index) {
         fmt.setFontFamily("Monospace");
         fmt.setFontStyleHint(QFont::Monospace);
         fmt.setFontFixedPitch(true);
+    }
+    if (index == ParagraphStandard) {
+        fmt = originalFmt;
+        fmt.setFontPointSize(m_fontsize_standard);
+        fmt.setFontWeight(QFont::Normal);
     }
     cursor.setCharFormat(fmt);
     f_textedit->setCurrentCharFormat(fmt);

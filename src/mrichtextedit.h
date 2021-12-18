@@ -86,6 +86,7 @@ class MRichTextEdit : public QWidget, public Ui::MRichTextEdit {
     int m_fontsize_h2;
     int m_fontsize_h3;
     int m_fontsize_h4;
+    int m_fontsize_standard;
 
     enum ParagraphItems { ParagraphStandard = 0,
                           ParagraphHeading1,
