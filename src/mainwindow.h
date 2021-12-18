@@ -57,7 +57,12 @@ static const QString GRACEFUL_EXIT_KEY = "graceful_exit";
 static const QString AUTOSAVE_KEY = "autosave";
 static const QString OPEN_NOTEBOOKS_KEY = "open_notebooks";
 static const QString BROWSER_WIDTH_KEY = "browser_width";
+static const QString THEME_KEY = "theme";
 
+//Theme JSON keys
+static const QString THEME_SYSTEM = "THEME_SYSTEM";
+static const QString THEME_LIGHT = "THEME_LIGHT";
+static const QString THEME_DARK = "THEME_DARK";
 
 /**
  * @brief MainWindow::MainWindow - Header for MainWindow that contains the bulk of Spiral's functionality.
@@ -118,6 +123,9 @@ protected slots:
     void userManualButtonClicked();
     void contributeButtonClicked();
     void donateButtonClicked();
+    void systemThemeButtonClicked(bool systemThemeEnabled);
+    void darkThemeButtonClicked(bool darkThemeEnabled);
+    void lightThemeButtonClicked(bool lightThemeEnabled);
     void checkUpdatesButtonClicked();
     void exitButtonClicked();
     void setAutosaveEnabled(bool autosaveEnabled);
@@ -132,6 +140,7 @@ protected slots:
     void replaceTextChanged(QString text);
 
 private:
+    void setTheme();
     QVector<Notebook*> *openNotebooks = new QVector<Notebook*>();
     SpiralStringList *notebookBrowserStringListModel = new SpiralStringList();
     SpiralStringList *sectionBrowserStringListModel = new SpiralStringList();
@@ -145,6 +154,7 @@ private:
     bool crashDetected = false;
     bool autosaveEnabled = true;
     bool savedFlag = true;
+    QString theme = THEME_SYSTEM;
     QVector<QFuture<void>> *saveThreads = new QVector<QFuture<void>>();
     QDialog *findDialog = nullptr;
     QLineEdit *findTextLineEdit = nullptr;

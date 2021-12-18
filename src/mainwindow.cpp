@@ -116,6 +116,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionCheck_for_Updates, SIGNAL(triggered()), this, SLOT(checkUpdatesButtonClicked()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(exitButtonClicked()));
     connect(ui->actionAutosave, SIGNAL(toggled(bool)), this, SLOT(setAutosaveEnabled(bool)));
+    connect(ui->actionSystem_Theme, SIGNAL(triggered(bool)), this, SLOT(systemThemeButtonClicked(bool)));
+    connect(ui->actionDark_Theme, SIGNAL(triggered(bool)), this, SLOT(darkThemeButtonClicked(bool)));
+    connect(ui->actionLight_Theme, SIGNAL(triggered(bool)), this, SLOT(lightThemeButtonClicked(bool)));
     connect(ui->actionFind, SIGNAL(triggered()), this, SLOT(findButtonClicked()));
 
     connect(ui->openSession, SIGNAL(clicked()), this, SLOT(loadSession()));
@@ -292,6 +295,7 @@ void MainWindow::updateSessionFile() {
             obj.insert(OPEN_NOTEBOOKS_KEY, openNotebooksArray);
             obj.insert(AUTOSAVE_KEY, autosaveEnabled);
             obj.insert(BROWSER_WIDTH_KEY, browserSplitterHorizontal->sizes().at(0));
+            obj.insert(THEME_KEY, theme);
             qDebug() << "Autosave? " << autosaveEnabled;
             QTextStream outputStream(&file);
             outputStream << QJsonDocument(obj).toJson();
@@ -320,6 +324,21 @@ void MainWindow::loadSession() {
             inputStream.flush();
             QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
             QJsonObject rootObj = doc.object();
+
+            theme = (rootObj.value(THEME_KEY).isString() ? rootObj.value(THEME_KEY).toString() : THEME_SYSTEM);
+            if (theme != THEME_SYSTEM) {
+                setTheme();
+            }
+            if (theme == THEME_SYSTEM) {
+                ui->actionSystem_Theme->setChecked(true);
+            }
+            if (theme == THEME_DARK) {
+                ui->actionDark_Theme->setChecked(true);
+            }
+            if (theme == THEME_LIGHT) {
+                ui->actionLight_Theme->setChecked(true);
+            }
+
             bool gracefulExit = rootObj.value(GRACEFUL_EXIT_KEY).toBool();
             if (!rootObj.value(GRACEFUL_EXIT_KEY).isUndefined() && !gracefulExit) {
                 crashDetected = true;
@@ -361,6 +380,7 @@ void MainWindow::loadSession() {
     browserSplitterVertical->setVisible(true);
 
     sessionActive = true;
+    updateSessionFile();
 }
 
 /**
@@ -1546,6 +1566,131 @@ void MainWindow::contributeButtonClicked() {
  */
 void MainWindow::donateButtonClicked() {
     QDesktopServices::openUrl(QUrl("https://mitchellaugustin.com/spiral/contribute.html#donate"));
+}
+
+/**
+ * @brief MainWindow::setTheme - Applies the currently selected theme
+ */
+void MainWindow::setTheme() {
+    if (theme == THEME_SYSTEM) {
+        QMessageBox::information(this, "Restart to apply changes", "Spiral must be restarted to apply the system theme.");
+        return;
+    }
+    else if (theme == THEME_DARK) {
+        //Credit: https://stackoverflow.com/questions/15035767/is-the-qt-5-dark-fusion-theme-available-for-windows
+        // set style
+        qApp->setStyle(QStyleFactory::create("Fusion"));
+        // increase font size for better reading
+        QFont defaultFont = QApplication::font();
+        defaultFont.setPointSize(defaultFont.pointSize()+2);
+        qApp->setFont(defaultFont);
+        // modify palette to dark
+        QPalette darkPalette;
+        darkPalette.setColor(QPalette::Window,QColor(53,53,53));
+        darkPalette.setColor(QPalette::WindowText,Qt::white);
+        darkPalette.setColor(QPalette::Disabled,QPalette::WindowText,QColor(127,127,127));
+        darkPalette.setColor(QPalette::Base,QColor(42,42,42));
+        darkPalette.setColor(QPalette::AlternateBase,QColor(66,66,66));
+        darkPalette.setColor(QPalette::ToolTipBase,Qt::white);
+        darkPalette.setColor(QPalette::ToolTipText,Qt::white);
+        darkPalette.setColor(QPalette::Text,Qt::white);
+        darkPalette.setColor(QPalette::Disabled,QPalette::Text,QColor(127,127,127));
+        darkPalette.setColor(QPalette::Dark,QColor(35,35,35));
+        darkPalette.setColor(QPalette::Shadow,QColor(20,20,20));
+        darkPalette.setColor(QPalette::Button,QColor(53,53,53));
+        darkPalette.setColor(QPalette::ButtonText,Qt::white);
+        darkPalette.setColor(QPalette::Disabled,QPalette::ButtonText,QColor(127,127,127));
+        darkPalette.setColor(QPalette::BrightText,Qt::red);
+        darkPalette.setColor(QPalette::Link,QColor(42,130,218));
+        darkPalette.setColor(QPalette::Highlight,QColor(42,130,218));
+        darkPalette.setColor(QPalette::Disabled,QPalette::Highlight,QColor(80,80,80));
+        darkPalette.setColor(QPalette::HighlightedText,Qt::white);
+        darkPalette.setColor(QPalette::Disabled,QPalette::HighlightedText,QColor(127,127,127));
+
+        qApp->setPalette(darkPalette);
+    }
+    else if (theme == THEME_LIGHT) {
+        qApp->setStyle(QStyleFactory::create("Fusion"));
+        // increase font size for better reading
+        QFont defaultFont = QApplication::font();
+        defaultFont.setPointSize(defaultFont.pointSize()+2);
+        qApp->setFont(defaultFont);
+        // modify palette to light
+        QPalette lightPalette;
+        lightPalette.setColor(QPalette::Window,QColor(255,255,255));
+        lightPalette.setColor(QPalette::WindowText,Qt::black);
+        lightPalette.setColor(QPalette::Disabled,QPalette::WindowText,QColor(173, 173, 173));
+        lightPalette.setColor(QPalette::Base,QColor(173, 173, 173));
+        lightPalette.setColor(QPalette::AlternateBase,QColor(179, 179, 179));
+        lightPalette.setColor(QPalette::ToolTipBase,Qt::black);
+        lightPalette.setColor(QPalette::ToolTipText,Qt::black);
+        lightPalette.setColor(QPalette::Text,Qt::black);
+        lightPalette.setColor(QPalette::Disabled,QPalette::Text,QColor(127,127,127));
+        lightPalette.setColor(QPalette::Dark,QColor(173, 173, 173));
+        lightPalette.setColor(QPalette::Shadow,QColor(20,20,20));
+        lightPalette.setColor(QPalette::Button,QColor(173, 173, 173));
+        lightPalette.setColor(QPalette::ButtonText,Qt::white);
+        lightPalette.setColor(QPalette::Disabled,QPalette::ButtonText,QColor(127,127,127));
+        lightPalette.setColor(QPalette::BrightText,Qt::red);
+        lightPalette.setColor(QPalette::Link,QColor(42,130,218));
+        lightPalette.setColor(QPalette::Highlight,QColor(42,130,218));
+        lightPalette.setColor(QPalette::Disabled,QPalette::Highlight,QColor(80,80,80));
+        lightPalette.setColor(QPalette::HighlightedText,Qt::white);
+        lightPalette.setColor(QPalette::Disabled,QPalette::HighlightedText,QColor(127,127,127));
+
+        qApp->setPalette(lightPalette);
+    }
+}
+
+/**
+ * @brief MainWindow::systemThemeButtonClicked - Sets system theme
+ */
+void MainWindow::systemThemeButtonClicked(bool systemThemeEnabled) {
+    if (systemThemeEnabled == false) {
+        ui->actionSystem_Theme->setChecked(true);
+        return;
+    }
+    theme = THEME_SYSTEM;
+    ui->actionSystem_Theme->setChecked(true);
+    ui->actionDark_Theme->setChecked(false);
+    ui->actionLight_Theme->setChecked(false);
+    updateSessionFile();
+    savedFlag = true;
+    setTheme();
+}
+
+/**
+ * @brief MainWindow::darkThemeButtonClicked - Sets dark theme
+ */
+void MainWindow::darkThemeButtonClicked(bool darkThemeEnabled) {
+    if (darkThemeEnabled == false) {
+        ui->actionDark_Theme->setChecked(true);
+        return;
+    }
+    theme = THEME_DARK;
+    ui->actionSystem_Theme->setChecked(false);
+    ui->actionDark_Theme->setChecked(true);
+    ui->actionLight_Theme->setChecked(false);
+    updateSessionFile();
+    savedFlag = true;
+    setTheme();
+}
+
+/**
+ * @brief MainWindow::lightThemeButtonClicked - Sets light theme
+ */
+void MainWindow::lightThemeButtonClicked(bool lightThemeButtonClicked) {
+    if (lightThemeButtonClicked == false) {
+        ui->actionLight_Theme->setChecked(true);
+        return;
+    }
+    theme = THEME_LIGHT;
+    ui->actionSystem_Theme->setChecked(false);
+    ui->actionDark_Theme->setChecked(false);
+    ui->actionLight_Theme->setChecked(true);
+    updateSessionFile();
+    savedFlag = true;
+    setTheme();
 }
 
 /**
