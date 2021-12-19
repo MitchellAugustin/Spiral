@@ -1,4 +1,7 @@
 /*
+** Copyright (C) 2021 Mitchell Augustin
+** Contact: https://www.mitchellaugustin.com/
+**
 ** Copyright (C) 2013 Jiří Procházka (Hobrasoft)
 ** Contact: http://www.hobrasoft.cz/
 **
@@ -42,8 +45,17 @@
 #include <QMenu>
 #include <QDialog>
 
-bool QWidget::focusNextPrevChild([[maybe_unused]] bool next) {
-    return false;
+bool MRichTextEdit::focusNextPrevChild([[maybe_unused]] bool next) {
+    //This function handles indentation using TAB and SHIFT+TAB
+    if (next) {
+        increaseIndentation();
+    }
+    else {
+        decreaseIndentation();
+    }
+    //Returning true here prevents the event from being passed to further functions (prevents tab char from being written into
+    //doc alongside indent increase)
+    return true;
 }
 
 int MRichTextEdit::getHeight(QString uuid) {
@@ -186,6 +198,9 @@ MRichTextEdit::MRichTextEdit(QWidget *parent, bool *queryUpdated) : QWidget(pare
 
     // indentation
 
+    //Note: As of Release 1.5, increase/decrease indent is also done with tab/shift+tab.
+    //Since tab does not reach this point of execution, it and shift+tab are handled in focusNextPrevChild().
+    //For backwards compatibility, the old binds are still enabled.
     f_indent_dec->setShortcut(Qt::CTRL + Qt::Key_Comma);
     f_indent_inc->setShortcut(Qt::CTRL + Qt::Key_Period);
 

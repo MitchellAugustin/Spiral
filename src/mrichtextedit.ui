@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>819</width>
+    <width>1049</width>
     <height>312</height>
    </rect>
   </property>
@@ -373,7 +373,7 @@
          <enum>Qt::ClickFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Decrease indentation (CTRL+,)</string>
+         <string>Decrease indentation (SHIFT+TAB or CTRL+,)</string>
         </property>
         <property name="text">
          <string>Decrease indentation</string>
@@ -396,7 +396,7 @@
          <enum>Qt::ClickFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Increase indentation (CTRL+.)</string>
+         <string>Increase indentation (TAB or CTRL+.)</string>
         </property>
         <property name="text">
          <string>Increase indentation</string>
@@ -511,7 +511,8 @@
          <string notr="true">...</string>
         </property>
         <property name="icon">
-         <iconset theme="insert-image"/>
+         <iconset theme="insert-image">
+          <normaloff>.</normaloff>.</iconset>
         </property>
        </widget>
       </item>
