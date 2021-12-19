@@ -3,6 +3,7 @@ Spiral Changelog:
 Version Release 1.5:
 *  Added "Themes" menu to allow users to explicitly use a built-in light or dark theme instead of the default system theme
 *  Fixed a bug that prevented the "standard" text type from being correctly applied in textbox editors
+*  Tab and Shift+Tab can now be used to increase/decrease indent
 
 Version Release 1.4:
 *  Fixed a bug that caused right-click and middle-click to create new textboxes
