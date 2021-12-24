@@ -147,7 +147,18 @@ private:
     QTabWidget *tabWidget;
     QSplitter *browserSplitterVertical;
     QSplitter *browserSplitterHorizontal;
-    QString sessionFilePath = QDir::currentPath() + "/session.json";
+#ifdef Q_OS_LINUX
+    QString dotspiraldir = QDir::homePath() + "/.spiral";
+    QString sessionFilePath = dotspiraldir + "/session.json";
+    QString defaultSessionFilePath = "/usr/share/spiral/session.json";
+    QString defaultDemoSnbPath = "/usr/share/spiral/Demo.snb";
+#endif
+#ifdef Q_OS_WIN
+    QString dotspiraldir = QDir::homePath() + "/.spiral";
+    QString sessionFilePath = dotspiraldir + "/session.json";
+    QString defaultSessionFilePath = QDir::currentPath() + "/session.json";
+    QString defaultDemoSnbPath = QDir::currentPath() + "/Demo.snb";
+#endif
     void updateSessionFile();
     bool sessionActive = false;
     bool gracefulExitFlag = false;

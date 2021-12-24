@@ -312,6 +312,21 @@ void MainWindow::updateSessionFile() {
 void MainWindow::loadSession() {
     ui->openSession->hide();
     int browserWidth = 75;
+    //Create .spiral directory and open Demo.snb
+    if (dotspiraldir != nullptr) {
+        QDir dir(dotspiraldir);
+        if (!dir.exists()) {
+            QDir().mkdir(dotspiraldir);
+            QFile dsf(defaultSessionFilePath);
+            if (dsf.exists()) {
+                QFile::copy(defaultSessionFilePath, sessionFilePath);
+            }
+            QFile dsnb(defaultSessionFilePath);
+            if (dsnb.exists()) {
+                QFile::copy(defaultDemoSnbPath, dotspiraldir + "/Demo.snb");
+            }
+        }
+    }
     if (sessionFilePath != nullptr) {
         QFile file(sessionFilePath);
         if (!file.open(QIODevice::ReadOnly)) {
