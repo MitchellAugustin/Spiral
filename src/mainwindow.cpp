@@ -317,13 +317,13 @@ void MainWindow::loadSession() {
         QDir dir(dotspiraldir);
         if (!dir.exists()) {
             QDir().mkdir(dotspiraldir);
-            QFile dsf(defaultSessionFilePath);
-            if (dsf.exists()) {
-                QFile::copy(defaultSessionFilePath, sessionFilePath);
-            }
             QFile dsnb(defaultSessionFilePath);
             if (dsnb.exists()) {
                 QFile::copy(defaultDemoSnbPath, dotspiraldir + "/Demo.snb");
+            }
+            QFile dsf(defaultSessionFilePath);
+            if (dsf.exists()) {
+                QFile::copy(defaultSessionFilePath, sessionFilePath);
             }
         }
     }
@@ -611,6 +611,9 @@ void MainWindow::openNotebookFromFile(QString filePath) {
     }
     qDebug() << "Opening notebook at location:" << filePath;
     if (filePath != nullptr) {
+        if (QString::compare(filePath, "Demo.snb") == 0) {
+            filePath = dotspiraldir + "/Demo.snb";
+        }
         QFile file(filePath);
         if (!file.open(QIODevice::ReadOnly)) {
             QMessageBox::information(this, "Unable to open notebook:", file.errorString());
