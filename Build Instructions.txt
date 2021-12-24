@@ -24,3 +24,13 @@ Windows:
 File structure of distributable zip should contain:
 These folders: iconengines, imageformats, platforms, styles, translations
 These files: D3Dcompiler_47.dll, Demo.snb, Qt5Core.dll, Qt5Gui.dll, Qt5Svg.dll, Qt5Widgets.dll, Spiral.exe, libEGL.dll, libGLESV2.dll, libgcc_s_seh-1.dll, libstdc++-6.dll, libwinpthread-1.dll, logo.png, opengl32sw.dll, and session.json.
+
+To update package in AUR:
+1. Copy spiral-aur-1.x directory to new directory
+2. Generate binary as usual
+3. Copy new binary to new directory
+4. Compress .tar.gz archive and upload to website
+5. Modify PKGBUILD's pkgver (and source if necessary) to reflect new package location
+6. Test new PKGBUILD on VM
+7. Generate .SRCINFO with makepkg --printsrcinfo > .SRCINFO
+8. Upload new PKGBUILD to AUR by pushing to git repository
