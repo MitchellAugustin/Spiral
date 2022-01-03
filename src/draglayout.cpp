@@ -271,7 +271,7 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
             QDrag *drag = new QDrag(this);
             drag->setMimeData(mimeData);
             drag->setHotSpot(hotSpot);
-            drag->setPixmap(QPixmap::grabWidget(child));
+            drag->setPixmap(child->grab());
 
             child->hide();
 
