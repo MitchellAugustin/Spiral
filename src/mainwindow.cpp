@@ -104,6 +104,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionDelete_Current_Page, SIGNAL(triggered()), this, SLOT(deletePageButtonClicked()));
     connect(ui->actionDelete_Current_Section, SIGNAL(triggered()), this, SLOT(deleteSectionButtonClicked()));
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openNotebookButtonClicked()));
+    connect(ui->actionPrint, SIGNAL(triggered()), this, SLOT(printButtonClicked()));
     connect(ui->actionClose_This_Notebook, SIGNAL(triggered()), this, SLOT(closeNotebookButtonClicked()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveNotebookButtonClicked()));
     connect(ui->actionSave_All, SIGNAL(triggered()), this, SLOT(saveAllButtonClicked()));
@@ -435,6 +436,64 @@ void MainWindow::openNotebookButtonClicked() {
     if (fileURL != nullptr && !fileURL.isEmpty()) {
         openNotebookFromFile(fileURL);
     }
+}
+
+/**
+ * @brief MainWindow::printButtonClicked - Called when the "Print" button is clicked
+ */
+void MainWindow::printButtonClicked() {
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFileName("print.pdf");
+    QPrintPreviewDialog dialog(&printer, this);
+    connect(&dialog, SIGNAL(paintRequested(QPrinter *)), this, SLOT(generatePrintPreview(QPrinter *)));
+    dialog.setWindowTitle(tr("Print Page"));
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+    dialog.setVisible(true);
+}
+
+/**
+ * @brief MainWindow::generatePrintPreview - Renders the current page in the print preview/printer
+ * @param printer
+ */
+void MainWindow::generatePrintPreview(QPrinter *printer) {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    QPainter painter;
+    painter.begin(printer);
+    double spiralPageHeight = 0;
+    for (int i = 0; i < currentlyOpenPage->textBoxList.size(); ++i) {
+        TextBox *box = currentlyOpenPage->textBoxList.at(i);
+        if (box->pos().y() + box->height() > spiralPageHeight) {
+            spiralPageHeight = box->pos().y() + box->height();
+        }
+    }
+
+    double yScale = printer->pageLayout().paintRectPixels(printer->resolution()).height() / double(spiralPageHeight);
+    painter.scale(yScale, yScale);
+
+    qDebug() << "yScale: " << yScale;
+
+    qDebug() << "spiralPageWidth: " << currentlyOpenPage->dragLayout->width() << ", spiralPageHeight: " << currentlyOpenPage->dragLayout->height();
+    qDebug() << "printerPageWidth: " << printer->pageLayout().paintRectPixels(printer->resolution()).width() << ", printerPageHeight: " << printer->pageLayout().paintRectPixels(printer->resolution()).height();
+
+    //Get printer page-sized sectors in Spiral's coordinate space
+    double sectorX =  printer->pageLayout().paintRectPixels(printer->resolution()).width() / yScale;
+
+    //Round up instead of truncate so no page content ends up missing
+    int sectorXCount = int(sectorX / double(currentlyOpenPage->dragLayout->width())) + 2;
+
+    for (int x = 0; x <= sectorXCount; ++x) {
+        qDebug() << "Rendering page " << x;
+        double xOffset = (double(-x) * sectorX);
+        currentlyOpenPage->dragLayout->render(&painter, QPoint(int(xOffset), 0));
+        if (x < sectorXCount) {
+            printer->newPage();
+        }
+    }
+    painter.end();
+
+    QApplication::restoreOverrideCursor();
 }
 
 /**

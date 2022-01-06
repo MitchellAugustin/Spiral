@@ -5,6 +5,7 @@ find_package(
     Core
     Gui
     Widgets
+    PrintSupport
 )
 
 set(CMAKE_AUTOMOC ON)
@@ -43,4 +44,5 @@ target_link_libraries(
     project_warnings
     project_options
     Qt5::Widgets
+    Qt5::PrintSupport
 )
