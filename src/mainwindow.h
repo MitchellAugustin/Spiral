@@ -20,6 +20,14 @@
 #include <QTabWidget>
 #include <QScrollArea>
 #include <QStringListModel>
+#include <QtPrintSupport/qabstractprintdialog.h>
+#include <QtPrintSupport/qpagesetupdialog.h>
+#include <QtPrintSupport/qprintdialog.h>
+#include <QtPrintSupport/qprintengine.h>
+#include <QtPrintSupport/qprintpreviewdialog.h>
+#include <QtPrintSupport/qprintpreviewwidget.h>
+#include <QtPrintSupport/qprinter.h>
+#include <QtPrintSupport/qprinterinfo.h>
 
 #include "draglayout.h"
 #include "textbox.h"
@@ -114,6 +122,8 @@ protected slots:
     void testAddBoxProgrammatically();
     void openNotebookButtonClicked();
     void saveNotebookButtonClicked();
+    void printButtonClicked();
+    void generatePrintPreview(QPrinter *printer);
     void saveAllButtonClicked();
     void loadSession();
     void focusChanged(QWidget *, QWidget *);
