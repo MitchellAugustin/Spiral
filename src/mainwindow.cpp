@@ -461,32 +461,52 @@ void MainWindow::generatePrintPreview(QPrinter *printer) {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QPainter painter;
     painter.begin(printer);
-    double spiralPageHeight = 0;
+    double spiralPageYEnd = 0;
+    double spiralPageXEnd = 0;
     for (int i = 0; i < currentlyOpenPage->textBoxList.size(); ++i) {
         TextBox *box = currentlyOpenPage->textBoxList.at(i);
-        if (box->pos().y() + box->height() > spiralPageHeight) {
-            spiralPageHeight = box->pos().y() + box->height();
+        if (box->pos().y() + box->height() > spiralPageYEnd) {
+            spiralPageYEnd = box->pos().y() + box->height();
+        }
+        if (box->pos().x() + box->width() > spiralPageXEnd) {
+            spiralPageXEnd = box->pos().x() + box->width();
         }
     }
+
+    double spiralPageYStart = spiralPageYEnd;
+    double spiralPageXStart = spiralPageXEnd;
+    for (int i = 0; i < currentlyOpenPage->textBoxList.size(); ++i) {
+        TextBox *box = currentlyOpenPage->textBoxList.at(i);
+        if (box->pos().y() < spiralPageYStart) {
+            spiralPageYStart = box->pos().y();
+        }
+        if (box->pos().x() < spiralPageXStart) {
+            spiralPageXStart = box->pos().x();
+        }
+    }
+
+    double spiralPageHeight = spiralPageYEnd - spiralPageYStart;
+    double spiralPageWidth = spiralPageXEnd - spiralPageXStart;
 
     double yScale = printer->pageLayout().paintRectPixels(printer->resolution()).height() / double(spiralPageHeight);
     painter.scale(yScale, yScale);
 
     qDebug() << "yScale: " << yScale;
 
-    qDebug() << "spiralPageWidth: " << currentlyOpenPage->dragLayout->width() << ", spiralPageHeight: " << currentlyOpenPage->dragLayout->height();
+    qDebug() << "spiralPageWidth: " << spiralPageWidth << ", spiralPageHeight: " << spiralPageHeight;
     qDebug() << "printerPageWidth: " << printer->pageLayout().paintRectPixels(printer->resolution()).width() << ", printerPageHeight: " << printer->pageLayout().paintRectPixels(printer->resolution()).height();
 
     //Get printer page-sized sectors in Spiral's coordinate space
     double sectorX =  printer->pageLayout().paintRectPixels(printer->resolution()).width() / yScale;
 
     //Round up instead of truncate so no page content ends up missing
-    int sectorXCount = int(sectorX / double(currentlyOpenPage->dragLayout->width())) + 2;
+    int sectorXCount = int(sectorX / double(spiralPageWidth)) + 2;
 
     for (int x = 0; x <= sectorXCount; ++x) {
         qDebug() << "Rendering page " << x;
-        double xOffset = (double(-x) * sectorX);
-        currentlyOpenPage->dragLayout->render(&painter, QPoint(int(xOffset), 0));
+        double xOffset = (double(-x) * sectorX) - spiralPageXStart;
+        double yOffset = -spiralPageYStart;
+        currentlyOpenPage->dragLayout->render(&painter, QPoint(int(xOffset), int(yOffset)));
         if (x < sectorXCount) {
             printer->newPage();
         }
