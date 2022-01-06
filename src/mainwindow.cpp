@@ -488,7 +488,7 @@ void MainWindow::generatePrintPreview(QPrinter *printer) {
     double spiralPageHeight = spiralPageYEnd - spiralPageYStart;
     double spiralPageWidth = spiralPageXEnd - spiralPageXStart;
 
-    double yScale = printer->pageLayout().paintRectPixels(printer->resolution()).height() / double(spiralPageHeight);
+    double yScale = printer->pageLayout().paintRectPixels(printer->resolution()).height() / spiralPageHeight;
     painter.scale(yScale, yScale);
 
     qDebug() << "yScale: " << yScale;
@@ -499,8 +499,7 @@ void MainWindow::generatePrintPreview(QPrinter *printer) {
     //Get printer page-sized sectors in Spiral's coordinate space
     double sectorX =  printer->pageLayout().paintRectPixels(printer->resolution()).width() / yScale;
 
-    //Round up instead of truncate so no page content ends up missing
-    int sectorXCount = int(sectorX / double(spiralPageWidth)) + 2;
+    int sectorXCount = int(double(spiralPageWidth) / sectorX);
 
     for (int x = 0; x <= sectorXCount; ++x) {
         qDebug() << "Rendering page " << x;
