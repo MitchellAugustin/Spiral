@@ -442,6 +442,10 @@ void MainWindow::openNotebookButtonClicked() {
  * @brief MainWindow::printButtonClicked - Called when the "Print" button is clicked
  */
 void MainWindow::printButtonClicked() {
+    if (currentlyOpenPage == nullptr) {
+        QMessageBox::information(this, "Error: Cannot print page", "Please open the page you would like to print before attempting to print/export.");
+        return;
+    }
     QPrinter printer(QPrinter::HighResolution);
     printer.setOutputFileName("print.pdf");
     QPrintPreviewDialog dialog(&printer, this);
@@ -458,6 +462,10 @@ void MainWindow::printButtonClicked() {
  * @param printer
  */
 void MainWindow::generatePrintPreview(QPrinter *printer) {
+    if (currentlyOpenPage == nullptr) {
+        QMessageBox::information(this, "Error: Cannot print page", "Please open the page you would like to print before attempting to print/export.");
+        return;
+    }
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QPainter painter;
     painter.begin(printer);
