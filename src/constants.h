@@ -19,7 +19,7 @@
  */
 
 //Global constants
-static const QString SPIRAL_VERSION = "Release 1.6";
+static const QString SPIRAL_VERSION = "Release 1.7-WIP";
 static const QString BUILD_DATE = __DATE__;
 static const QString DEFAULT_WINDOW_TITLE = "Spiral";
 static const QString SPIRAL_CONTENT_MIME_TYPE = "application/x-spiralcontent";
@@ -29,7 +29,7 @@ static const QString FILE_DIALOG_FORMAT_STRING = "Spiral Notebooks (*.snb)";
 //UI Constants
 static const int DEFAULT_TEXTBOX_WIDTH = 800;
 static const int DEFAULT_TAB_SIZE = 2000;
-
+static const QString DEFAULT_TEXT = "Type here";
 
 namespace utilities {
 int getMRichTextEditHeight(MRichTextEdit *richTextEdit);

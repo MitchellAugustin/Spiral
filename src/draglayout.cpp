@@ -234,7 +234,7 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
             TextBox *tBox = new TextBox(this, queryUpdated);
             parentPage->textBoxList.append(tBox);
             qDebug() << "Appended in mousePressEvent";
-            tBox->richTextEdit->setText("Type here");
+            tBox->richTextEdit->setText(DEFAULT_TEXT);
             tBox->move(event->pos());
             tBox->location = event->pos();
             tBox->show();
@@ -242,7 +242,7 @@ void DragLayout::mousePressEvent(QMouseEvent *event)
             tBox->resize(DEFAULT_TEXTBOX_WIDTH, getHeight(tBox));
             event->accept();
             tBox->richTextEdit->f_textedit->setFocus();
-            tBox->richTextEdit->f_textedit->setTextCursor(tBox->richTextEdit->f_textedit->document()->find("Type here", 0, QTextDocument::FindCaseSensitively));
+            tBox->richTextEdit->f_textedit->setTextCursor(tBox->richTextEdit->f_textedit->document()->find(DEFAULT_TEXT, 0, QTextDocument::FindCaseSensitively));
             return;
         }
 

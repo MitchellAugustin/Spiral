@@ -26,6 +26,20 @@ target_sources(spiral
   mtextedit.cpp
 )
 
+target_sources(spiral
+  PRIVATE
+  constants.h
+  draglayout.h
+  dragresizelabel.h
+  mainwindow.h
+  textbox.h
+  mrichtextedit.h
+  mtextedit.h
+  spiralstringlist.h
+  mainwindow.ui
+  mrichtextedit.ui
+)
+
 # Icon QRC files
 target_sources(spiral
         PRIVATE

@@ -45,6 +45,16 @@
 #include <QMenu>
 #include <QDialog>
 
+void MRichTextEdit::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Escape && f_textedit->toPlainText() == DEFAULT_TEXT) {
+        f_textedit->document()->clear();
+    }
+    else {
+        qDebug() << "keyPress forwarded to superclass";
+        QWidget::keyPressEvent(event);
+    }
+}
+
 bool MRichTextEdit::focusNextPrevChild([[maybe_unused]] bool next) {
     //This function handles indentation using TAB and SHIFT+TAB
     if (next) {

@@ -81,6 +81,7 @@ class MRichTextEdit : public QWidget, public Ui::MRichTextEdit {
     void list(bool checked, QTextListFormat::Style style);
     void indent(int delta);
     void focusInEvent(QFocusEvent *event);
+    void keyPressEvent(QKeyEvent *) override;
 
     QStringList m_paragraphItems;
     int m_fontsize_h1;
