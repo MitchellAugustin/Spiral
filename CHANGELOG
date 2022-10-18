@@ -1,5 +1,8 @@
 Spiral Changelog:
 
+Version Release 1.7:
+*  Pressing 'escape' when a new textbox has been created now deletes the box if the placeholder text has not been replaced
+
 Version Release 1.6:
 *  Added printing and PDF export functionality
 *  Added textbox preview during drag operations
