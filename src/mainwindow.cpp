@@ -1813,7 +1813,7 @@ void MainWindow::aboutSpiralButtonClicked() {
     aboutSpiralBox.setIconPixmap(QPixmap(":/icons/spiral/logo.png").scaled(110, 100));
     aboutSpiralBox.setWindowTitle("About Spiral");
     aboutSpiralBox.setText("Spiral - https://mitchellaugustin.com/spiral/\n\nVersion: " + SPIRAL_VERSION + "\n\nBuild Date: " + BUILD_DATE + "\n\nAuthor: Mitchell Augustin\n\n" +
-        "Licensed under the GNU General Public License v3\nhttps://www.gnu.org/licenses/gpl-3.0.en.html\n\nSpiral was built on the QT framework (https://www.qt.io/) and utilizes elements from " +
+        "Licensed under the GNU General Public License v2\nhttps://www.gnu.org/licenses/gpl-2.0.en.html\n\nSpiral was built on the QT framework (https://www.qt.io/) and utilizes elements from " +
                            "Anchakor's MRichTextEdit, which can be found at \nhttps://github.com/Anchakor/MRichTextEditor." +
                            "\n\nThe Spiral logo is based on the following image from WikiMedia Commons, which is labeled for " +
                            "reuse with modification:\nhttps://commons.wikimedia.org/wiki/File:Triple-Spiral-Symbol-filled.svg.\n\n" +

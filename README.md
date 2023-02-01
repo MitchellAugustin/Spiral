@@ -11,8 +11,8 @@ Spiral is a program that allows users to take notes in a format similar to a spi
 *  More to come
 
 # License
-Spiral is licensed under the GNU General Public License v3
-https://www.gnu.org/licenses/gpl-3.0.en.html
+Spiral is licensed under the GNU General Public License v2
+https://www.gnu.org/licenses/gpl-2.0.en.html
 
 # Acknowledgements
 Spiral was built on the QT framework (https://www.qt.io/) and utilizes elements from Anchakor's MRichTextEdit, which can be found at 
